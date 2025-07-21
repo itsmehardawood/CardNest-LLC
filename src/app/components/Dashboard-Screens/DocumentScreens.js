@@ -77,107 +77,86 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
     }
   };
 
-  const renderCredentialsSection = () => {
-    const profile = verificationData?.data?.business_profile;
-    const aesKey = verificationData?.data?.aes_key;
-    const verificationStatus = verificationData?.data?.business_verified;
-    
-    // Only show credentials if business is approved
-    if (verificationStatus !== 'APPROVED' || (!profile && !aesKey)) return null;
+ const renderCredentialsSection = () => {
+  const profile = verificationData?.data?.business_profile;
+  const aesKey = verificationData?.data?.aes_key;
+  const verificationStatus = verificationData?.data?.business_verified;
 
-    return (
-      <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6 mt-6">
-        <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-3 mb-6">
-          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-            <span className="text-purple-600">🔑</span>
+  if (verificationStatus !== 'APPROVED' || (!profile && !aesKey)) return null;
+
+  return (
+    <div className="bg-white/60 backdrop-blur-md border border-gray-200 rounded-2xl shadow-md p-5 sm:p-7 mt-6 transition-all">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+        <div className="w-11 h-11 bg-purple-200 text-purple-700 text-xl rounded-full flex items-center justify-center shadow-inner">
+          🔑
+        </div>
+        <div>
+          <h3 className="text-xl font-semibold text-gray-900">API Credentials</h3>
+          <p className="text-sm text-gray-500 mt-1">
+            Use these credentials to integrate your business with our APIs.
+          </p>
+        </div>
+      </div>
+
+      {/* Credentials */}
+      <div className="space-y-6">
+        {/* Merchant ID */}
+        {userData?.merchant_id && (
+          <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Merchant ID</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="flex-1 px-4 py-2 text-sm font-mono bg-gray-50 border rounded break-all">
+                {userData.merchant_id}
+              </div>
+              <button
+                onClick={() => copyToClipboard(userData.merchant_id, 'merchantId')}
+                className="px-4 py-2 rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium hover:from-blue-700 hover:to-indigo-700 transition-colors"
+              >
+                {copiedField === 'merchantId' ? '✓ Copied' : 'Copy'}
+              </button>
+            </div>
           </div>
+        )}
+
+        {/* AES Encryption Key */}
+        {aesKey && (
+          <div className="rounded-xl border border-gray-100 bg-white p-4 shadow-sm hover:shadow-md transition">
+            <label className="block text-sm font-medium text-gray-700 mb-2">AES Encryption Key</label>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="flex-1 px-4 py-2 text-sm font-mono bg-gray-50 border rounded break-all">
+                {maskEncryptionKey(aesKey)}
+              </div>
+              <button
+                onClick={() => copyToClipboard(aesKey, 'aesKey')}
+                className="px-4 py-2 rounded-md bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-medium hover:from-blue-700 hover:to-indigo-700 transition-colors"
+              >
+                {copiedField === 'aesKey' ? '✓ Copied' : 'Copy'}
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              For security, the key is partially masked. Use the copy button to retrieve the full key.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Security Notice */}
+      <div className="mt-6 rounded-xl border border-yellow-200 bg-yellow-50 p-4 shadow-sm">
+        <div className="flex items-start gap-3">
+          <span className="text-yellow-500 text-lg">⚠️</span>
           <div>
-            <h3 className="text-lg sm:text-xl font-semibold text-gray-900">API Credentials</h3>
-            <p className="text-sm text-gray-600">Your merchant credentials for API integration</p>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          {/* Merchant ID */}
-          {userData?.id && (
-            <div className="p-3 sm:p-4 bg-gray-50 rounded-lg border">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Merchant ID
-              </label>
-              <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-                <code className="text-xs sm:text-sm font-mono bg-white px-3 py-2 rounded border flex-1 break-all">
-                  {userData.id}
-                </code>
-                <button
-                  onClick={() => copyToClipboard(userData.id, 'merchantId')}
-                  className="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors flex items-center justify-center space-x-1 min-w-max"
-                >
-                  {copiedField === 'merchantId' ? (
-                    <>
-                      <span className="text-xs">✓</span>
-                      <span>Copied</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-xs">📋</span>
-                      <span>Copy</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Encryption Key */}
-          {aesKey && (
-            <div className="p-3 sm:p-4 bg-gray-50 rounded-lg border">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                AES Encryption Key
-              </label>
-              <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-                <code className="text-xs sm:text-sm font-mono bg-white px-3 py-2 rounded border flex-1 break-all">
-                  {maskEncryptionKey(aesKey)}
-                </code>
-                <button
-                  onClick={() => copyToClipboard(aesKey, 'aesKey')}
-                  className="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors flex items-center justify-center space-x-1 min-w-max"
-                >
-                  {copiedField === 'aesKey' ? (
-                    <>
-                      <span className="text-xs">✓</span>
-                      <span>Copied</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-xs">📋</span>
-                      <span>Copy</span>
-                    </>
-                  )}
-                </button>
-              </div>
-              <p className="text-xs text-gray-500 mt-2">
-                Key is masked for security. Click copy to get the full key.
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Security Notice */}
-        <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <div className="flex flex-col sm:flex-row sm:items-start space-y-2 sm:space-y-0 sm:space-x-2">
-            <span className="text-yellow-600 text-sm">⚠️</span>
-            <div>
-              <p className="text-yellow-800 text-sm font-medium">Security Notice</p>
-              <p className="text-yellow-700 text-xs mt-1">
-                Keep your credentials secure. Never share them publicly or store them in client-side code. 
-                Use environment variables in your server-side applications.
-              </p>
-            </div>
+            <p className="text-sm font-semibold text-yellow-800">Security Reminder</p>
+            <p className="text-xs text-yellow-700 mt-1">
+              Do not share your credentials publicly. Use environment variables to keep your secrets safe in server-side applications.
+            </p>
           </div>
         </div>
       </div>
-    );
-  };
+    </div>
+  );
+};
+
 
   const handleUploadNew = () => {
     // Navigate to business profile component and focus on file upload
