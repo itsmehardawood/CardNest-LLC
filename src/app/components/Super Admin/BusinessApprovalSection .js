@@ -479,14 +479,14 @@ const BusinessApprovalSectionUpdated = () => {
                           <FileDigit className="w-3 h-3 mr-1" />
                           Reg. Number
                         </p>
-                        <p className="text-xs font-medium truncate">{business.business_registration_number}</p>
+                        <p className="text-xs font-medium truncate text-black">{business.business_registration_number}</p>
                       </div>
                       <div className="bg-gray-50 p-2 rounded-lg transition-all duration-200 hover:bg-gray-100">
                         <p className="text-xs text-gray-500 flex items-center">
                           <Calendar className="w-3 h-3 mr-1" />
                           {isApproved ? 'Approved' : 'Requested'}
                         </p>
-                        <p className="text-xs font-medium truncate">
+                        <p className="text-xs font-medium truncate text-black">
                           {formatDate(isApproved ? business.updated_at : business.created_at)}
                         </p>
                       </div>
