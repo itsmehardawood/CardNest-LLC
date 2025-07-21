@@ -94,11 +94,6 @@ function DevelopersScreen() {
     alert('Webhook configured successfully!');
   };
 
-  const handleDownloadSDK = (language) => {
-    // Download SDK logic here
-    console.log('Downloading SDK for:', language);
-    alert(`${language} SDK download started!`);
-  };
 
   return (
     <div className="bg-white rounded-lg shadow-sm border p-4 md:p-6 min-h-screen">
@@ -108,81 +103,9 @@ function DevelopersScreen() {
         {/* API Management Section */}
         <div className="bg-gray-50 rounded-lg p-4 md:p-6">
           <h3 className="text-lg md:text-xl font-medium text-gray-800 mb-4">API Management</h3>
-          
-          <div className="space-y-4">
-            {/* API Key Generation */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                API Key
-              </label>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="text"
-                  value={apiKey}
-                  readOnly
-                  placeholder="Click 'Generate' to create an API key"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm"
-                />
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleGenerateApiKey}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm"
-                  >
-                    Generate
-                  </button>
-                  {apiKey && (
-                    <button
-                      onClick={handleCopyApiKey}
-                      className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors text-sm"
-                    >
-                      Copy
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Webhook Configuration */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Webhook URL
-              </label>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <input
-                  type="url"
-                  value={webhookUrl}
-                  onChange={(e) => setWebhookUrl(e.target.value)}
-                  placeholder="https://your-domain.com/webhook"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                />
-                <button
-                  onClick={handleConfigureWebhooks}
-                  className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm"
-                >
-                  Configure
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* SDK Downloads */}
-        <div className="bg-gray-50 rounded-lg p-4 md:p-6">
-          <h3 className="text-lg md:text-xl font-medium text-gray-800 mb-4">SDK Downloads</h3>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {['JavaScript', 'Python', 'PHP', 'Node.js'].map((language) => (
-              <button
-                key={language}
-                onClick={() => handleDownloadSDK(language)}
-                className="bg-white border border-gray-300 rounded-lg p-4 hover:shadow-md transition-shadow text-center"
-              >
-                <div className="text-lg font-medium text-gray-800 mb-2">{language}</div>
-                <div className="text-sm text-gray-600">Download SDK</div>
-              </button>
-            ))}
-          </div>
-        </div>
+    
 
         {/* Documentation Section */}
         <div className="bg-gray-50 rounded-lg p-4 md:p-6">
