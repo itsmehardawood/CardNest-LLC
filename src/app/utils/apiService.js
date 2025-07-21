@@ -77,8 +77,8 @@ export const sendFrameToAPI = async (frame, phase, sessionId, frameNumber) => {
       console.log(`Sending frame ${frameNumber} for ${phase} phase to API (attempt ${attempt})...`);
       console.log(`Using scan ID from URL: ${scanId}`);
       
-      // const apiUrl = `https://cardapp.hopto.org/detect/card/${scanId}`;
-      const apiUrl = `https://de90b759b94b.ngrok-free.app/detect/card/${scanId}`;
+      const apiUrl = `https://cardapp.hopto.org/detect/card/${scanId}`;
+      // const apiUrl = `https://de90b759b94b.ngrok-free.app/detect/card/${scanId}`;
 
 
 
