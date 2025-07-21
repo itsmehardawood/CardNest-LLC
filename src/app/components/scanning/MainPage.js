@@ -244,6 +244,7 @@ export default function MainPage() {
     
     console.log('🔍 Starting card validation...');
     setCurrentPhase('validation');
+      setDetectionActive(true); // ADD ONLY THIS LINE!
     setErrorMessage('');
     stopRequestedRef.current = false;
     setValidationState({
@@ -323,6 +324,8 @@ export default function MainPage() {
           }
           
           setIsProcessing(false);
+            setDetectionActive(false); // MAKE SURE THIS LINE EXISTS
+
           
           console.log('✅ Validation passed! Resetting attempt count.');
           // FIXED: Reset attempts only on successful validation
@@ -360,6 +363,9 @@ export default function MainPage() {
             clearInterval(validationIntervalRef.current);
           }
           
+            setDetectionActive(false); // MAKE SURE THIS LINE EXISTS
+
+
           console.log('✅ Legacy validation complete! Resetting attempt count.');
           // FIXED: Reset attempts only on successful validation
           setAttemptCount(0);

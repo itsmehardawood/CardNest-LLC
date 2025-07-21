@@ -1,121 +1,138 @@
-'use client'
+'use client';
+
 import React, { useEffect, useState } from 'react';
+import {
+  Home,
+  User,
+  FileText,
+  BadgeDollarSign,
+  ClipboardList,
+  Zap,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 
-function Sidebar({ 
-  sidebarOpen, 
-  setSidebarOpen, 
-  activeTab, 
-  setActiveTab, 
-  status 
-}) {
+const Sidebar = ({ sidebarOpen, setSidebarOpen, activeTab, setActiveTab, status }) => {
+  const [email, setEmail] = useState('');
 
- const [email, setEmail] = useState('');
-
- useEffect(() => {
-  const storedData = localStorage.getItem('userData');
-  if (storedData) {
-    try {
-      const parsed = JSON.parse(storedData);
-      const userEmail = parsed?.user?.email || parsed?.email;
-      if (userEmail) {
-        console.log('Loaded email:', userEmail);
-        setEmail(userEmail);
-      } else {
-        console.log('Email not found in stored user data');
+  useEffect(() => {
+    const storedData = localStorage.getItem('userData');
+    if (storedData) {
+      try {
+        const parsed = JSON.parse(storedData);
+        const userEmail = parsed?.user?.email || parsed?.email;
+        if (userEmail) setEmail(userEmail);
+      } catch (err) {
+        console.error('Error parsing user data from localStorage:', err);
       }
-    } catch (err) {
-      console.error('Error parsing user data from localStorage:', err);
     }
-  } else {
-    console.log('No userData found in localStorage');
-  }
-}, []);
+  }, []);
 
   const sidebarItems = [
-    { id: 'home', label: 'Home', icon: '🏠' },
-    { id: 'profile', label: 'Business Profile', icon: '👤' },
-    { id: 'subscriptions', label: 'Subscriptions', icon: '📋' },
-   { id: 'Card', label: 'Feature Settings', icon: ' 💳 ' },
-    { id: 'documents', label: 'Documents', icon: '📄' },
-    { id: 'developers', label: 'Developers', icon: '⚡' }
-
+    { id: 'home', label: 'Home', icon: <Home className="w-5 h-5" /> },
+    { id: 'profile', label: 'Business Profile', icon: <User className="w-5 h-5" /> },
+    { id: 'subscriptions', label: 'Subscriptions', icon: <ClipboardList className="w-5 h-5" /> },
+    { id: 'Card', label: 'Feature Settings', icon: <BadgeDollarSign className="w-5 h-5" /> },
+    { id: 'documents', label: 'Documents', icon: <FileText className="w-5 h-5" /> },
+    { id: 'developers', label: 'Developers', icon: <Zap className="w-5 h-5" /> },
   ];
 
+  const statusColor = {
+    active: 'bg-green-100 text-green-800',
+    pending: 'bg-yellow-100 text-yellow-800',
+    approved: 'bg-blue-100 text-blue-800',
+    'incomplete-profile': 'bg-orange-100 text-orange-800',
+    incomplete: 'bg-red-100 text-red-800',
+  };
+
   return (
-    <div className={`${sidebarOpen ? 'w-64' : 'w-16'} bg-white shadow-lg border-r border-gray-200 transition-all duration-300 ease-in-out flex flex-col h-screen`}>
-      {/* Header - Fixed at top */}
-      <div className="flex-shrink-0 p-4 border-b border-gray-100">
-        <div className="flex items-center justify-between">
-          {sidebarOpen && (
-            <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
+    <div
+      className={`${
+        sidebarOpen ? 'w-64' : 'w-16'
+      } bg-white shadow-lg border-r border-gray-200 transition-all duration-300 ease-in-out flex flex-col h-screen z-40`}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-gray-100">
+        {sidebarOpen && <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 rounded hover:bg-gray-100 transition-colors"
+        >
+          {sidebarOpen ? (
+            <ChevronLeft className="w-5 h-5 text-gray-600" />
+          ) : (
+            <ChevronRight className="w-5 h-5 text-gray-600" />
           )}
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            {sidebarOpen ? '←' : '→'}
-          </button>
-        </div>
+        </button>
       </div>
 
-      {/* Navigation - Scrollable middle section */}
-      <div className="flex-1 overflow-y-auto">
-        <nav className="py-4">
-          <div className={`${sidebarOpen ? 'px-4' : 'px-2'} space-y-2`}>
-            {sidebarItems.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center ${
-                  sidebarOpen ? 'px-4 py-3' : 'px-2 py-3 justify-center'
-                } text-left rounded-lg transition-colors ${
-                  activeTab === item.id
-                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-                title={!sidebarOpen ? item.label : undefined}
-              >
-                <span className="text-lg">{item.icon}</span>
-                {sidebarOpen && (
-                  <span className="ml-3 font-medium">{item.label}</span>
-                )}
-              </button>
-            ))}
-          </div>
-
+      {/* Navigation */}
+      <div className="flex-1 overflow-y-auto py-4">
+        <nav className={`${sidebarOpen ? 'px-4' : 'px-2'} space-y-1`}>
+          {sidebarItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`group relative w-full flex items-center ${
+                sidebarOpen ? 'px-4 py-3' : 'px-2 py-3 justify-center'
+              } text-left rounded-lg transition-colors ${
+                activeTab === item.id
+                  ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              {item.icon}
+              {sidebarOpen && <span className="ml-3 font-medium">{item.label}</span>}
+              {!sidebarOpen && (
+                <span className="absolute left-14 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition duration-200 whitespace-nowrap z-50">
+                  {item.label}
+                </span>
+              )}
+            </button>
+          ))}
         </nav>
       </div>
 
-      {/* Status indicator - Fixed at bottom */}
-      {sidebarOpen && (
-        <div className="flex-shrink-0 p-4 border-t border-gray-100">
-          <div className={`px-3 py-2 rounded-full text-sm font-medium text-center ${
-            status === 'active' ? 'bg-green-100 text-green-800' :
-            status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-            status === 'approved' ? 'bg-blue-100 text-blue-800' :
-            status === 'incomplete-profile' ? 'bg-orange-100 text-orange-800' :
-            status === 'incomplete' ? 'bg-red-100 text-red-800' :
-            'bg-gray-100 text-gray-800'
-          }`}>
-            Status: {status === 'incomplete-profile' ? 'Incomplete Profile' : status.charAt(0).toUpperCase() + status.slice(1)}
-          </div>
-
-          {/* User info at bottom */}
-          <div className="mt-3 px-3 py-2 bg-gray-50 rounded-lg">
-            <div className="flex items-center space-x-2">
-              <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-medium">U</span>
+      {/* Status & User Info */}
+      <div className="flex-shrink-0 p-4 border-t border-gray-100 space-y-3">
+        {sidebarOpen && (
+          <>
+            <div
+              className={`text-sm font-medium text-center rounded-full px-3 py-2 ${
+                statusColor[status] || 'bg-gray-100 text-gray-800'
+              }`}
+            >
+              Status:{' '}
+              {status === 'incomplete-profile'
+                ? 'Incomplete Profile'
+                : status?.charAt(0).toUpperCase() + status?.slice(1)}
+            </div>
+            <div className="flex items-center space-x-2 bg-gray-50 px-3 py-2 rounded-lg">
+              <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                U
               </div>
-              <div className="flex-1 min-w-0">
+              <div className="min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">User Account</p>
                 <p className="text-xs text-gray-500 truncate">{email || 'Loading...'}</p>
               </div>
             </div>
+          </>
+        )}
+
+        {!sidebarOpen && (
+          <div className="flex justify-center relative group">
+            <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
+              U
+            </div>
+            <div className="absolute left-10 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-xs px-3 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
+              {email || 'Loading...'}
+              <div className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-1 w-2 h-2 bg-gray-800 rotate-45"></div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
-}
+};
 
 export default Sidebar;

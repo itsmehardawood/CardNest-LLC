@@ -1,4 +1,3 @@
-
 import React from "react";
 
 const CameraView = ({
@@ -40,9 +39,45 @@ const CameraView = ({
     }
   };
 
+  // Check if we should show the scanning animation
+  const showScanningAnimation = detectionActive && (
+    currentPhase === 'validation' || 
+    currentPhase === 'front' || 
+    currentPhase === 'back'
+  );
+
+  // Don't render camera view if we're in results phase
+  if (currentPhase === 'results') {
+    return (
+      <div className="bg-white rounded-lg shadow-lg p-4 mb-6">
+        <div className="text-center py-8">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4">
+            <svg 
+              className="w-12 h-12 text-green-600" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M5 13l4 4L19 7" 
+              />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-green-600 mb-2">Scan Complete!</h2>
+          <p className="text-lg font-medium text-gray-800">
+            {getPhaseInstructions()}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 mb-6">
-      <div className="relative">
+      <div className="relative overflow-hidden">
         {/* Camera Video */}
         <video
           ref={videoRef}
@@ -70,9 +105,50 @@ const CameraView = ({
           </div>
         </div>
 
+        {/* Scanning Animation - Green Lines */}
+        {showScanningAnimation && (
+          <>
+            {/* Animated scanning lines */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-15">
+              <div className="relative w-3/4 h-3/4">
+                {/* Main scanning line */}
+                <div className="absolute left-0 right-0 h-0.5 bg-green-400 shadow-lg animate-scan-vertical opacity-90"></div>
+                
+                {/* Secondary scanning line with delay */}
+                <div className="absolute left-0 right-0 h-0.5 bg-green-300 shadow-md animate-scan-vertical-delayed opacity-70"></div>
+                
+                {/* Subtle glow effect */}
+                <div className="absolute left-0 right-0 h-1 bg-green-400 blur-sm animate-scan-vertical opacity-50"></div>
+              </div>
+            </div>
+
+            {/* Scanning grid overlay for extra effect */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-12">
+              <div className="relative w-3/4 h-3/4">
+                {/* Horizontal grid lines */}
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div
+                    key={`h-${i}`}
+                    className="absolute left-0 right-0 h-px bg-green-200 opacity-20"
+                    style={{ top: `${(i + 1) * 12.5}%` }}
+                  />
+                ))}
+                {/* Vertical grid lines */}
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div
+                    key={`v-${i}`}
+                    className="absolute top-0 bottom-0 w-px bg-green-200 opacity-20"
+                    style={{ left: `${(i + 1) * 16.66}%` }}
+                  />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
         {/* Countdown Overlay */}
         {countdown > 0 && (
-          <div className="absolute inset-0 bg-opacity-50 flex items-center justify-center rounded-lg z-20">
+          <div className="absolute inset-0 bg-black/10 bg-opacity-50 flex items-center justify-center rounded-lg z-20">
             <div className="text-6xl font-bold text-white animate-pulse">
               {countdown}
             </div>
@@ -88,28 +164,27 @@ const CameraView = ({
             </div>
           </div>
         )}
+
+        {/* Scanning Status Indicator */}
+     
       </div>
 
-      
-{currentPhase === "validation" && validationState?.movementMessage && (
-  <div className="mt-4 text-center">
-    <div
-      className={`text-white text-sm px-6 py-3 rounded-md border-2 border-red-600 shadow-md inline-block
-       ${
-        validationState.movementMessage === "Physical Card Validated!"
-          ? "bg-green-500"
-          : validationState.movementMessage === "Validation Failed"
-          ? "bg-red-500"
-          : "bg-gray-700"
-      }`}
-    >
-      {validationState.movementMessage}
-    </div>
-  </div>
-)}
-
-
-      
+      {currentPhase === "validation" && validationState?.movementMessage && (
+        <div className="mt-4 text-center">
+          <div
+            className={`text-white text-sm px-6 py-3 rounded-md border-2 border-red-600 shadow-md inline-block
+             ${
+              validationState.movementMessage === "Physical Card Validated!"
+                ? "bg-green-500"
+                : validationState.movementMessage === "Validation Failed"
+                ? "bg-red-500"
+                : "bg-gray-700"
+            }`}
+          >
+            {validationState.movementMessage}
+          </div>
+        </div>
+      )}
 
       {/* Phase Instructions */}
       <div className="mt-4 text-center">
@@ -117,6 +192,61 @@ const CameraView = ({
           {getPhaseInstructions()}
         </p>
       </div>
+
+      {/* Custom CSS for scanning animations */}
+      <style jsx>{`
+        @keyframes scan-vertical {
+          0% {
+            top: 0%;
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            top: 100%;
+            opacity: 0;
+          }
+        }
+
+        @keyframes scan-vertical-delayed {
+          0% {
+            top: 0%;
+            opacity: 0;
+          }
+          20% {
+            opacity: 0;
+          }
+          30% {
+            opacity: 0.7;
+          }
+          70% {
+            opacity: 0.7;
+          }
+          80% {
+            opacity: 0;
+          }
+          100% {
+            top: 100%;
+            opacity: 0;
+          }
+        }
+
+        .animate-scan-vertical {
+          animation: scan-vertical 3s ease-in-out infinite;
+        }
+
+        .animate-scan-vertical-delayed {
+          animation: scan-vertical-delayed 3s ease-in-out infinite;
+          animation-delay: 0.5s;
+        }
+      `}</style>
     </div>
   );
 };
