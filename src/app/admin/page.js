@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import LoadingComponent from '../components/Super Admin/Loading';
-import BusinessApprovalSection from '../components/Super Admin/BusinessApprovalSection';
+import BusinessApprovalSection from '../components/Super Admin/BusinessApproved';
 import PricingSectionAdmin from '../components/Super Admin/PricingSection';
 import UserActivitySection from '../components/Super Admin/UserActivityScreen';
 import ContentManagementSection from '../components/Super Admin/ContentManagement';
