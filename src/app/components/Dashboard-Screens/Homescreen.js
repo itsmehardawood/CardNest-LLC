@@ -156,6 +156,15 @@ function HomeScreen({ status, setActiveTab }) {
             <h3 className="font-semibold text-green-900">Quick Actions</h3>
           </div>
           <div className="space-y-2">
+
+          {status === 'approved'&&(
+            <button 
+              onClick={() => setActiveTab('profile')}
+              className="block text-green-700 hover:text-green-900 text-sm"
+            >
+              View Profile →
+            </button>
+          )}
             <button 
               onClick={() => setActiveTab('profile')}
               className="block text-green-700 hover:text-green-900 text-sm"
@@ -168,6 +177,17 @@ function HomeScreen({ status, setActiveTab }) {
             >
               Upload Documents →
             </button>
+            {/* if approved */}
+            {status === 'approved'&& (
+  <button 
+              onClick={() => setActiveTab('documents')}
+              className="block text-green-700 hover:text-green-900 text-sm"
+            >
+              Uploaded Documents →
+            </button>
+            )}
+         
+
             <button 
               onClick={() => setActiveTab('developers')}
               className="block text-green-700 hover:text-green-900 text-sm"
@@ -185,13 +205,7 @@ function HomeScreen({ status, setActiveTab }) {
           </div>
           <p className="text-purple-700 text-sm mb-3">Our support team is here to assist you</p>
           <div className="space-y-2">
-            <button 
-              onClick={() => setActiveTab('support')}
-              className="block text-purple-700 hover:text-purple-900 text-sm"
-            >
-              Contact Support →
-            </button>
-            <a 
+              <a 
               href="mailto:support@cardnest.io"
               className="block text-purple-700 hover:text-purple-900 text-sm"
             >
