@@ -631,9 +631,6 @@ const BusinessApprovalSectionUpdated = () => {
             <div className="flex items-center justify-center">
               <Clock className="w-4 h-4 mr-1.5 transition-transform duration-200 hover:scale-110" />
               <span>Pending</span>
-              <span className="ml-2 px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-                {businesses.length}
-              </span>
             </div>
           </button>
           <button
@@ -647,10 +644,7 @@ const BusinessApprovalSectionUpdated = () => {
             <div className="flex items-center justify-center">
               <CheckCircle className="w-4 h-4 mr-1.5 transition-transform duration-200 hover:scale-110" />
               <span>Approved</span>
-              <span className="ml-2 px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">
-                {approvedBusinesses.length}
-              </span>
-            </div>
+                     </div>
           </button>
         </div>
 
