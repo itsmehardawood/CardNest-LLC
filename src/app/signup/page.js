@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
 import countryCodes from "../lib/Counttycodes";
 import { auth } from "../lib/firebase";
+import Select from "react-select";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 export default function SignUpPage() {
@@ -19,9 +20,6 @@ export default function SignUpPage() {
   const [Success, setSuccess] = useState("");
   const [otpError, setOtpError] = useState("");
   const [confirmationResult, setConfirmationResult] = useState(null);
-  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
-  const [countrySearchTerm, setCountrySearchTerm] = useState("");
-  const countryDropdownRef = useRef(null);
   const [formData, setFormData] = useState({
     email: "",
     phone: "",
@@ -29,46 +27,65 @@ export default function SignUpPage() {
     country_name: "United States",
   });
 
-  // Initialize Firebase reCAPTCHA
-  useEffect(() => {
-    if (typeof window !== "undefined" && !window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(
-        auth,
-        "recaptcha-container",
-        {
-          size: "invisible",
-          callback: (response) => {
-            console.log("reCAPTCHA solved");
-          },
-          "expired-callback": () => {
-            console.log("reCAPTCHA expired");
-          },
-        }
-      );
+  const options = countryCodes.map((country) => ({
+  value: `${country.code}-${country.name}`,
+  label: `${country.flag} ${country.name} (${country.code})`,
+}));
 
-      window.recaptchaVerifier.render().then((widgetId) => {
-        window.recaptchaWidgetId = widgetId;
-      });
+
+
+  // Initialize Firebase reCAPTCHA
+useEffect(() => {
+  if (typeof window === "undefined") return;
+
+  // Clear previous verifier if it exists
+  if (window.recaptchaVerifier) {
+    try {
+      window.recaptchaVerifier.clear();
+    } catch (e) {
+      console.warn("Failed to clear existing reCAPTCHA", e);
     }
-  }, []);
+    window.recaptchaVerifier = null;
+  }
+
+  try {
+    window.recaptchaVerifier = new RecaptchaVerifier(
+      auth,
+      "recaptcha-container",
+      {
+        size: "invisible",
+        callback: (response) => {
+          console.log("reCAPTCHA solved");
+        },
+        "expired-callback": () => {
+          console.log("reCAPTCHA expired");
+        },
+      }
+    );
+
+    window.recaptchaVerifier.render().then((widgetId) => {
+      window.recaptchaWidgetId = widgetId;
+    });
+  } catch (error) {
+    console.error("reCAPTCHA setup failed:", error);
+  }
+
+  // Clean up on unmount
+  return () => {
+    if (window.recaptchaVerifier) {
+      try {
+        window.recaptchaVerifier.clear();
+      } catch (e) {
+        console.warn("Failed to clear reCAPTCHA on unmount", e);
+      }
+      window.recaptchaVerifier = null;
+    }
+  };
+}, []);
+
 
   // Close country dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        countryDropdownRef.current &&
-        !countryDropdownRef.current.contains(event.target)
-      ) {
-        setShowCountryDropdown(false);
-        setCountrySearchTerm("");
-      }
-    };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -81,26 +98,16 @@ export default function SignUpPage() {
   };
 
   // Fixed country selector handler
-  const handleCountrySelect = (selectedCountry) => {
-    setFormData((prev) => ({
-      ...prev,
-      countryCode: selectedCountry.code,
-      country_name: selectedCountry.name,
-    }));
-    setShowCountryDropdown(false);
-    setCountrySearchTerm("");
-    // Clear error when user makes selection
-    if (error) setError("");
-  };
+ const handleChange = (selectedOption) => {
+  const [code, name] = selectedOption.value.split("-");
+  setFormData((prev) => ({
+    ...prev,
+    countryCode: code,
+    country_name: name,
+  }));
+};
 
-  // Filter countries based on search term
-  const filteredCountries = countryCodes.filter((country) => {
-    const searchLower = countrySearchTerm.toLowerCase();
-    return (
-      country.name.toLowerCase().includes(searchLower) ||
-      country.code.toLowerCase().includes(searchLower)
-    );
-  });
+
 
   // Fixed function to get selected country info
   const getSelectedCountryInfo = () => {
@@ -446,116 +453,30 @@ export default function SignUpPage() {
 
                     {/* Country Selector */}
 
-                    <div className="relative" ref={countryDropdownRef}>
-                      <label
-                        htmlFor="countrySelector"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
-                        Select your country
-                      </label>
-                      <div className="mt-1 relative">
-                        <input
-                          type="text"
-                          placeholder="Type or select your country..."
-                          value={
-                            countrySearchTerm ||
-                            `${getSelectedCountryInfo().flag} ${
-                              formData.country_name
-                            } (${formData.countryCode})`
-                          }
-                          onChange={(e) => {
-                            setCountrySearchTerm(e.target.value);
-                            setShowCountryDropdown(true);
-                          }}
-                          onFocus={() => {
-                            setCountrySearchTerm("");
-                            setShowCountryDropdown(true);
-                          }}
-                          className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm bg-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                        />
-                        <div
-                          className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
-                          onClick={() =>
-                            setShowCountryDropdown(!showCountryDropdown)
-                          }
-                        >
-                          <svg
-                            className={`w-5 h-5 text-gray-400 transition-transform ${
-                              showCountryDropdown ? "rotate-180" : ""
-                            }`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </div>
+                  <div>
+  <label
+    htmlFor="countryCode"
+    className="block text-sm font-medium text-gray-700 mb-1"
+  >
+    Select your country
+  </label>
 
-                        {/* Dropdown */}
-                        {showCountryDropdown && (
-                          <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-hidden">
-                            {/* Country List */}
-                            <div className="max-h-60 overflow-y-auto">
-                              {filteredCountries.length > 0 ? (
-                                filteredCountries.map((country, index) => (
-                                  <div
-                                    key={index}
-                                    className={`px-3 py-2 cursor-pointer hover:bg-blue-50 flex items-center space-x-3 text-sm ${
-                                      formData.countryCode === country.code &&
-                                      formData.country_name === country.name
-                                        ? "bg-blue-100 text-blue-900"
-                                        : "text-gray-900"
-                                    }`}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleCountrySelect(country);
-                                    }}
-                                  >
-                                    <span className="text-lg">
-                                      {country.flag}
-                                    </span>
-                                    <div className="flex-1">
-                                      <span className="font-medium">
-                                        {country.name}
-                                      </span>
-                                      <span className="text-gray-500 ml-2">
-                                        ({country.code})
-                                      </span>
-                                    </div>
-                                    {formData.countryCode === country.code &&
-                                      formData.country_name ===
-                                        country.name && (
-                                        <svg
-                                          className="w-4 h-4 text-blue-600"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          viewBox="0 0 24 24"
-                                        >
-                                          <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M5 13l4 4L19 7"
-                                          />
-                                        </svg>
-                                      )}
-                                  </div>
-                                ))
-                              ) : (
-                                <div className="px-3 py-2 text-sm text-gray-500">
-                                  No countries found
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+  <Select
+    id="countryCode"
+    name="countryCode"
+    value={options.find(
+      (opt) =>
+        opt.value ===
+        `${formData.countryCode}-${formData.country_name}`
+    )}
+    onChange={handleChange}
+    isDisabled={loading}
+    options={options}
+    placeholder="Select your country"
+    className="text-sm"
+    classNamePrefix="react-select"
+  />
+</div>
 
                     {/* Phone Number Input */}
                     <div>
