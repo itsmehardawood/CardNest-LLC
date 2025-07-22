@@ -275,17 +275,9 @@ function HomeScreen({ status, setActiveTab }) {
                 Account Approved!
               </h3>
               <p className="text-blue-700 text-sm mb-4">
-                Congratulations! Your account has been approved.
+        Congratulations! Your account has been approved. If you have not subscribed yet, you can now choose a subscription plan and start using our services.
               </p>
-              <div className="flex gap-3">
-                <button 
-                  onClick={() => setActiveTab('subscriptions')}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 flex items-center"
-                >
-                  <FiDollarSign className="mr-2" />
-                  Choose Plan
-                </button>
-              </div>
+              
             </div>
           )}
         </div>
