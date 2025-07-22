@@ -3,7 +3,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState, useEffect, Suspense } from 'react';
 import BusinessScreen from '../components/Dashboard-Screens/BusinessScreen';
 import SubscriptionsScreen from '../components/Dashboard-Screens/SubscriptionScreen';
-import DocumentsScreen from '../components/Dashboard-Screens/DocumentScreens';
+import DocumentsScreen from '../components/Dashboard-Screens/DocumentScreens_new';
 import DevelopersScreen from '../components/Dashboard-Screens/Developer';
 import Sidebar from '../components/Dashboard-Screens/Sidebar';
 import HomeScreen from '../components/Dashboard-Screens/Homescreen_new';
