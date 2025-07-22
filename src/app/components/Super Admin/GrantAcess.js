@@ -16,8 +16,8 @@ export default function GrantAccessForm() {
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
-        if (parsedUser.email) {
-          setAdminEmail(parsedUser.email);
+        if (parsedUser.user.email) {
+          setAdminEmail(parsedUser.user.email);
         }
       } catch (err) {
         console.error('Invalid userData in localStorage', err);
