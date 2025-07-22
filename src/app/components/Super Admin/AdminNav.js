@@ -8,10 +8,11 @@ import {
   FileText,
   BookOpen,
   ChevronLeft,
+  CheckCircle,
 } from 'lucide-react';
 
 const NavigationSidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
-  const [userEmail, setUserEmail] = useState('admin@cardnest.com');
+  const [userEmail, setUserEmail] = useState('');
 
   useEffect(() => {
     try {
@@ -36,7 +37,9 @@ const NavigationSidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpe
     { id: 'pricing', label: 'Pricing', icon: DollarSign },
     { id: 'activity', label: 'User Activity', icon: BarChart2 },
     { id: 'content', label: 'Content Management', icon: FileText },
-    { id: 'api-docs', label: 'API Documentation', icon: BookOpen }
+    { id: 'api-docs', label: 'API Documentation', icon: BookOpen },
+    { id: 'access', label: 'Access Grant', icon: CheckCircle  }
+
   ];
 
   const handleTabClick = (tabId, tabLabel) => {

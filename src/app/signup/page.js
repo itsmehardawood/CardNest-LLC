@@ -1,4 +1,4 @@
-// firebase code logic 
+// firebase code logic
 
 "use client";
 
@@ -7,10 +7,7 @@ import { useRouter } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
 import countryCodes from "../lib/Counttycodes";
 import { auth } from "../lib/firebase";
-import {
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-} from "firebase/auth";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -58,7 +55,10 @@ export default function SignUpPage() {
   // Close country dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (countryDropdownRef.current && !countryDropdownRef.current.contains(event.target)) {
+      if (
+        countryDropdownRef.current &&
+        !countryDropdownRef.current.contains(event.target)
+      ) {
         setShowCountryDropdown(false);
         setCountrySearchTerm("");
       }
@@ -106,18 +106,20 @@ export default function SignUpPage() {
   const getSelectedCountryInfo = () => {
     // First try to find by matching both code and name
     const selectedByBoth = countryCodes.find(
-      (country) => country.code === formData.countryCode && country.name === formData.country_name
+      (country) =>
+        country.code === formData.countryCode &&
+        country.name === formData.country_name
     );
-    
+
     if (selectedByBoth) {
       return selectedByBoth;
     }
-    
+
     // If not found, try to find by country code only
     const selectedByCode = countryCodes.find(
       (country) => country.code === formData.countryCode
     );
-    
+
     if (selectedByCode) {
       // Update the country_name to match the code
       setFormData((prev) => ({
@@ -126,9 +128,11 @@ export default function SignUpPage() {
       }));
       return selectedByCode;
     }
-    
+
     // Fallback to United States
-    const fallback = countryCodes.find((country) => country.name === "United States");
+    const fallback = countryCodes.find(
+      (country) => country.name === "United States"
+    );
     return fallback || { code: "+1", name: "United States", flag: "🇺🇸" };
   };
 
@@ -143,18 +147,23 @@ export default function SignUpPage() {
       // Only send Firebase OTP - don't create account yet
       const fullPhoneNumber = `${formData.countryCode}${formData.phone}`;
       const appVerifier = window.recaptchaVerifier;
-      const confirmation = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
-      
+      const confirmation = await signInWithPhoneNumber(
+        auth,
+        fullPhoneNumber,
+        appVerifier
+      );
+
       // Store confirmation result for OTP verification
       setConfirmationResult(confirmation);
       setShowOtpForm(true);
-      setSuccess("Verification code sent to your phone. Please verify to complete signup.");
-      
-      console.log("Firebase OTP sent successfully");
+      setSuccess(
+        "Verification code sent to your phone. Please verify to complete signup."
+      );
 
+      console.log("Firebase OTP sent successfully");
     } catch (err) {
       console.error("Error sending OTP:", err);
-      
+
       // Handle Firebase-specific errors
       if (err.code === "auth/invalid-phone-number") {
         setError("Invalid phone number format. Please check your number.");
@@ -163,7 +172,9 @@ export default function SignUpPage() {
       } else if (err.code === "auth/quota-exceeded") {
         setError("SMS quota exceeded. Please try again later.");
       } else {
-        setError(err.message || "Failed to send verification code. Please try again.");
+        setError(
+          err.message || "Failed to send verification code. Please try again."
+        );
       }
     } finally {
       setLoading(false);
@@ -193,23 +204,28 @@ export default function SignUpPage() {
         email: formData.email,
         country_code: formData.countryCode,
         phone_no: `${formData.phone}`,
-        country_name: formData.country_name
+        country_name: formData.country_name,
       };
 
-      const response = await fetch("https://cardsecuritysystem-8xdez.ondigitalocean.app/api/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(apiData),
-      });
+      const response = await fetch(
+        "https://cardsecuritysystem-8xdez.ondigitalocean.app/api/signup",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(apiData),
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok || !data.status) {
         // If API fails after OTP verification, we need to handle this carefully
         console.error("API signup failed after OTP verification:", data);
-        throw new Error(data.message || "Failed to create account. Please contact support.");
+        throw new Error(
+          data.message || "Failed to create account. Please contact support."
+        );
       }
 
       // Step 3: Store user data in localStorage with both API and Firebase info
@@ -229,22 +245,23 @@ export default function SignUpPage() {
           updated_at: data.user.updated_at,
           firebaseUid: user.uid,
           firebasePhone: user.phoneNumber,
-        }
+        },
       };
 
       localStorage.setItem("userData", JSON.stringify(userData));
       console.log("Account created and verified successfully:", userData);
 
-      setSuccess("Account created and verified successfully! Redirecting to dashboard...");
-      
+      setSuccess(
+        "Account created and verified successfully! Redirecting to dashboard..."
+      );
+
       // Redirect to dashboard
       setTimeout(() => {
         router.push("/dashboard");
       }, 1500);
-
     } catch (err) {
       console.error("Error during OTP verification or account creation:", err);
-      
+
       if (err.code === "auth/invalid-verification-code") {
         setOtpError("Invalid verification code. Please check and try again.");
       } else if (err.code === "auth/code-expired") {
@@ -252,7 +269,9 @@ export default function SignUpPage() {
       } else {
         // Handle API errors that occur after successful OTP verification
         if (err.message.includes("Failed to create account")) {
-          setOtpError("Phone verified but account creation failed. Please contact support.");
+          setOtpError(
+            "Phone verified but account creation failed. Please contact support."
+          );
         } else {
           setOtpError("Verification failed. Please try again.");
         }
@@ -272,11 +291,15 @@ export default function SignUpPage() {
 
     try {
       const appVerifier = window.recaptchaVerifier;
-      const confirmation = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
-      
+      const confirmation = await signInWithPhoneNumber(
+        auth,
+        fullPhoneNumber,
+        appVerifier
+      );
+
       setConfirmationResult(confirmation);
       setSuccess("Verification code resent successfully!");
-      
+
       console.log("Firebase OTP resent successfully");
     } catch (err) {
       console.error("Resend OTP error:", err);
@@ -319,8 +342,10 @@ export default function SignUpPage() {
                 className="text-2xl pl-8 font-bold text-gray-900 hover:text-blue-600 transition-colors"
               >
                 <video autoPlay loop muted playsInline width="70">
-            <source src="https://dw1u598x1c0uz.cloudfront.net/CardNest%20Logo%20WebM%20version.webm" alt="CardNest Logo" />
-
+                  <source
+                    src="https://dw1u598x1c0uz.cloudfront.net/CardNest%20Logo%20WebM%20version.webm"
+                    alt="CardNest Logo"
+                  />
                   Your browser does not support the video tag.
                 </video>
               </Link>
@@ -420,103 +445,117 @@ export default function SignUpPage() {
                     </div>
 
                     {/* Country Selector */}
-                  
-                  <div className="relative" ref={countryDropdownRef}>
-  <label
-    htmlFor="countrySelector"
-    className="block text-sm font-medium text-gray-700 mb-1"
-  >
-    Select your country
-  </label>
-  <div className="mt-1 relative">
-    <input
-      type="text"
-      placeholder="Type or select your country..."
-      value={countrySearchTerm || `${getSelectedCountryInfo().flag} ${formData.country_name} (${formData.countryCode})`}
-      onChange={(e) => {
-        setCountrySearchTerm(e.target.value);
-        setShowCountryDropdown(true);
-      }}
-      onFocus={() => {
-        setCountrySearchTerm("");
-        setShowCountryDropdown(true);
-      }}
-      className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm bg-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-    />
-    <div 
-      className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
-      onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-    >
-      <svg
-        className={`w-5 h-5 text-gray-400 transition-transform ${
-          showCountryDropdown ? "rotate-180" : ""
-        }`}
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M19 9l-7 7-7-7"
-        />
-      </svg>
-    </div>
 
-    {/* Dropdown */}
-    {showCountryDropdown && (
-      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-hidden">
-        {/* Country List */}
-        <div className="max-h-60 overflow-y-auto">
-          {filteredCountries.length > 0 ? (
-            filteredCountries.map((country, index) => (
-              <div
-                key={index}
-                className={`px-3 py-2 cursor-pointer hover:bg-blue-50 flex items-center space-x-3 text-sm ${
-                  formData.countryCode === country.code &&
-                  formData.country_name === country.name
-                    ? "bg-blue-100 text-blue-900"
-                    : "text-gray-900"
-                }`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleCountrySelect(country);
-                }}
-              >
-                <span className="text-lg">{country.flag}</span>
-                <div className="flex-1">
-                  <span className="font-medium">{country.name}</span>
-                  <span className="text-gray-500 ml-2">({country.code})</span>
-                </div>
-                {formData.countryCode === country.code &&
-                  formData.country_name === country.name && (
-                    <svg
-                      className="w-4 h-4 text-blue-600"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  )}
-              </div>
-            ))
-          ) : (
-            <div className="px-3 py-2 text-sm text-gray-500">
-              No countries found
-            </div>
-          )}
-        </div>
-      </div>
-    )}
-  </div>
-</div>
+                    <div className="relative" ref={countryDropdownRef}>
+                      <label
+                        htmlFor="countrySelector"
+                        className="block text-sm font-medium text-gray-700 mb-1"
+                      >
+                        Select your country
+                      </label>
+                      <div className="mt-1 relative">
+                        <input
+                          type="text"
+                          placeholder="Type or select your country..."
+                          value={
+                            countrySearchTerm ||
+                            `${getSelectedCountryInfo().flag} ${
+                              formData.country_name
+                            } (${formData.countryCode})`
+                          }
+                          onChange={(e) => {
+                            setCountrySearchTerm(e.target.value);
+                            setShowCountryDropdown(true);
+                          }}
+                          onFocus={() => {
+                            setCountrySearchTerm("");
+                            setShowCountryDropdown(true);
+                          }}
+                          className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm bg-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        />
+                        <div
+                          className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                          onClick={() =>
+                            setShowCountryDropdown(!showCountryDropdown)
+                          }
+                        >
+                          <svg
+                            className={`w-5 h-5 text-gray-400 transition-transform ${
+                              showCountryDropdown ? "rotate-180" : ""
+                            }`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </div>
+
+                        {/* Dropdown */}
+                        {showCountryDropdown && (
+                          <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-hidden">
+                            {/* Country List */}
+                            <div className="max-h-60 overflow-y-auto">
+                              {filteredCountries.length > 0 ? (
+                                filteredCountries.map((country, index) => (
+                                  <div
+                                    key={index}
+                                    className={`px-3 py-2 cursor-pointer hover:bg-blue-50 flex items-center space-x-3 text-sm ${
+                                      formData.countryCode === country.code &&
+                                      formData.country_name === country.name
+                                        ? "bg-blue-100 text-blue-900"
+                                        : "text-gray-900"
+                                    }`}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleCountrySelect(country);
+                                    }}
+                                  >
+                                    <span className="text-lg">
+                                      {country.flag}
+                                    </span>
+                                    <div className="flex-1">
+                                      <span className="font-medium">
+                                        {country.name}
+                                      </span>
+                                      <span className="text-gray-500 ml-2">
+                                        ({country.code})
+                                      </span>
+                                    </div>
+                                    {formData.countryCode === country.code &&
+                                      formData.country_name ===
+                                        country.name && (
+                                        <svg
+                                          className="w-4 h-4 text-blue-600"
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M5 13l4 4L19 7"
+                                          />
+                                        </svg>
+                                      )}
+                                  </div>
+                                ))
+                              ) : (
+                                <div className="px-3 py-2 text-sm text-gray-500">
+                                  No countries found
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
 
                     {/* Phone Number Input */}
                     <div>
@@ -643,7 +682,9 @@ export default function SignUpPage() {
                       disabled={otp.length !== 6 || loading}
                       className="w-full bg-blue-600 text-white py-2.5 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium text-base transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
-                      {loading ? "Creating Account..." : "Verify and Create Account"}
+                      {loading
+                        ? "Creating Account..."
+                        : "Verify and Create Account"}
                     </button>
                   </form>
 

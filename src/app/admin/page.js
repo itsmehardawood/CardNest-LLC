@@ -11,6 +11,7 @@ import NavigationSidebar from '../components/Super Admin/AdminNav';
 import DashboardFooter from '../components/Super Admin/AdminFooter';
 import HomePage from '../components/Super Admin/HomePage';
 import BusinessApprovalSectionUpdated from '../components/Super Admin/BusinessApprovalSection ';
+import GrantAccessForm from '../components/Super Admin/GrantAcess';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('Home');
@@ -20,81 +21,81 @@ const AdminDashboard = () => {
   const router = useRouter();
 
   // Helper function to get userData and check if it's expired
-  const getUserDataFromStorage = () => {
-    try {
-      const storedData = localStorage.getItem("userData");
-      if (!storedData) return null;
+  // const getUserDataFromStorage = () => {
+  //   try {
+  //     const storedData = localStorage.getItem("userData");
+  //     if (!storedData) return null;
       
-      const userData = JSON.parse(storedData);
-      const now = new Date().getTime();
+  //     const userData = JSON.parse(storedData);
+  //     const now = new Date().getTime();
       
-      // Check if data has expired
-      if (userData.expirationTime && now > userData.expirationTime) {
-        localStorage.removeItem("userData");
-        return null;
-      }
+  //     // Check if data has expired
+  //     if (userData.expirationTime && now > userData.expirationTime) {
+  //       localStorage.removeItem("userData");
+  //       return null;
+  //     }
       
-      return userData;
-    } catch (error) {
-      console.error("Error reading userData from localStorage:", error);
-      localStorage.removeItem("userData");
-      return null;
-    }
-  };
+  //     return userData;
+  //   } catch (error) {
+  //     console.error("Error reading userData from localStorage:", error);
+  //     localStorage.removeItem("userData");
+  //     return null;
+  //   }
+  // };
 
-  useEffect(() => {
-    // Check authentication and authorization
-    const checkAuth = () => {
-      const userData = getUserDataFromStorage();
+  // useEffect(() => {
+  //   // Check authentication and authorization
+  //   const checkAuth = () => {
+  //     const userData = getUserDataFromStorage();
       
-      if (!userData) {
-        // No user data found or expired
-        console.log("No valid user data found, redirecting to admin login");
-        router.push("/admin-login");
-        return;
-      }
+  //     if (!userData) {
+  //       // No user data found or expired
+  //       console.log("No valid user data found, redirecting to admin login");
+  //       router.push("/admin-login");
+  //       return;
+  //     }
       
-      // Check if user has SUPER_ADMIN role - strict check only
-      const userRole = userData.user?.role;
+  //     // Check if user has SUPER_ADMIN role - strict check only
+  //     const userRole = userData.user?.role;
       
-      if (userRole !== "SUPER_ADMIN") {
-        // User is not a superadmin - redirect to admin login regardless of role
-        console.log("Access denied: User is not a superadmin");
-        router.push("/admin-login");
-        return;
-      }
+  //     if (userRole !== "SUPER_ADMIN") {
+  //       // User is not a superadmin - redirect to admin login regardless of role
+  //       console.log("Access denied: User is not a superadmin");
+  //       router.push("/admin-login");
+  //       return;
+  //     }
       
-      // User is authenticated and is a superadmin
-      console.log("Access granted: User is a superadmin");
-      setIsAuthenticated(true);
-    };
+  //     // User is authenticated and is a superadmin
+  //     console.log("Access granted: User is a superadmin");
+  //     setIsAuthenticated(true);
+  //   };
 
-    // Enable authentication check
-    checkAuth();
-  }, [router]);
+  //   // Enable authentication check
+  //   checkAuth();
+  // }, [router]);
 
-  useEffect(() => {
-    // Only start the loading simulation if user is authenticated
-    if (isAuthenticated) {
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 1000);
+  // useEffect(() => {
+  //   // Only start the loading simulation if user is authenticated
+  //   if (isAuthenticated) {
+  //     const timer = setTimeout(() => {
+  //       setIsLoading(false);
+  //     }, 1000);
 
-      return () => clearTimeout(timer);
-    }
-  }, [isAuthenticated]);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [isAuthenticated]);
 
-  // Show loading spinner while checking authentication
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-sm border p-12 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Verifying access...</p>
-        </div>
-      </div>
-    );
-  }
+  // // Show loading spinner while checking authentication
+  // if (!isAuthenticated) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+  //       <div className="bg-white rounded-lg shadow-sm border p-12 text-center">
+  //         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+  //         <p className="text-gray-600">Verifying access...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // const getPageDescription = (tabName) => {
   //   const descriptions = {
@@ -108,9 +109,9 @@ const AdminDashboard = () => {
   // };
 
   const renderTabContent = () => {
-    if (isLoading) {
-      return <LoadingComponent message="Loading dashboard..." />;
-    }
+    // if (isLoading) {
+    //   return <LoadingComponent message="Loading dashboard..." />;
+    // }
 
     switch (activeTab) {
       case 'Home':
@@ -125,6 +126,8 @@ const AdminDashboard = () => {
         return <ContentManagementSection />;
       case 'API Documentation':
         return <APIDocumentationSection />;
+      case 'Access Grant':
+        return <GrantAccessForm />;
       default:
         return (
           <div className="bg-white rounded-lg shadow-sm border p-6">
