@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import PricingSection from '../SubscriptionsCard';
+import PricingSection from '../General/SubscriptionsCard';
 
 function SubscriptionsScreen() {
   const router = useRouter();

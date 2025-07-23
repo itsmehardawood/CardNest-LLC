@@ -123,14 +123,15 @@ function HomeScreen({ status, setActiveTab }) {
               {status === 'incomplete-profile' ? 'Complete Profile' : 'Update Profile'}
             </button>
           )}
-          {status === 'pending' && (
-            <button 
-              onClick={() => setActiveTab('support')}
-              className="mt-3 px-3 py-1 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 text-sm"
-            >
-              Contact Support
-            </button>
-          )}
+      {status === 'pending' && (
+  <a
+    href="mailto:support@cardnest.io?subject=Help with Pending Status&body=Hi Support Team,%0A%0AI need help with my pending status."
+    className="mt-3 inline-block px-3 py-1 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 text-sm"
+  >
+    Contact Support
+  </a>
+)}
+
           {status === 'approved' && (
             <button 
               onClick={() => setActiveTab('subscriptions')}

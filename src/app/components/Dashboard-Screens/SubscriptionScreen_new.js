@@ -1,0 +1,257 @@
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import PricingSection from '../General/SubscriptionsCard';
+
+function SubscriptionsScreen() {
+  const router = useRouter();
+  const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
+  const [subscriptionData, setSubscriptionData] = useState(null);
+  const [userObj, setUserObj] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkSubscription = async () => {
+      try {
+        const storedUser = localStorage.getItem('userData');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          const userData = parsedUser.user || parsedUser;
+          setUserObj(userData);
+          
+          const merchantId = userData.merchant_id;
+          if (merchantId) {
+            const paramVariations = [
+              `merchant_id=${merchantId}`,
+              `merchantId=${merchantId}`,
+              `id=${merchantId}`,
+              `MerchantID=${merchantId}`,
+              `UserID=${merchantId}`
+            ];
+            
+            let subscriptionFound = false;
+            for (const param of paramVariations) {
+              if (subscriptionFound) break;
+              try {
+                const response = await fetch(
+                  `https://cardsecuritysystem-8xdez.ondigitalocean.app/api/Subscriptions/GetByUserIDorMerchantID?${param}`,
+                  { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+                );
+                
+                if (response.ok) {
+                  const data = await response.json();
+                  if (data.status === true && data.data) {
+                    setHasActiveSubscription(true);
+                    setSubscriptionData(data.data);
+                    subscriptionFound = true;
+                  } else if (data.status === true) {
+                    setHasActiveSubscription(true);
+                    subscriptionFound = true;
+                  }
+                  break;
+                }
+              } catch (error) {
+                console.error(`Error with ${param}:`, error);
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error checking subscription:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkSubscription();
+  }, []);
+
+  const handleBrowsePlans = () => router.push("/plans");
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const formatCurrency = (amount) => amount ? `$${parseFloat(amount).toFixed(2)}` : '$0.00';
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 sm:p-10">
+            <div className="flex flex-col items-center justify-center space-y-6">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
+              <div className="text-center space-y-2">
+                <h2 className="text-2xl font-bold text-gray-800">Loading Subscription Details</h2>
+                <p className="text-gray-600">We are fetching your subscription information...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+
+        {/* Main Content */}
+        <div className="space-y-8">
+          {/* Status Section */}
+          {hasActiveSubscription ? (
+            <div className="space-y-6">
+              {/* Active Subscription Banner */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center">
+                  <div className="bg-green-100 p-2 rounded-full mr-4">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-900">Active Subscription</h2>
+                    <p className="text-gray-600">Your subscription is active and ready to use</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Plan Details */}
+              {subscriptionData?.package && (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="p-6 border-b border-gray-200">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-1">{subscriptionData.package.package_name} Plan</h3>
+                        <p className="text-gray-600 text-lg">{formatCurrency(subscriptionData.package.package_price)} / {subscriptionData.package.package_period}</p>
+                      </div>
+                      <div className="mt-3 sm:mt-0 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
+                        <svg className="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        Approved
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-6">
+                    {/* Usage Stats */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                      <div className="bg-blue-50 p-5 rounded-lg border border-blue-100">
+                        <div className="flex items-center mb-2">
+                          <svg className="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                          </svg>
+                          <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Monthly Limit</h4>
+                        </div>
+                        <p className="text-3xl font-bold text-gray-900">{subscriptionData.package.monthly_limit}</p>
+                        <p className="text-sm text-gray-500">API Calls</p>
+                      </div>
+
+                      <div className="bg-purple-50 p-5 rounded-lg border border-purple-100">
+                        <div className="flex items-center mb-2">
+                          <svg className="w-5 h-5 text-purple-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 0l-2 2a1 1 0 101.414 1.414L8 10.414l1.293 1.293a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Used</h4>
+                        </div>
+                        <p className="text-3xl font-bold text-gray-900">{subscriptionData.api_calls_used}</p>
+                        <p className="text-sm text-gray-500">API Calls</p>
+                      </div>
+
+                      <div className="bg-green-50 p-5 rounded-lg border border-green-100">
+                        <div className="flex items-center mb-2">
+                          <svg className="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Remaining</h4>
+                        </div>
+                        <p className="text-3xl font-bold text-gray-900">
+                          {subscriptionData.package.monthly_limit - subscriptionData.api_calls_used}
+                        </p>
+                        <p className="text-sm text-gray-500">API Calls</p>
+                      </div>
+                    </div>
+
+                    {/* Progress Bar */}
+                    <div className="mb-8">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Usage Progress</h4>
+                        <span className="text-sm font-medium text-gray-600">
+                          {Math.round((subscriptionData.api_calls_used / subscriptionData.package.monthly_limit) * 100)}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div 
+                          className={`h-2.5 rounded-full ${
+                            (subscriptionData.api_calls_used / subscriptionData.package.monthly_limit) > 0.9 
+                              ? 'bg-red-500' 
+                              : (subscriptionData.api_calls_used / subscriptionData.package.monthly_limit) > 0.7 
+                                ? 'bg-yellow-500' 
+                                : 'bg-blue-500'
+                          }`}
+                          style={{ 
+                            width: `${Math.min((subscriptionData.api_calls_used / subscriptionData.package.monthly_limit) * 100, 100)}%` 
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    {/* Next Renewal */}
+                    <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                      <div className="flex items-center mb-2">
+                        <svg className="w-5 h-5 text-gray-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                        </svg>
+                        <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Next Renewal</h4>
+                      </div>
+                      <p className="text-lg font-medium text-gray-900">{formatDate(subscriptionData?.renewal_date)}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-12 px-6 bg-white rounded-xl shadow-sm border border-gray-200">
+              <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-gray-100 mb-4">
+                <svg className="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">No Active Subscription</h3>
+              <p className="text-gray-600 max-w-md mx-auto mb-6">
+                You do not have an active subscription. Choose a plan that fits your needs to unlock all features.
+              </p>
+              <button
+                onClick={handleBrowsePlans}
+                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
+              >
+                Browse Plans
+                <svg className="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {/* Plans Section - Always shown */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div className="mb-8 text-center">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Available Plans</h2>
+              <p className="text-gray-600">Choose the perfect plan for your business needs</p>
+            </div>
+            <PricingSection />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default SubscriptionsScreen;

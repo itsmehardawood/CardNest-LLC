@@ -107,7 +107,7 @@ function HomeScreen({ status, setActiveTab }) {
           <p className="text-gray-600 mt-1">Manage your account and access services</p>
         </div>
         
-        <div className="p-6">
+        <div className="p-3">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
             {/* Status Card */}
@@ -122,6 +122,15 @@ function HomeScreen({ status, setActiveTab }) {
                 {status === 'incomplete-profile' ? 'Incomplete Profile' : status.replace('-', ' ')}
               </p>
               <p className={`${statusStyling.textColor} text-sm mb-4`}>{getStatusMessage(status)}</p>
+
+                  {status === 'pending' && (
+  <a
+    href="mailto:support@cardnest.io?subject=Help with Pending Status&body=Hi Support Team,%0A%0AI need help with my pending status."
+    className="mt-3 inline-block px-3 py-1 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 text-sm"
+  >
+    Contact Support
+  </a>
+)}
               
               {/* Action buttons */}
               {(status === 'incomplete-profile' || status === 'incomplete') && (

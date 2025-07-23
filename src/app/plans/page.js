@@ -2,8 +2,7 @@
 import React, { useState } from 'react'
 import { Check, X } from 'lucide-react';
 import Link from 'next/link';
-import Navbar from "../components/Navbar";
-import PricingSection from '../components/SubscriptionsCard';
+import PricingSection from '../components/General/SubscriptionsCard';
 
 
 const PlanPage = () => {

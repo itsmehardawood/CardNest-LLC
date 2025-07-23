@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import DiagonalHeroSection from "./HeroSection";
 import Link from "next/link";
 import ContactSection from "./ContactSection";
-import PricingSection from "./SubscriptionsCard";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -320,8 +319,9 @@ import {
   Shield,
   Zap,
 } from "lucide-react";
-import FAQs from "./FAQs";
 import Image from "next/image";
+import PricingSection from "./SubscriptionsCard";
+import FAQs from "./FAQs";
 
 const LandingPage = () => {
  const sectionsData = {
