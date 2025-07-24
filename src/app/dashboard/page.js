@@ -6,7 +6,7 @@ import DocumentsScreen from '../components/Dashboard-Screens/DocumentScreens_new
 import DevelopersScreen from '../components/Dashboard-Screens/Developer';
 import Sidebar from '../components/Dashboard-Screens/Sidebar';
 import HomeScreen from '../components/Dashboard-Screens/Homescreen_new';
-import CardFeatureScreen from '../components/Dashboard-Screens/CardFeatureScreen';
+import CardFeatureScreen from '../components/Dashboard-Screens/CardFeatureScreen_new';
 import SubscriptionsScreen from '../components/Dashboard-Screens/SubscriptionScreen_new';
 
 
