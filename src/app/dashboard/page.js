@@ -1,7 +1,7 @@
 'use client'
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState, useEffect, Suspense } from 'react';
-import BusinessScreen from '../components/Dashboard-Screens/BusinessScreen';
+import BusinessScreen from '../components/Dashboard-Screens/BusinessScreen_new';
 import DocumentsScreen from '../components/Dashboard-Screens/DocumentScreens_new';
 import DevelopersScreen from '../components/Dashboard-Screens/Developer';
 import Sidebar from '../components/Dashboard-Screens/Sidebar';
@@ -179,20 +179,36 @@ useEffect(() => {
   router.replace('/login');
 };
 
-  const [businessInfo, setBusinessInfo] = useState({
-    business_name: '',
-    business_registration_number: '',
-    street: '',
-    street_line2: '',
-    city: '',
-    state: '',
-    zip_code: '',
-    country: 'United States of America',
-    account_holder_first_name: '',
-    account_holder_last_name: '',
-    registration_document: null,
-    email: ''
-  });
+
+const [businessInfo, setBusinessInfo] = useState({
+  // Business Info
+  business_name: '',
+  business_registration_number: '',
+  email: userData?.email || '',
+  // Business Address
+  street: '',
+  street_line2: '',
+  city: '',
+  state: '',
+  zip_code: '',
+  country: 'United States of America',
+  // Account Holder Info
+  account_holder_first_name: '',
+  account_holder_last_name: '',
+  account_holder_email: '',
+  account_holder_date_of_birth: '', // Format: YYYY-MM-DD
+  account_holder_street: '',
+  account_holder_street_line2: '',
+  account_holder_city: '',
+  account_holder_state: '',
+  account_holder_zip_code: '',
+  account_holder_country: '',
+  account_holder_id_type: '',
+  account_holder_id_number: '',
+  account_holder_id_document: null, // File object
+  // Uploads
+  registration_document: null // File object
+});
   
   const [documents, setDocuments] = useState([]);
   const [status, setStatus] = useState('incomplete'); // Initialize as incomplete
@@ -239,83 +255,110 @@ useEffect(() => {
   };
 
  // API INTEGRATION - Fixed handleSubmit function
-const handleSubmit = async () => {
+
+
+
+
+ const handleSubmit = async () => {
   setIsSubmitting(true);
   setSubmitError(null);
   setSubmitSuccess(false);
-  
   // Validation
-  const requiredFields = ['business_name', 'business_registration_number', 'account_holder_first_name', 'account_holder_last_name', 'street', 'city', 'state', 'country', 'email'];
-  const missingFields = requiredFields.filter(field => !businessInfo[field]?.trim());
-  
-  if (missingFields.length > 0) {
-    setSubmitError('Please fill in all required fields');
+  // const requiredFields = ['business_name', 'business_registration_number', 'account_holder_first_name', 'account_holder_last_name', 'street', 'city', 'state', 'country', 'email'];
+  // const missingFields = requiredFields.filter(field => !businessInfo[field]?.trim());
+const requiredFields = [
+  // Business Info
+  'business_name',
+  'business_registration_number',
+  'email',
+  'street',
+  'city',
+  'state',
+  'country',
+  // Account Holder Info
+  'account_holder_first_name',
+  'account_holder_last_name',
+  'account_holder_email',
+  'account_holder_date_of_birth',
+  'account_holder_street',
+  'account_holder_city',
+  'account_holder_state',
+  'account_holder_country',
+  'account_holder_id_type',
+  'account_holder_id_number'
+];
+const missingFields = requiredFields.filter(field => !businessInfo[field] || businessInfo[field].toString().trim() === '');
+  //check for all Required fields in case of Incomplete profile
+    if (missingFields.length > 0) {
+      setSubmitError('Please fill in all required field');
+      setIsSubmitting(false);
+      return;
+    }
+    if (!businessInfo.account_holder_id_document) {
+    setSubmitError('Please upload an identity document for the account holder');
     setIsSubmitting(false);
     return;
-  }
-
+    }
   if (!businessInfo.registration_document) {
     setSubmitError('Please upload a business registration document');
     setIsSubmitting(false);
     return;
   }
-  
   try {
     // Prepare FormData for API submission
     const formData = new FormData();
-    
+    //formData.append("user_id", userData?.id); // or merchant_id
     // Add all business information fields individually
     Object.keys(businessInfo).forEach(key => {
-      if (key === 'registration_document' && businessInfo[key]) {
-        formData.append('registration_document', businessInfo[key]);
-      } else if (key !== 'registration_document' && businessInfo[key]) {
+      if (
+        (key === 'registration_document' || key === 'account_holder_id_document') &&
+        businessInfo[key]
+      ) {
+        formData.append(key, businessInfo[key]);
+      } else if (businessInfo[key]) {
         formData.append(key, businessInfo[key]);
       }
     });
-    
+    //Checking on console
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
     // Make API call
     const response = await fetch('https://cardsecuritysystem-8xdez.ondigitalocean.app/api/business-profile', {
       method: 'POST',
       body: formData,
       // Don't set Content-Type header - let browser set it for FormData
     });
-    
     // Check if response is successful
     if (response.ok) {
       let result;
-      
       try {
         result = await response.json();
       } catch (parseError) {
         // If JSON parsing fails, treat as success if status is ok
         result = { message: 'Business profile submitted successfully' };
       }
-      
       // FIXED: Handle different success response formats including your API's structure
       const isSuccess = result.status === true ||           // Your API returns status: true
-                       result.success === true || 
+                       result.success === true ||
                        result.success === 'true' ||
                        result.message?.includes('successfully') ||
                        result.status === 'success' ||
-                       response.status === 200 || 
+                       response.status === 200 ||
                        response.status === 201;
-      
       if (isSuccess) {
         setStatus('pending');
         setActiveTab('profile');
         setSubmitSuccess(true);
-        
         // Store submission ID for tracking - check your API response structure
         if (typeof window !== 'undefined') {
           const submissionId = result.data?.id || result.submissionId || result.id || Date.now().toString();
           localStorage.setItem('businessSubmissionId', submissionId);
         }
-        
         // Update userData in localStorage with new business_verified status
         if (userData) {
           // Get the original stored data structure
           const storedUserData = JSON.parse(localStorage.getItem('userData') || '{}');
-          
           let updatedUserData;
           if (storedUserData.user) {
             // If nested structure, update the nested user object
@@ -333,19 +376,15 @@ const handleSubmit = async () => {
               business_verified: 'PENDING'
             };
           }
-          
           localStorage.setItem('userData', JSON.stringify(updatedUserData));
-          
           // Update state with the user object (not the wrapper)
           const userObj = updatedUserData.user || updatedUserData;
           setUserData(userObj);
-          
           // Immediately check the new status via API
           setTimeout(() => {
             checkBusinessVerificationStatus(userObj.id);
           }, 2000); // Check after 2 seconds to allow server processing
         }
-        
         console.log('Submission successful:', result);
       } else {
         throw new Error(result.error || result.message || 'Submission failed');
@@ -355,10 +394,8 @@ const handleSubmit = async () => {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || errorData.error || `HTTP error! status: ${response.status}`);
     }
-    
   } catch (error) {
     console.error('Submission failed:', error);
-    
     // Handle different types of errors
     if (error.message.includes('400')) {
       setSubmitError('Invalid data submitted. Please check your information.');
@@ -552,6 +589,7 @@ const checkBusinessStatus = async () => {
             businessInfo={businessInfo}
             documents={documents}
             status={status}
+            setBusinessInfo={setBusinessInfo}
             isSubmitting={isSubmitting}
             submitError={submitError}
             submitSuccess={submitSuccess}

@@ -1028,7 +1028,7 @@ const BusinessApprovalSectionUpdated = () => {
               <textarea
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
-                className="w-full px-4 py-3 border border-red-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm resize-none"
+                className="w-full px-4 py-3 border text-black border-red-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm resize-none"
                 rows="4"
                 placeholder="Please provide a detailed reason for rejection. This will help the business understand what needs to be corrected."
                 required

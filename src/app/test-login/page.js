@@ -133,7 +133,7 @@ export default function LoginPage() {
         },
         body: JSON.stringify({
           country_code: '+92',
-          login_input: '3174565993'
+          login_input: 'test@hotmail.com'
         }),
       });
       const data = await response.json();
@@ -146,7 +146,7 @@ export default function LoginPage() {
         // In your actual Next.js project, use:
         // window.location.href = '/dashboard';
         // or with Next.js router:
-        router.push('/admin');
+        router.push('/dashboard');
       } else {
         setError(data.message || 'Login failed');
       }
