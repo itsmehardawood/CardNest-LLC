@@ -220,7 +220,7 @@ const BusinessApprovalSectionUpdated = () => {
         },
         body: JSON.stringify({
           user_id: selectedBusiness.user.id,
-          status: 'REJECTED',
+          status: 'INCOMPLETE',
           reason: rejectReason || 'Business profile rejected after verification'
         })
       });
@@ -832,7 +832,7 @@ const BusinessApprovalSectionUpdated = () => {
                   <textarea
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
-                    className="w-full px-2 py-1.5 border border-red-300 rounded focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 text-sm"
+                    className="w-full px-2 py-1.5 border text-black border-red-300 rounded focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 text-sm"
                     rows="3"
                     placeholder="Please provide a detailed reason for rejection..."
                     required
