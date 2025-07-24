@@ -55,9 +55,9 @@ const PricingSection = ({ isDark = false }) => {
       
       // Add overage rate feature
       if (isEnterprise) {
-        features.push({ text: 'Card-at-Present (CaP) real-time scan', included: true });
+        features.push({ text: 'Card-at-Present (CaP) real-time scan', included: true });
       } else {
-        features.push({ text: `Card-at-Present (CaP) real-time scan`, included: true });
+        features.push({ text: `Card-at-Present (CaP) real-time scan`, included: true });
       }
 
       return {
@@ -173,7 +173,7 @@ const PricingSection = ({ isDark = false }) => {
   // Modal component
   const VerificationModal = () => (
     <div className="fixed inset-0 bg-black/60 bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center">
             <AlertCircle className="w-6 h-6 text-orange-500 mr-2" />
@@ -205,8 +205,6 @@ const PricingSection = ({ isDark = false }) => {
             </div>
           )}
         </div>
-        
-   
       </div>
     </div>
   );
@@ -214,10 +212,10 @@ const PricingSection = ({ isDark = false }) => {
   // Loading state
   if (loading) {
     return (
-      <div className={`${isDark ? 'bg-slate-900' : 'bg-white'} py-4 px-4`}>
+      <div className={`${isDark ? 'bg-slate-900' : 'bg-white'} py-8 px-4`}>
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-4">
-            <h2 className={`text-4xl font-bold ${isDark ? 'text-white' : 'text-black'} mb-3`}>
+          <div className="text-center mb-8">
+            <h2 className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${isDark ? 'text-white' : 'text-black'} mb-3`}>
               Subscription Plans
             </h2>
           </div>
@@ -232,10 +230,10 @@ const PricingSection = ({ isDark = false }) => {
   // Error state
   if (error) {
     return (
-      <div className={`${isDark ? 'bg-slate-900' : 'bg-white'} py-4 px-4`}>
+      <div className={`${isDark ? 'bg-slate-900' : 'bg-white'} py-8 px-4`}>
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-4">
-            <h2 className={`text-4xl font-bold ${isDark ? 'text-white' : 'text-black'} mb-3`}>
+          <div className="text-center mb-8">
+            <h2 className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${isDark ? 'text-white' : 'text-black'} mb-3`}>
               Subscription Plans
             </h2>
           </div>
@@ -254,47 +252,46 @@ const PricingSection = ({ isDark = false }) => {
   }
 
   return (
-    <div className={`${isDark ? 'bg-slate-900' : 'bg-white'} py-4 px-4`}>
+    <div className={`${isDark ? 'bg-slate-900' : 'bg-white'} py-8 px-4`}>
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-4">
-          <h2 className={`text-4xl font-bold ${isDark ? 'text-white' : 'text-black'} mb-3`}>
+        <div className="text-center mb-8">
+          <h2 className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${isDark ? 'text-white' : 'text-black'} mb-3 px-4`}>
             Subscription Plans
           </h2>
-          <p className={`${isDark ? 'text-gray-300' : 'text-gray-400'} text-base`}>
+          <p className={`${isDark ? 'text-gray-300' : 'text-gray-400'} text-sm sm:text-base px-4`}>
             Protect your transactions with AI-powered card fraud detection
           </p>
         </div>
         
-              
-        <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto">
           {plans.map((plan, index) => (
             <div
               key={plan.id}
               className={`relative rounded-2xl overflow-hidden shadow-lg transform hover:scale-105 transition-all duration-300 ${
                 plan.popular ? 'ring-2 ring-cyan-400' : ''
-              }`}
+              } w-full`}
             >
               {/* Popular badge */}
               {plan.popular && (
-                <div className="absolute top-0 right-0 bg-cyan-400 text-white px-3 py-1 text-xs font-semibold rounded-bl-lg z-20">
+                <div className="absolute top-0 right-0 bg-cyan-400 text-white px-2 sm:px-3 py-1 text-xs font-semibold rounded-bl-lg z-20">
                   POPULAR
                 </div>
               )}
                          
               {/* Header with gradient */}
-               <div className={`bg-gradient-to-br ${plan.gradient} p-6 text-white relative overflow-hidden`}>
+               <div className={`bg-gradient-to-br ${plan.gradient} p-4 sm:p-6 text-white relative overflow-hidden`}>
                 {/* Transparent decorative circles using rgba */}
-                <div className="absolute top-3 left-3 w-8 h-8 rounded-full" style={{backgroundColor: 'rgba(255, 255, 255, 0.1)'}}></div>
-                <div className="absolute top-6 right-6 w-4 h-4 rounded-full" style={{backgroundColor: 'rgba(255, 255, 255, 0.08)'}}></div>
-                <div className="absolute bottom-3 left-6 w-3 h-3 rounded-full" style={{backgroundColor: 'rgba(255, 255, 255, 0.06)'}}></div>
-                <div className="absolute bottom-6 right-3 w-6 h-6 rounded-full" style={{backgroundColor: 'rgba(255, 255, 255, 0.12)'}}></div>
+                <div className="absolute top-2 sm:top-3 left-2 sm:left-3 w-6 sm:w-8 h-6 sm:h-8 rounded-full" style={{backgroundColor: 'rgba(255, 255, 255, 0.1)'}}></div>
+                <div className="absolute top-4 sm:top-6 right-4 sm:right-6 w-3 sm:w-4 h-3 sm:h-4 rounded-full" style={{backgroundColor: 'rgba(255, 255, 255, 0.08)'}}></div>
+                <div className="absolute bottom-2 sm:bottom-3 left-4 sm:left-6 w-2 sm:w-3 h-2 sm:h-3 rounded-full" style={{backgroundColor: 'rgba(255, 255, 255, 0.06)'}}></div>
+                <div className="absolute bottom-4 sm:bottom-6 right-2 sm:right-3 w-4 sm:w-6 h-4 sm:h-6 rounded-full" style={{backgroundColor: 'rgba(255, 255, 255, 0.12)'}}></div>
                 
                 <div className="relative z-10 w-full flex-col flex justify-center items-center">
-                  <h3 className="text-2xl font-bold text-center">{plan.name}</h3>
-                  <p className="text-xs text-gray-300 mb-3 text-center">{plan.period}</p>
+                  <h3 className="text-xl sm:text-2xl font-bold text-center">{plan.name}</h3>
+                  <p className="text-xs text-gray-300 mb-2 sm:mb-3 text-center">{plan.period}</p>
 
-                  <div className="bg-white/30 flex flex-col items-center justify-center  rounded-full h-30 w-30 mb-2">
-                    <span className="text-xl font-bold text-center text-white w-[80%]">{plan.price}</span>
+                  <div className="bg-white/30 flex flex-col items-center justify-center rounded-full h-20 w-20 sm:h-24 sm:w-24 lg:h-30 lg:w-30 mb-2">
+                    <span className="text-sm sm:text-lg lg:text-xl font-bold text-center text-white px-2">{plan.price}</span>
                   </div>
                   
                   <div className="text-center">
@@ -306,7 +303,7 @@ const PricingSection = ({ isDark = false }) => {
                 
                 {/* Wavy bottom border */}
                 <div className="absolute bottom-0 left-0 w-full">
-                  <svg viewBox="0 0 400 40" className="w-full h-6" preserveAspectRatio="none">
+                  <svg viewBox="0 0 400 40" className="w-full h-4 sm:h-6" preserveAspectRatio="none">
                     <path 
                       d="M0,20 Q100,0 200,20 T400,20 L400,40 L0,40 Z" 
                       className={`fill-current ${plan.bgGradient.includes('purple') ? 'text-purple-50' : 
@@ -317,10 +314,10 @@ const PricingSection = ({ isDark = false }) => {
               </div>
               
               {/* Features */}
-              <div className={`bg-gradient-to-br ${plan.bgGradient} p-6 relative`}>
+              <div className={`bg-gradient-to-br ${plan.bgGradient} p-4 sm:p-6 relative`}>
                 {/* Light wavy overlay at the bottom - behind content */}
                 <div className="absolute bottom-0 left-0 w-full pointer-events-none">
-                  <svg viewBox="0 0 400 60" className="w-full h-8" preserveAspectRatio="none">
+                  <svg viewBox="0 0 400 60" className="w-full h-6 sm:h-8" preserveAspectRatio="none">
                     <path 
                       d="M0,30 Q100,10 200,30 T400,30 L400,60 L0,60 Z" 
                       className={`fill-current ${isDark ? 'text-blue-800 opacity-40' : 'text-white opacity-60'}`}
@@ -330,13 +327,13 @@ const PricingSection = ({ isDark = false }) => {
                 
                 {/* Content with higher z-index to stay above the wave */}
                 <div className="relative z-10">
-                  <ul className="space-y-1.5 mb-4">
+                  <ul className="space-y-1 sm:space-y-1.5 mb-4 sm:mb-6">
                     {plan.features.map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-start">
                         {feature.included ? (
-                          <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                          <Check className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
                         ) : (
-                          <X className="w-4 h-4 text-red-400 mr-2 flex-shrink-0 mt-0.5" />
+                          <X className="w-3 h-3 sm:w-4 sm:h-4 text-red-400 mr-2 flex-shrink-0 mt-0.5" />
                         )}
                         <span className={`text-xs leading-relaxed ${
                           feature.included 
@@ -353,21 +350,21 @@ const PricingSection = ({ isDark = false }) => {
                   {!userData ? (
                     <button
                       onClick={() => handlePlanClick(plan.id, plan.name)}
-                      className={`w-full ${plan.buttonColor} text-white block text-center py-2.5 px-4 rounded-full text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5`}
+                      className={`w-full ${plan.buttonColor} text-white block text-center py-2 sm:py-2.5 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5`}
                     >
                       {plan.name === 'ENTERPRISE' ? 'CONTACT SALES →' : 'SUBSCRIBE NOW →'}
                     </button>
                   ) : shouldRedirectToPayments() ? (
                     <Link 
                       href={`/payments/${plan.id}`} 
-                      className={`w-full ${plan.buttonColor} text-white block text-center py-2.5 px-4 rounded-full text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5`}
+                      className={`w-full ${plan.buttonColor} text-white block text-center py-2 sm:py-2.5 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5`}
                     >
                       {plan.name === 'ENTERPRISE' ? 'CONTACT SALES →' : 'SUBSCRIBE NOW →'}
                     </Link>
                   ) : (
                     <button
                       onClick={() => handlePlanClick(plan.id, plan.name)}
-                      className={`w-full ${plan.buttonColor} text-white block text-center py-2.5 px-4 rounded-full text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5`}
+                      className={`w-full ${plan.buttonColor} text-white block text-center py-2 sm:py-2.5 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5`}
                     >
                       {plan.name === 'ENTERPRISE' ? 'CONTACT SALES →' : 'SUBSCRIBE NOW →'}
                     </button>
@@ -379,7 +376,7 @@ const PricingSection = ({ isDark = false }) => {
         </div>
         
         {/* Additional info */}
-        <div className="text-center mt-8">
+        <div className="text-center mt-6 sm:mt-8 px-4">
           <p className={`${isDark ? 'text-gray-400' : 'text-gray-500'} text-xs`}>
             * Enterprise plan includes unlimited scans. Standard and Premium plans include ${plans.length > 0 ? `$${plans[0]?.originalData?.overage_rate || '0.10'}` : '$0.10'} per additional scan after monthly limit.
           </p>
