@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Eye, CheckCircle, XCircle, Calendar, Building, Mail, FileText, AlertCircle, Users, Download, Search, Filter, ChevronDown, ChevronUp, Clock, ShieldCheck, FileDigit, User, MapPin, Home, Briefcase, FileBadge } from 'lucide-react';
+import { Eye, CheckCircle, XCircle, Calendar, Building, Mail, FileText, AlertCircle, Users, Download, Search, Filter, ChevronDown, ChevronUp, Clock, ShieldCheck, FileDigit, User, MapPin, Home, Briefcase, FileBadge, CreditCard } from 'lucide-react';
 
 const BusinessApprovalSectionUpdated = () => {
   const [businesses, setBusinesses] = useState([]);
@@ -286,41 +286,7 @@ const BusinessApprovalSectionUpdated = () => {
     }
   };
 
-  const renderMobileCard = (business, isApproved = false) => (
-    <div key={business.id} className="bg-white border border-gray-100 rounded-xl p-4 mb-3 shadow-sm hover:shadow-md transition-all duration-300 ease-in-out hover:border-blue-100">
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-gray-900 truncate mb-1">
-            {business.business_name}
-          </h3>
-          <p className="text-xs text-gray-600 truncate">
-            <FileDigit className="inline mr-1 w-3 h-3" />
-            {business.business_registration_number}
-          </p>
-        </div>
-        {getStatusBadge(business.user.business_verified)}
-      </div>
-      
-      <div className="space-y-2 mb-3">
-        <div className="flex items-center text-xs text-gray-700 bg-gray-50 rounded-lg p-2 transition-all duration-200 hover:bg-gray-100">
-          <Mail className="h-3.5 w-3.5 mr-2 text-blue-500" />
-          <span className="truncate">{business.user.email}</span>
-        </div>
-        <div className="flex items-center text-xs text-gray-600 bg-gray-50 rounded-lg p-2 transition-all duration-200 hover:bg-gray-100">
-          <Calendar className="h-3.5 w-3.5 mr-2 text-purple-500" />
-          <span>{formatDate(isApproved ? business.updated_at : business.created_at)}</span>
-        </div>
-      </div>
-      
-      <button
-        onClick={() => handleViewDocument(business)}
-        className="w-full inline-flex items-center justify-center px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-xs font-medium rounded-lg hover:from-blue-700 hover:to-blue-600 transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
-      >
-        <Eye className="h-3.5 w-3.5 mr-1.5" />
-        View Details
-      </button>
-    </div>
-  );
+ 
 
   const renderBusinessTable = (businessList, isApproved = false) => (
     <div className="overflow-hidden">
@@ -680,10 +646,10 @@ const BusinessApprovalSectionUpdated = () => {
         </div>
       </div>
 
-      {/* Modal */}
+            {/* Modal */}
       {isModalOpen && selectedBusiness && (
         <div className="fixed inset-0 bg-black/50 overflow-y-auto h-full w-full z-50 p-2">
-          <div className="relative top-2 sm:top-8 mx-auto border-0 w-full max-w-3xl shadow-xl rounded bg-white">
+          <div className="relative top-2 sm:top-8 mx-auto border-0 w-full max-w-4xl shadow-xl rounded bg-white">
             {/* Modal Header */}
             <div className="bg-slate-800 text-white p-3 sm:p-4">
               <div className="flex items-center justify-between">
@@ -699,204 +665,411 @@ const BusinessApprovalSectionUpdated = () => {
                   }}
                   className="text-white/80 hover:text-white hover:bg-white/20 rounded p-1"
                   disabled={actionLoading}
->
+                >
                   <XCircle className="h-4 w-4" />
                 </button>
               </div>
             </div>
             
             <div className="p-3 sm:p-4 max-h-[80vh] overflow-y-auto">
-              <div className="space-y-4">
-                {/* Business Information */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                  <div className="bg-blue-50 rounded p-3">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Business Name</label>
-                    <p className="text-gray-900 text-sm font-medium">{selectedBusiness.business_name}</p>
+              <div className="space-y-6">
+                {/* Business Information Section */}
+                <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+                  <h4 className="text-sm font-semibold text-blue-900 mb-3 flex items-center">
+                    <Briefcase className="h-4 w-4 mr-2" />
+                    Business Information
+                  </h4>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    <div className="bg-white rounded p-3 shadow-sm">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Business Name</label>
+                      <p className="text-gray-900 text-sm font-medium">{selectedBusiness.business_name}</p>
+                    </div>
+                    <div className="bg-white rounded p-3 shadow-sm">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Registration Number</label>
+                      <p className="text-gray-900 text-sm font-medium">{selectedBusiness.business_registration_number}</p>
+                    </div>
+                    <div className="bg-white rounded p-3 shadow-sm">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Business Email</label>
+                      <p className="text-gray-900 text-sm font-medium">{selectedBusiness.email}</p>
+                    </div>
+                    <div className="bg-white rounded p-3 shadow-sm">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">User Email</label>
+                      <p className="text-gray-900 text-sm font-medium">{selectedBusiness.user.email}</p>
+                    </div>
                   </div>
-                  <div className="bg-blue-50 rounded p-3">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Registration Number</label>
-                    <p className="text-gray-900 text-sm font-medium">{selectedBusiness.business_registration_number}</p>
+                </div>
+
+                {/* Business Address Section */}
+                <div className="bg-gradient-to-r from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                  <h4 className="text-sm font-semibold text-green-900 mb-3 flex items-center">
+                    <MapPin className="h-4 w-4 mr-2" />
+                    Business Address
+                  </h4>
+                  <div className="bg-white rounded p-3 shadow-sm">
+                    <div className="text-gray-900 text-sm space-y-1">
+                      <p className="font-medium">{selectedBusiness.street}</p>
+                      {selectedBusiness.street_line2 && <p>{selectedBusiness.street_line2}</p>}
+                      <p>{selectedBusiness.city}, {selectedBusiness.state} {selectedBusiness.zip_code}</p>
+                      <p className="font-medium text-green-700">{selectedBusiness.country}</p>
+                    </div>
                   </div>
                 </div>
                 
-                <div className="bg-green-50 rounded p-3">
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Account Holder</label>
-                  <p className="text-gray-900 text-sm font-medium">
-                    {selectedBusiness.account_holder_first_name} {selectedBusiness.account_holder_last_name}
-                  </p>
+                {/* Account Holder Information Section */}
+                <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                  <h4 className="text-sm font-semibold text-purple-900 mb-3 flex items-center">
+                    <User className="h-4 w-4 mr-2" />
+                    Account Holder Details
+                  </h4>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    <div className="bg-white rounded p-3 shadow-sm">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Full Name</label>
+                      <p className="text-gray-900 text-sm font-medium">
+                        {selectedBusiness.account_holder_first_name} {selectedBusiness.account_holder_last_name}
+                      </p>
+                    </div>
+                    <div className="bg-white rounded p-3 shadow-sm">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Email</label>
+                      <p className="text-gray-900 text-sm font-medium">{selectedBusiness.account_holder_email}</p>
+                    </div>
+                    <div className="bg-white rounded p-3 shadow-sm">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Date of Birth</label>
+                      <p className="text-gray-900 text-sm font-medium">
+                        {new Date(selectedBusiness.account_holder_date_of_birth).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="bg-white rounded p-3 shadow-sm">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Phone</label>
+                      <p className="text-gray-900 text-sm font-medium">
+                        {selectedBusiness.user.country_code} {selectedBusiness.user.phone_no}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="bg-amber-50 rounded p-3">
-                  <label className="block text-xs font-medium text-gray-700 mb-1">Business Address</label>
-                  <div className="text-gray-900 text-sm space-y-1">
-                    <p>{selectedBusiness.street}</p>
-                    {selectedBusiness.street_line2 && <p>{selectedBusiness.street_line2}</p>}
-                    <p>{selectedBusiness.city}, {selectedBusiness.state} {selectedBusiness.zip_code}</p>
-                    <p className="font-medium">{selectedBusiness.country}</p>
+
+                {/* Account Holder Address Section */}
+                <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg p-4 border border-amber-200">
+                  <h4 className="text-sm font-semibold text-amber-900 mb-3 flex items-center">
+                    <Home className="h-4 w-4 mr-2" />
+                    Account Holder Address
+                  </h4>
+                  <div className="bg-white rounded p-3 shadow-sm">
+                    <div className="text-gray-900 text-sm space-y-1">
+                      <p className="font-medium">{selectedBusiness.account_holder_street}</p>
+                      {selectedBusiness.account_holder_street_line2 && (
+                        <p>{selectedBusiness.account_holder_street_line2}</p>
+                      )}
+                      <p>{selectedBusiness.account_holder_city}, {selectedBusiness.account_holder_state} {selectedBusiness.account_holder_zip_code}</p>
+                      <p className="font-medium text-amber-700">{selectedBusiness.account_holder_country}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ID Information Section */}
+                <div className="bg-gradient-to-r from-indigo-50 to-indigo-100 rounded-lg p-4 border border-indigo-200">
+                  <h4 className="text-sm font-semibold text-indigo-900 mb-3 flex items-center">
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Identity Information
+                  </h4>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                    <div className="bg-white rounded p-3 shadow-sm">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">ID Type</label>
+                      <p className="text-gray-900 text-sm font-medium">{selectedBusiness.account_holder_id_type}</p>
+                    </div>
+                    <div className="bg-white rounded p-3 shadow-sm">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">ID Number</label>
+                      <p className="text-gray-900 text-sm font-medium font-mono">
+                        {selectedBusiness.account_holder_id_number}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Account Status Section */}
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200">
+                  <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center">
+                    <ShieldCheck className="h-4 w-4 mr-2" />
+                    Account Status
+                  </h4>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                    <div className="bg-white rounded p-3 shadow-sm">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Merchant ID</label>
+                      <p className="text-gray-900 text-sm font-medium font-mono">{selectedBusiness.user.merchant_id}</p>
+                    </div>
+                    <div className="bg-white rounded p-3 shadow-sm">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Trial Status</label>
+                      <p className="text-gray-900 text-sm font-medium">
+                        {selectedBusiness.user.on_trial ? 'Active' : 'Inactive'}
+                      </p>
+                    </div>
+                    <div className="bg-white rounded p-3 shadow-sm">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Trial Calls Remaining</label>
+                      <p className="text-gray-900 text-sm font-medium">{selectedBusiness.user.trial_calls_remaining}</p>
+                    </div>
+                    <div className="bg-white rounded p-3 shadow-sm">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Trial Ends</label>
+                      <p className="text-gray-900 text-sm font-medium">
+                        {new Date(selectedBusiness.user.trial_ends_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="bg-white rounded p-3 shadow-sm">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">OTP Verified</label>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        selectedBusiness.user.otp_verified 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {selectedBusiness.user.otp_verified ? 'Verified' : 'Not Verified'}
+                      </span>
+                    </div>
+                    <div className="bg-white rounded p-3 shadow-sm">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Role</label>
+                      <p className="text-gray-900 text-sm font-medium">{selectedBusiness.user.role}</p>
+                    </div>
                   </div>
                 </div>
 
                 {/* Previous verification reason */}
                 {selectedBusiness.user.verification_reason && (
-                  <div className="bg-red-50 border border-red-200 rounded p-3">
-                    <label className="block text-xs font-medium text-red-800 mb-1 flex items-center">
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <label className="block text-xs font-medium text-red-800 mb-2 flex items-center">
                       <AlertCircle className="h-3 w-3 mr-1" />
-                      Previous Notes
+                      Previous Rejection Notes
                     </label>
-                    <p className="text-red-700 text-sm bg-white rounded p-2">{selectedBusiness.user.verification_reason}</p>
+                    <div className="bg-white rounded p-3 shadow-sm">
+                      <p className="text-red-700 text-sm">{selectedBusiness.user.verification_reason}</p>
+                    </div>
                   </div>
                 )}
 
-              {/* Document Section */}
-              {activeTab === "pending" && (
-                <div className="bg-white border border-gray-200 rounded overflow-hidden">
-                  <div className="bg-indigo-600 text-white p-3">
-                    <h4 className="text-sm font-medium flex items-center">
-                      <FileText className="h-4 w-4 mr-1" />
-                      Registration Document
-                    </h4>
-                  </div>
-                  
-                  <div className="p-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 space-y-2 sm:space-y-0">
-                      <div className="flex items-center min-w-0 bg-gray-50 rounded p-2">
-                        <FileText className="h-3 w-3 text-indigo-500 mr-1" />
-                        <span className="text-gray-700 text-xs truncate">
-                          {selectedBusiness.registration_document_path.split('/').pop()}
-                        </span>
+                {/* Documents Section */}
+                {activeTab === "pending" && (
+                  <div className="space-y-4">
+                    {/* Registration Document */}
+                    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                      <div className="bg-indigo-600 text-white p-3">
+                        <h4 className="text-sm font-medium flex items-center">
+                          <FileText className="h-4 w-4 mr-2" />
+                          Business Registration Document
+                        </h4>
                       </div>
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => window.open(`${selectedBusiness.registration_document_path}`, '_blank')}
-                          className="flex items-center px-2 py-1 bg-slate-700 text-white text-xs font-medium rounded hover:bg-slate-600">
-                          <Eye className="h-3 w-3 mr-1" />
-                          View
-                        </button>
-                        <button
-                          onClick={() => handleDownloadDocument(
-                            selectedBusiness.registration_document_path,
-                            `${selectedBusiness.business_name}_registration_document.${selectedBusiness.registration_document_path.split('.').pop()}`
-                          )}
-                          disabled={downloadLoading}
-                          className="flex items-center px-2 py-1 bg-emerald-600 text-white text-xs font-medium rounded hover:bg-emerald-700 disabled:opacity-50"
-                        >
-                          {downloadLoading ? (
-                            <div className="animate-spin rounded-full h-3 w-3 border border-white border-t-transparent mr-1"></div>
-                          ) : (
-                            <Download className="h-3 w-3 mr-1" />
-                          )}
-                          Download
-                        </button>
+                      
+                      <div className="p-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 space-y-2 sm:space-y-0">
+                          <div className="flex items-center min-w-0 bg-gray-50 rounded p-2">
+                            <FileText className="h-3 w-3 text-indigo-500 mr-1" />
+                            <span className="text-gray-700 text-xs truncate">
+                              {selectedBusiness.registration_document_path.split('/').pop()}
+                            </span>
+                          </div>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => window.open(`${selectedBusiness.registration_document_path}`, '_blank')}
+                              className="flex items-center px-2 py-1 bg-slate-700 text-white text-xs font-medium rounded hover:bg-slate-600">
+                              <Eye className="h-3 w-3 mr-1" />
+                              View
+                            </button>
+                            <button
+                              onClick={() => handleDownloadDocument(
+                                selectedBusiness.registration_document_path,
+                                `${selectedBusiness.business_name}_registration_document.${selectedBusiness.registration_document_path.split('.').pop()}`
+                              )}
+                              disabled={downloadLoading}
+                              className="flex items-center px-2 py-1 bg-emerald-600 text-white text-xs font-medium rounded hover:bg-emerald-700 disabled:opacity-50"
+                            >
+                              {downloadLoading ? (
+                                <div className="animate-spin rounded-full h-3 w-3 border border-white border-t-transparent mr-1"></div>
+                              ) : (
+                                <Download className="h-3 w-3 mr-1" />
+                              )}
+                              Download
+                            </button>
+                          </div>
+                        </div>
+                        
+                        {/* Document Preview */}
+                        <div className="bg-gray-50 rounded p-3">
+                          <div className="aspect-w-16 aspect-h-9">
+                            {selectedBusiness.registration_document_path.toLowerCase().includes('.pdf') ? (
+                              <iframe
+                                src={`${selectedBusiness.registration_document_path}`}
+                                className="w-full h-48 border-0 rounded"
+                                title="Registration Document Preview"
+                              />
+                            ) : (
+                              <img
+                                src={`${selectedBusiness.registration_document_path}`}
+                                alt="Registration Document"
+                                className="w-full h-48 object-contain rounded"
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling.style.display = 'flex';
+                                }}
+                              />
+                            )}
+                            <div className="hidden w-full h-48 bg-gray-100 rounded flex items-center justify-center">
+                              <div className="text-center">
+                                <FileText className="h-8 w-8 text-gray-400 mx-auto mb-1" />
+                                <p className="text-gray-500 text-xs">Preview not available</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    
-                    {/* Document Preview */}
-                    <div className="bg-gray-50 rounded p-3">
-                      <div className="aspect-w-16 aspect-h-9">
-                        {selectedBusiness.registration_document_path.toLowerCase().includes('.pdf') ? (
-                          <iframe
-                            src={`${selectedBusiness.registration_document_path}`}
-                            className="w-full h-48 border-0 rounded"
-                            title="Document Preview"
-                          />
-                        ) : (
-                          <img
-                            src={`${selectedBusiness.registration_document_path}`}
-                            alt="Registration Document"
-                            className="w-full h-48 object-contain rounded"
-                            onError={(e) => {
-                              e.target.style.display = 'none';
-                              e.target.nextSibling.style.display = 'flex';
-                            }}
-                          />
-                        )}
-                        <div className="hidden w-full h-48 bg-gray-100 rounded flex items-center justify-center">
-                          <div className="text-center">
-                            <FileText className="h-8 w-8 text-gray-400 mx-auto mb-1" />
-                            <p className="text-gray-500 text-xs">Preview not available</p>
+
+                    {/* ID Document */}
+                    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                      <div className="bg-purple-600 text-white p-3">
+                        <h4 className="text-sm font-medium flex items-center">
+                          <CreditCard className="h-4 w-4 mr-2" />
+                          Account Holder ID Document
+                        </h4>
+                      </div>
+                      
+                      <div className="p-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 space-y-2 sm:space-y-0">
+                          <div className="flex items-center min-w-0 bg-gray-50 rounded p-2">
+                            <CreditCard className="h-3 w-3 text-purple-500 mr-1" />
+                            <span className="text-gray-700 text-xs truncate">
+                              {selectedBusiness.account_holder_id_document_path.split('/').pop()}
+                            </span>
+                          </div>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => window.open(`${selectedBusiness.account_holder_id_document_path}`, '_blank')}
+                              className="flex items-center px-2 py-1 bg-slate-700 text-white text-xs font-medium rounded hover:bg-slate-600">
+                              <Eye className="h-3 w-3 mr-1" />
+                              View
+                            </button>
+                            <button
+                              onClick={() => handleDownloadDocument(
+                                selectedBusiness.account_holder_id_document_path,
+                                `${selectedBusiness.account_holder_first_name}_${selectedBusiness.account_holder_last_name}_id_document.${selectedBusiness.account_holder_id_document_path.split('.').pop()}`
+                              )}
+                              disabled={downloadLoading}
+                              className="flex items-center px-2 py-1 bg-emerald-600 text-white text-xs font-medium rounded hover:bg-emerald-700 disabled:opacity-50"
+                            >
+                              {downloadLoading ? (
+                                <div className="animate-spin rounded-full h-3 w-3 border border-white border-t-transparent mr-1"></div>
+                              ) : (
+                                <Download className="h-3 w-3 mr-1" />
+                              )}
+                              Download
+                            </button>
+                          </div>
+                        </div>
+                        
+                        {/* Document Preview */}
+                        <div className="bg-gray-50 rounded p-3">
+                          <div className="aspect-w-16 aspect-h-9">
+                            {selectedBusiness.account_holder_id_document_path.toLowerCase().includes('.pdf') ? (
+                              <iframe
+                                src={`${selectedBusiness.account_holder_id_document_path}`}
+                                className="w-full h-48 border-0 rounded"
+                                title="ID Document Preview"
+                              />
+                            ) : (
+                              <img
+                                src={`${selectedBusiness.account_holder_id_document_path}`}
+                                alt="ID Document"
+                                className="w-full h-48 object-contain rounded"
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling.style.display = 'flex';
+                                }}
+                              />
+                            )}
+                            <div className="hidden w-full h-48 bg-gray-100 rounded flex items-center justify-center">
+                              <div className="text-center">
+                                <CreditCard className="h-8 w-8 text-gray-400 mx-auto mb-1" />
+                                <p className="text-gray-500 text-xs">Preview not available</p>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Reject Reason Form */}
-             {showRejectForm && (
-                <div className="bg-red-50 border border-red-200 rounded p-3">
-                  <label className="block text-xs font-medium text-red-800 mb-1 flex items-center">
-                    <XCircle className="h-3 w-3 mr-1" />
-                    Reason for Rejection *
-                  </label>
-                  <textarea
-                    value={rejectReason}
-                    onChange={(e) => setRejectReason(e.target.value)}
-                    className="w-full px-2 py-1.5 border text-black border-red-300 rounded focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500 text-sm"
-                    rows="3"
-                    placeholder="Please provide a detailed reason for rejection..."
-                    required
-                  />
-                </div>
-              )}
-            </div>   
-        {/* Action Buttons */}
-            {activeTab === 'pending' && (
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-4 pt-3 border-t">
-                <button
-                  onClick={() => handleApprove(selectedBusiness.id)}
-                  disabled={actionLoading}
-                  className="flex items-center justify-center px-3 py-1.5 bg-emerald-600 text-white text-xs font-medium rounded hover:bg-emerald-700 disabled:opacity-50"
-                >
-                  {actionLoading ? (
-                    <div className="animate-spin rounded-full h-3 w-3 border border-white border-t-transparent mr-1"></div>
-                  ) : (
-                    <CheckCircle className="h-3 w-3 mr-1" />
-                  )}
-                  Approve
-                </button>
+                {/* Reject Reason Form */}
+                {showRejectForm && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <label className="block text-xs font-medium text-red-800 mb-2 flex items-center">
+                      <XCircle className="h-3 w-3 mr-1" />
+                      Reason for Rejection *
+                    </label>
+                    <textarea
+                      value={rejectReason}
+                      onChange={(e) => setRejectReason(e.target.value)}
+                      className="w-full px-3 py-2 border text-black border-red-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
+                      rows="4"
+                      placeholder="Please provide a detailed reason for rejection..."
+                      required
+                    />
+                  </div>
+                )}
+              </div>   
 
-                {!showRejectForm ? (
+              {/* Action Buttons */}
+              {activeTab === 'pending' && (
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end space-y-2 sm:space-y-0 sm:space-x-2 mt-6 pt-4 border-t">
                   <button
-                    onClick={handleRejectClick}
+                    onClick={() => handleApprove(selectedBusiness.id)}
                     disabled={actionLoading}
-                    className="flex items-center justify-center px-3 py-1.5 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 disabled:opacity-50"
-                  >
-                    <XCircle className="h-3 w-3 mr-1" />
-                    Reject
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleReject(selectedBusiness.id)}
-                    disabled={actionLoading || !rejectReason.trim()}
-                    className="flex items-center justify-center px-3 py-1.5 bg-red-600 text-white text-xs font-medium rounded hover:bg-red-700 disabled:opacity-50"
+                    className="flex items-center justify-center px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition-all duration-200"
                   >
                     {actionLoading ? (
-                      <div className="animate-spin rounded-full h-3 w-3 border border-white border-t-transparent mr-1"></div>
+                      <div className="animate-spin rounded-full h-4 w-4 border border-white border-t-transparent mr-2"></div>
                     ) : (
-                      <XCircle className="h-3 w-3 mr-1" />
+                      <CheckCircle className="h-4 w-4 mr-2" />
                     )}
-                    Confirm Rejection
+                    Approve Business
                   </button>
-                )}
-                
-                <button
-                  onClick={() => {
-                    setIsModalOpen(false);
-                    setShowRejectForm(false);
-                    setRejectReason('');
-                  }}
-                  disabled={actionLoading}
-                  className="px-3 py-1.5 text-gray-700 bg-gray-200 hover:bg-gray-300 text-xs font-medium rounded disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
+
+                  {!showRejectForm ? (
+                    <button
+                      onClick={handleRejectClick}
+                      disabled={actionLoading}
+                      className="flex items-center justify-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 disabled:opacity-50 transition-all duration-200"
+                    >
+                      <XCircle className="h-4 w-4 mr-2" />
+                      Reject Business
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleReject(selectedBusiness.id)}
+                      disabled={actionLoading || !rejectReason.trim()}
+                      className="flex items-center justify-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 disabled:opacity-50 transition-all duration-200"
+                    >
+                      {actionLoading ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border border-white border-t-transparent mr-2"></div>
+                      ) : (
+                        <XCircle className="h-4 w-4 mr-2" />
+                      )}
+                      Confirm Rejection
+                    </button>
+                  )}
+                  
+                  <button
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      setShowRejectForm(false);
+                      setRejectReason('');
+                    }}
+                    disabled={actionLoading}
+                    className="px-4 py-2 text-gray-700 bg-gray-200 hover:bg-gray-300 text-sm font-medium rounded-lg disabled:opacity-50 transition-all duration-200"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
+    
   </div>
 ); 
 };
