@@ -434,7 +434,7 @@ const renderPendingStatus = () => {
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500 block mb-1">Email</label>
+                  <label className="text-sm font-medium text-gray-500 block mb-1"> Business Email</label>
                   <p className="text-base text-gray-900 font-mono bg-gray-50 px-3 py-2 rounded-md">
                     {userData?.email}
                   </p>

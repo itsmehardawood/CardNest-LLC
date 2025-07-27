@@ -833,16 +833,7 @@ const BusinessApprovalSectionUpdated = () => {
                   {new Date(selectedBusiness.user.trial_ends_at).toLocaleDateString()}
                 </p>
               </div>
-              <div className="bg-gray-50 rounded-xl p-4 hover:shadow-md transition-shadow duration-200">
-                <label className="block text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">OTP Verified</label>
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                  selectedBusiness.user.otp_verified 
-                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
-                    : 'bg-red-100 text-red-800 border border-red-200'
-                }`}>
-                  {selectedBusiness.user.otp_verified ? 'Verified' : 'Not Verified'}
-                </span>
-              </div>
+            
               <div className="bg-gray-50 rounded-xl p-4 hover:shadow-md transition-shadow duration-200">
                 <label className="block text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">Role</label>
                 <p className="text-gray-900 text-sm font-semibold">{selectedBusiness.user.role}</p>

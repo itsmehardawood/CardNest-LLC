@@ -133,7 +133,7 @@ export default function LoginPage() {
         },
         body: JSON.stringify({
           country_code: '+92',
-          login_input: 'test@hotmail.com'
+          login_input: 'helloworld@gmail.com'
         }),
       });
       const data = await response.json();

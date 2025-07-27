@@ -1,13 +1,13 @@
 'use client'
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState, useEffect, Suspense } from 'react';
-import BusinessScreen from '../components/Dashboard-Screens/BusinessScreen_new';
 import DocumentsScreen from '../components/Dashboard-Screens/DocumentScreens_new';
 import DevelopersScreen from '../components/Dashboard-Screens/Developer';
 import Sidebar from '../components/Dashboard-Screens/Sidebar';
 import HomeScreen from '../components/Dashboard-Screens/Homescreen_new';
 import CardFeatureScreen from '../components/Dashboard-Screens/CardFeatureScreen_new';
 import SubscriptionsScreen from '../components/Dashboard-Screens/SubscriptionScreen_new';
+import MainBusinessScreen from '../components/Dashboard-Screens/BusinessDataScreen/MainBusinessScreen';
 
 
 // Loading component for Suspense fallback
@@ -585,7 +585,7 @@ const checkBusinessStatus = async () => {
         
       case 'profile':
         return (
-          <BusinessScreen
+          <MainBusinessScreen
             businessInfo={businessInfo}
             documents={documents}
             status={status}
