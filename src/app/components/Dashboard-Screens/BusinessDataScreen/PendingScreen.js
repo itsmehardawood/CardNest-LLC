@@ -52,28 +52,30 @@ const PendingStatus = ({ verificationData, userData, submitSuccess, handleManual
               <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-gray-500 block mb-1">Business Name</label>
-                  <p className="text-base  text-gray-900">
-                    {profile?.business_name}
+                  <p className="text-base text-gray-900">
+                    {profile?.business_name || 'null'}
                   </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500 block mb-1">Registration Number</label>
                   <p className="text-base text-gray-900 font-mono bg-gray-50 px-3 py-2 rounded-md">
-                    {profile?.business_registration_number}
+                    {profile?.business_registration_number || 'null'}
                   </p>
                 </div>
               </div>
               <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-gray-500 block mb-1">Account Holder Name</label>
-                  <p className="text-base  text-gray-900">
-                    {profile?.account_holder_first_name} {profile?.account_holder_last_name}
+                  <p className="text-base text-gray-900">
+                    {(profile?.account_holder_first_name && profile?.account_holder_last_name) 
+                      ? `${profile?.account_holder_first_name} ${profile?.account_holder_last_name}` 
+                      : 'null'}
                   </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500 block mb-1">Business Email</label>
                   <p className="text-base text-gray-900 font-mono bg-gray-50 px-3 py-2 rounded-md">
-                    {userData?.email}
+                    {userData?.email || 'null'}
                   </p>
                 </div>
               </div>
@@ -89,25 +91,26 @@ const PendingStatus = ({ verificationData, userData, submitSuccess, handleManual
                 <div>
                   <label className="text-sm font-medium text-gray-500 block mb-1">Street Address</label>
                   <p className="text-sm text-gray-900">
-                    {profile?.street}
-                    {profile?.street_line2 && `, ${profile?.street_line2}`}
+                    {profile?.street 
+                      ? `${profile?.street}${profile?.street_line2 ? `, ${profile?.street_line2}` : ''}` 
+                      : 'null'}
                   </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500 block mb-1">City</label>
-                  <p className="text-sm text-gray-900">{profile?.city}</p>
+                  <p className="text-sm text-gray-900">{profile?.city || 'null'}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500 block mb-1">State</label>
-                  <p className="text-sm text-gray-900">{profile?.state}</p>
+                  <p className="text-sm text-gray-900">{profile?.state || 'null'}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500 block mb-1">ZIP Code</label>
-                  <p className="text-sm text-gray-900 font-mono">{profile?.zip_code}</p>
+                  <p className="text-sm text-gray-900 font-mono">{profile?.zip_code || 'null'}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500 block mb-1">Country</label>
-                  <p className="text-sm text-gray-900">{profile?.country}</p>
+                  <p className="text-sm text-gray-900">{profile?.country || 'null'}</p>
                 </div>
               </div>
             </div>
@@ -122,25 +125,26 @@ const PendingStatus = ({ verificationData, userData, submitSuccess, handleManual
                 <div>
                   <label className="text-sm font-medium text-gray-500 block mb-1">Street Address</label>
                   <p className="text-sm text-gray-900">
-                    {profile?.account_holder_street}
-                    {profile?.account_holder_street_line2 && `, ${profile?.account_holder_street_line2}`}
+                    {profile?.account_holder_street 
+                      ? `${profile?.account_holder_street}${profile?.account_holder_street_line2 ? `, ${profile?.account_holder_street_line2}` : ''}`
+                      : 'null'}
                   </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500 block mb-1">City</label>
-                  <p className="text-sm text-gray-900">{profile?.account_holder_city}</p>
+                  <p className="text-sm text-gray-900">{profile?.account_holder_city || 'null'}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500 block mb-1">State</label>
-                  <p className="text-sm text-gray-900">{profile?.account_holder_state}</p>
+                  <p className="text-sm text-gray-900">{profile?.account_holder_state || 'null'}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500 block mb-1">ZIP Code</label>
-                  <p className="text-sm text-gray-900 font-mono">{profile?.account_holder_zip_code}</p>
+                  <p className="text-sm text-gray-900 font-mono">{profile?.account_holder_zip_code || 'null'}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500 block mb-1">Country</label>
-                  <p className="text-sm text-gray-900">{profile?.account_holder_country}</p>
+                  <p className="text-sm text-gray-900">{profile?.account_holder_country || 'null'}</p>
                 </div>
               </div>
             </div>
@@ -154,11 +158,11 @@ const PendingStatus = ({ verificationData, userData, submitSuccess, handleManual
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="text-sm font-medium text-gray-500 block mb-1">ID Type</label>
-                  <p className="text-sm text-gray-900">{profile?.account_holder_id_type}</p>
+                  <p className="text-sm text-gray-900">{profile?.account_holder_id_type || 'null'}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500 block mb-1">ID Number</label>
-                  <p className="text-sm text-gray-900 font-mono">{profile?.account_holder_id_number}</p>
+                  <p className="text-sm text-gray-900 font-mono">{profile?.account_holder_id_number || 'null'}</p>
                 </div>
               </div>
               
@@ -203,11 +207,13 @@ const PendingStatus = ({ verificationData, userData, submitSuccess, handleManual
                 <div>
                   <label className="text-sm font-medium text-gray-500">Submitted Date</label>
                   <p className="text-sm font-semibold text-gray-900">
-                    {new Date(profile?.created_at).toLocaleDateString('en-US', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}
+                    {profile?.created_at 
+                      ? new Date(profile?.created_at).toLocaleDateString('en-US', { 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        })
+                      : 'null'}
                   </p>
                 </div>
               </div>

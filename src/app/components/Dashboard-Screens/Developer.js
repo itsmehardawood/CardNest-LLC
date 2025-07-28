@@ -16,14 +16,7 @@ function DevelopersScreen() {
     setError(null);
     
     try {
-      const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-      const merchantId = userData.user?.merchant_id;
-
-      if (!merchantId) {
-        throw new Error('Merchant ID not found in UserData');
-      }
-
-      const response = await fetch(`${baseURL}/api/superadmin/getDocumentation?merchant_id=${merchantId}`, {
+      const response = await fetch(`${baseURL}/api/superadmin/getDocumentation`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

@@ -11,7 +11,7 @@ const BusinessForm = ({
   submitSuccess 
 }) => {
   return (
-    <main>
+  <main>
       <h2 className="text-xl font-semibold text-gray-800 mb-6">
         Complete Your Business Profile
       </h2>
@@ -77,7 +77,7 @@ const BusinessForm = ({
                 type="text"
                 name="business_name"
                 value={businessInfo.business_name}
-                placeholder="Enter your business name"
+                placeholder="e.g., ABC Corporation, Johnson & Associates LLC"
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
@@ -93,6 +93,7 @@ const BusinessForm = ({
                 type="text"
                 name="business_registration_number"
                 value={businessInfo.business_registration_number}
+                placeholder="e.g., 12345678, EIN-987654321"
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
@@ -107,7 +108,7 @@ const BusinessForm = ({
               <input
                 type="email"
                 name="email"
-                placeholder="Enter the same email you entered while signing up"
+                placeholder="business@company.com"
                 value={businessInfo.email}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -131,6 +132,7 @@ const BusinessForm = ({
                   type="text"
                   name="street"
                   value={businessInfo.street}
+                  placeholder="123 Main Street, Suite 456"
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
@@ -145,6 +147,7 @@ const BusinessForm = ({
                   type="text"
                   name="street_line2"
                   value={businessInfo.street_line2}
+                  placeholder="Building B, Floor 5, Apartment 101"
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -158,6 +161,7 @@ const BusinessForm = ({
                   type="text"
                   name="city"
                   value={businessInfo.city}
+                  placeholder="New York"
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
@@ -172,6 +176,7 @@ const BusinessForm = ({
                   type="text"
                   name="state"
                   value={businessInfo.state}
+                  placeholder="New York"
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
@@ -186,35 +191,29 @@ const BusinessForm = ({
                   type="text"
                   name="zip_code"
                   value={businessInfo.zip_code}
+                  placeholder="10001"
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Country *
-                </label>
-                <input
-                  list="country-options"
-                  name="country"
-                  value={businessInfo.country}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                  placeholder="Enter your country"
-                />
-                <datalist id="country-options">
-                  <option value="United States" />
-                  <option value="Canada" />
-                  <option value="United Kingdom" />
-                  <option value="France" />
-                  <option value="India" />
-                  <option value="Pakistan" />
-                  <option value="France" />
-                  <option value="Others" />
-                </datalist>
-              </div>
+
+
+<div>
+ <label className="block text-sm font-medium text-gray-700 mb-2">
+   Country *
+ </label>
+ <input
+   type="text"
+   name="account_holder_country"
+   value={businessInfo.country}
+   onChange={handleInputChange}
+   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+   required
+   placeholder="United States"
+ />
+</div>
+            
             </div>
           </div>
 
@@ -232,6 +231,7 @@ const BusinessForm = ({
                   type="text"
                   name="account_holder_first_name"
                   value={businessInfo.account_holder_first_name}
+                  placeholder="John"
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
@@ -246,6 +246,7 @@ const BusinessForm = ({
                   type="text"
                   name="account_holder_last_name"
                   value={businessInfo.account_holder_last_name}
+                  placeholder="Smith"
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
@@ -260,6 +261,7 @@ const BusinessForm = ({
                   type="email"
                   name="account_holder_email"
                   value={businessInfo.account_holder_email}
+                  placeholder="john.smith@company.com"
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
@@ -268,7 +270,7 @@ const BusinessForm = ({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Date of Birth (YYYY-MM-DD) *
+                  Date of Birth *
                 </label>
                 <input
                   type="date"
@@ -280,27 +282,20 @@ const BusinessForm = ({
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Country *
-                </label>
-                <select
-                  name="account_holder_country"
-                  value={businessInfo.account_holder_country}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                >
-                  <option value="">Select a country</option>
-                  <option value="United States">United States</option>
-                  <option value="Canada">Canada</option>
-                  <option value="United Kingdom">United Kingdom</option>
-                  <option value="France">France</option>
-                  <option value="India">India</option>
-                  <option value="Pakistan">Pakistan</option>
-                  <option value="Others">Others</option>
-                </select>
-              </div>
+             <div>
+ <label className="block text-sm font-medium text-gray-700 mb-2">
+   Country *
+ </label>
+ <input
+   type="text"
+   name="account_holder_country"
+   value={businessInfo.account_holder_country}
+   onChange={handleInputChange}
+   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+   required
+   placeholder="United States"
+ />
+</div>
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -310,6 +305,7 @@ const BusinessForm = ({
                   type="text"
                   name="account_holder_street"
                   value={businessInfo.account_holder_street}
+                  placeholder="456 Oak Avenue, Apartment 7B"
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
@@ -324,6 +320,7 @@ const BusinessForm = ({
                   type="text"
                   name="account_holder_street_line2"
                   value={businessInfo.account_holder_street_line2}
+                  placeholder="Near Central Park, Building C"
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -337,6 +334,7 @@ const BusinessForm = ({
                   type="text"
                   name="account_holder_city"
                   value={businessInfo.account_holder_city}
+                  placeholder="Los Angeles"
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
@@ -351,6 +349,7 @@ const BusinessForm = ({
                   type="text"
                   name="account_holder_state"
                   value={businessInfo.account_holder_state}
+                  placeholder="California"
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
@@ -365,6 +364,7 @@ const BusinessForm = ({
                   type="text"
                   name="account_holder_zip_code"
                   value={businessInfo.account_holder_zip_code}
+                  placeholder="90210"
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -381,12 +381,13 @@ const BusinessForm = ({
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
-                  placeholder="e.g. Passport"
+                  placeholder="Passport"
                 />
                 <datalist id="id-type-options">
                   <option value="Passport" />
                   <option value="Driver License" />
                   <option value="National ID" />
+                  <option value="State ID" />
                 </datalist>
               </div>
 
@@ -398,6 +399,7 @@ const BusinessForm = ({
                   type="text"
                   name="account_holder_id_number"
                   value={businessInfo.account_holder_id_number}
+                  placeholder="A12345678 or DL123456789"
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required
@@ -421,6 +423,9 @@ const BusinessForm = ({
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   required
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  Upload a clear photo or scan of your ID (JPG, PNG, PDF - Max 10MB)
+                </p>
                 {businessInfo.account_holder_id_document && (
                   <div className="bg-gray-50 mt-2 p-2 rounded text-sm text-gray-700">
                     📄 {businessInfo.account_holder_id_document.name}
@@ -449,8 +454,7 @@ const BusinessForm = ({
                 required
               />
               <p className="text-xs text-gray-500 mt-1">
-                Required: Business Registration Document (PDF, DOC, DOCX, JPG,
-                JPEG, PNG)
+                Upload your business registration certificate, articles of incorporation, or business license (PDF, DOC, DOCX, JPG, JPEG, PNG - Max 10MB)
               </p>
             </div>
 
