@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import ApprovedStatus from "./ApprovedScreen";
 import PendingStatus from "./PendingScreen";
 import BusinessForm from "./BusinessForm";
+import { apiFetch } from "@/app/lib/api.js";
 
 
 function MainBusinessScreen({
@@ -42,8 +43,8 @@ function MainBusinessScreen({
 
         // Fetch business verification status from API
         if (userObj.id) {
-          const response = await fetch(
-            `https://cardsecuritysystem-8xdez.ondigitalocean.app/api/business-profile/business-verification-status?user_id=${userObj.id}`
+          const response = await apiFetch(
+            `/business-profile/business-verification-status?user_id=${userObj.id}`
           );
       
           if (response.ok) {

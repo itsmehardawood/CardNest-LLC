@@ -10,8 +10,8 @@ import PageHeader from '../components/Super Admin/AdminHeader';
 import NavigationSidebar from '../components/Super Admin/AdminNav';
 import DashboardFooter from '../components/Super Admin/AdminFooter';
 import HomePage from '../components/Super Admin/HomePage';
-import BusinessApprovalSectionUpdated from '../components/Super Admin/BusinessApprovalSection ';
 import GrantAccessForm from '../components/Super Admin/GrantAcess';
+import BusinessApprovalSectionUpdated from '../components/Super Admin/ApprovalScreen/MainBusinessApproval';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('Home');

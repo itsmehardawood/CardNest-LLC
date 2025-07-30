@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { ShieldCheck } from 'lucide-react';
+import { apiFetch } from '@/app/lib/api.js';
 
 export default function GrantAccessForm() {
   const [adminEmail, setAdminEmail] = useState('');
@@ -32,7 +33,7 @@ export default function GrantAccessForm() {
     setError(null);
 
     try {
-      const res = await fetch('https://cardsecuritysystem-8xdez.ondigitalocean.app/api/superadmin/grant-subadmin-access', {
+      const res = await apiFetch('/superadmin/grant-subadmin-access', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

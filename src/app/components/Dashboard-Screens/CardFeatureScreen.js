@@ -74,7 +74,7 @@ const CreditCardFeatureSelector = () => {
               
               try {
                 const response = await fetch(
-                  `https://cardsecuritysystem-8xdez.ondigitalocean.app/api/Subscriptions/GetByUserIDorMerchantID?${param}`,
+                  `http://35.175.120.34:8001/api/Subscriptions/GetByUserIDorMerchantID?${param}`,
                   {
                     method: 'GET',
                     headers: {
@@ -154,7 +154,7 @@ const CreditCardFeatureSelector = () => {
 
       console.log('Sending request to API:', requestBody);
 
-      const response = await fetch('https://cardsecuritysystem-8xdez.ondigitalocean.app/api/feature/store', {
+      const response = await fetch('http://35.175.120.34:8001/api/feature/store', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

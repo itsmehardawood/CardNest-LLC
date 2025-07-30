@@ -1,3 +1,4 @@
+import { apiFetch } from "@/app/lib/api.js";
 import React, { useState } from "react";
 
 const APIDocumentationSection = () => {
@@ -14,7 +15,6 @@ const APIDocumentationSection = () => {
   const [error, setError] = useState(null);
 
   // Base URL for API calls
-  const baseURL = 'https://cardsecuritysystem-8xdez.ondigitalocean.app';
 
   // Fetch existing documentation
   const fetchDocuments = async () => {
@@ -29,7 +29,7 @@ const APIDocumentationSection = () => {
         throw new Error('Merchant ID not found in UserData');
       }
 
-      const response = await fetch(`${baseURL}/api/superadmin/getDocumentation?merchant_id=${merchantId}`, {
+      const response = await apiFetch(`/superadmin/getDocumentation?merchant_id=${merchantId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -146,7 +146,7 @@ const APIDocumentationSection = () => {
       };
 
       // Make API call
-      const response = await fetch(`${baseURL}/api/superadmin/uploadDocumentation`, {
+      const response = await apiFetch(`/superadmin/uploadDocumentation`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

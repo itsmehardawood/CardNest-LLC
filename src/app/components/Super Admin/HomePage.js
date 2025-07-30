@@ -14,6 +14,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import moment from 'moment';
+import { apiFetch } from '@/app/lib/api.js';
 export default function HomePage() {
   const [stackedData, setStackedData] = useState([]);
   const [histogramData, setHistogramData] = useState([]);
@@ -32,8 +33,8 @@ export default function HomePage() {
   const fetchData = async () => {
     try {
       const [pendingRes, approvedRes] = await Promise.all([
-        fetch('https://cardsecuritysystem-8xdez.ondigitalocean.app/api/business-profile'),
-        fetch('https://cardsecuritysystem-8xdez.ondigitalocean.app/api/business-profile/approved'),
+        apiFetch('/business-profile'),
+        apiFetch('/business-profile/approved'),
       ]);
       const pendingData = await pendingRes.json();
       const approvedData = await approvedRes.json();

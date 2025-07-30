@@ -1221,6 +1221,7 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
 } from "firebase/auth";
+import { apiFetch } from "../lib/api.js";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -1333,8 +1334,8 @@ export default function AdminLoginPage() {
 
         console.log("Sending admin login request:", JSON.stringify(requestBody, null, 2));
 
-        const response = await fetch(
-          "https://cardsecuritysystem-8xdez.ondigitalocean.app/api/login",
+        const response = await apiFetch(
+          "/login",
           {
             method: "POST",
             headers: {

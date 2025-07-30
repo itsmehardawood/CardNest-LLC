@@ -12,6 +12,7 @@ import {
   FiExternalLink,
 } from "react-icons/fi";
 import { FaShieldAlt } from "react-icons/fa";
+import { apiFetch } from "@/app/lib/api.js";
 
 function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
   const [userData, setUserData] = useState(null);
@@ -32,8 +33,8 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
           setUserData(userObj);
 
           if (userObj.id) {
-            const response = await fetch(
-              `https://cardsecuritysystem-8xdez.ondigitalocean.app/api/business-profile/business-verification-status?user_id=${userObj.id}`,
+            const response = await apiFetch(
+              `/business-profile/business-verification-status?user_id=${userObj.id}`,
               {
                 headers: {
                   Authorization: `Bearer ${userObj.token}`,

@@ -8,6 +8,7 @@ import HomeScreen from '../components/Dashboard-Screens/Homescreen_new';
 import CardFeatureScreen from '../components/Dashboard-Screens/CardFeatureScreen_new';
 import SubscriptionsScreen from '../components/Dashboard-Screens/SubscriptionScreen_new';
 import MainBusinessScreen from '../components/Dashboard-Screens/BusinessDataScreen/MainBusinessScreen';
+import { apiFetch } from '../lib/api.js';
 
 
 // Loading component for Suspense fallback
@@ -324,7 +325,7 @@ const missingFields = requiredFields.filter(field => !businessInfo[field] || bus
       console.log(`${key}: ${value}`);
     }
     // Make API call
-    const response = await fetch('https://cardsecuritysystem-8xdez.ondigitalocean.app/api/business-profile', {
+    const response = await apiFetch('/business-profile', {
       method: 'POST',
       body: formData,
       // Don't set Content-Type header - let browser set it for FormData
@@ -414,7 +415,7 @@ const missingFields = requiredFields.filter(field => !businessInfo[field] || bus
 // API function to check business verification status
 const checkBusinessVerificationStatus = async (userId) => {
   try {
-    const response = await fetch(`https://cardsecuritysystem-8xdez.ondigitalocean.app/api/business-profile/business-verification-status?user_id=${userId}`);
+    const response = await apiFetch(`/business-profile/business-verification-status?user_id=${userId}`);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -494,7 +495,7 @@ const checkBusinessVerificationStatus = async (userId) => {
 // Legacy API function to check business status (keeping as backup)
 const checkBusinessStatus = async () => {
   try {
-    const response = await fetch(`https://cardsecuritysystem-8xdez.ondigitalocean.app/api/business-profile`);
+    const response = await apiFetch(`/business-profile`);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

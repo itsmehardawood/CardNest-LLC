@@ -2,6 +2,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { apiFetch } from '../lib/api.js';
 export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -11,7 +12,7 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError('');
     try {
-      const response = await fetch('https://cardsecuritysystem-8xdez.ondigitalocean.app/api/login', {
+      const response = await apiFetch('/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

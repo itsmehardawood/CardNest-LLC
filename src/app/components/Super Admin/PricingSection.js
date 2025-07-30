@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Edit, Save, X, AlertCircle, CheckCircle, RefreshCw, DollarSign, Calendar, Users } from 'lucide-react';
+import { apiFetch } from '@/app/lib/api.js';
 
 function PricingSectionAdmin() {
   const [packages, setPackages] = useState([]);
@@ -15,7 +16,7 @@ function PricingSectionAdmin() {
   const fetchPricingData = async () => {
     setLoading(true);
     try {
-      const response = await fetch('https://cardsecuritysystem-8xdez.ondigitalocean.app/api/Packages');
+      const response = await apiFetch('/Packages');
       
       if (response.ok) {
         const result = await response.json();
@@ -38,7 +39,7 @@ function PricingSectionAdmin() {
   const updatePricing = async (packageData) => {
     setLoading(true);
     try {
-      const response = await fetch(`https://cardsecuritysystem-8xdez.ondigitalocean.app/api/Packages/Update/${packageData.id}`, {
+      const response = await apiFetch(`/Packages/Update/${packageData.id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

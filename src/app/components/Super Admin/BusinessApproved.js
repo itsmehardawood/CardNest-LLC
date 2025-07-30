@@ -740,6 +740,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Eye, CheckCircle, XCircle, Calendar, Building, Mail, FileText, AlertCircle, Users, Download, Search, Filter } from 'lucide-react';
+import { apiFetch } from '@/app/lib/api.js';
 
 const BusinessApprovalSection = () => {
   const [businesses, setBusinesses] = useState([]);
@@ -760,7 +761,7 @@ const BusinessApprovalSection = () => {
     const fetchAllBusinesses = async () => {
       try {
         // Fetch pending businesses
-        const pendingResponse = await fetch('https://cardsecuritysystem-8xdez.ondigitalocean.app/api/business-profile');
+        const pendingResponse = await apiFetch('/business-profile');
         const pendingData = await pendingResponse.json();
             
         if (pendingData.status) {
@@ -775,7 +776,7 @@ const BusinessApprovalSection = () => {
         }
 
         // Fetch approved businesses
-        const approvedResponse = await fetch('https://cardsecuritysystem-8xdez.ondigitalocean.app/api/business-profile/approved');
+        const approvedResponse = await apiFetch('/business-profile/approved');
         const approvedData = await approvedResponse.json();
             
         if (approvedData.status) {
@@ -798,7 +799,7 @@ const BusinessApprovalSection = () => {
     
     setApprovedLoading(true);
     try {
-      const response = await fetch('https://cardsecuritysystem-8xdez.ondigitalocean.app/api/business-profile/approved');
+      const response = await apiFetch('/business-profile/approved');
       const data = await response.json();
           
       if (data.status) {
@@ -896,7 +897,7 @@ const BusinessApprovalSection = () => {
   const handleApprove = async (businessId) => {
     setActionLoading(true);
     try {
-      const response = await fetch('https://cardsecuritysystem-8xdez.ondigitalocean.app/api/business-profile/decision', {
+      const response = await apiFetch('/business-profile/decision', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -951,7 +952,7 @@ const BusinessApprovalSection = () => {
 
     setActionLoading(true);
     try {
-      const response = await fetch('https://cardsecuritysystem-8xdez.ondigitalocean.app/api/business-profile/decision', {
+      const response = await apiFetch('/business-profile/decision', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

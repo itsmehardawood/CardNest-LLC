@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Check, CreditCard, Shield, Zap, Phone, RotateCcw, Lock, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
+import { apiFetch } from '@/app/lib/api.js';
 
 const CreditCardFeatureSelector = () => {
   const [selectedFeatures, setSelectedFeatures] = useState({
@@ -54,7 +55,7 @@ const CreditCardFeatureSelector = () => {
     
     setIsLoadingFeatures(true);
     try {
-      const response = await fetch(`https://cardsecuritysystem-8xdez.ondigitalocean.app/api/feature/get?user_id=${userIdToUse}`, {
+      const response = await apiFetch(`/feature/get?user_id=${userIdToUse}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -119,7 +120,7 @@ const CreditCardFeatureSelector = () => {
         symmetry: selectedFeatures.symmetry
       };
 
-      const response = await fetch('https://cardsecuritysystem-8xdez.ondigitalocean.app/api/feature/store', {
+      const response = await apiFetch('/feature/store', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -170,8 +171,8 @@ const CreditCardFeatureSelector = () => {
               if (subscriptionFound) break;
               
               try {
-                const response = await fetch(
-                  `https://cardsecuritysystem-8xdez.ondigitalocean.app/api/Subscriptions/GetByUserIDorMerchantID?${param}`,
+                const response = await apiFetch(
+                  `/Subscriptions/GetByUserIDorMerchantID?${param}`,
                   {
                     method: 'GET',
                     headers: {

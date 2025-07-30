@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import PricingSection from '../General/SubscriptionsCard';
+import { apiFetch } from '@/app/lib/api.js';
 
 function SubscriptionsScreen() {
   const router = useRouter();
@@ -33,8 +34,8 @@ function SubscriptionsScreen() {
             for (const param of paramVariations) {
               if (subscriptionFound) break;
               try {
-                const response = await fetch(
-                  `https://cardsecuritysystem-8xdez.ondigitalocean.app/api/Subscriptions/GetByUserIDorMerchantID?${param}`,
+                const response = await apiFetch(
+                  `/Subscriptions/GetByUserIDorMerchantID?${param}`,
                   { method: 'GET', headers: { 'Content-Type': 'application/json' } }
                 );
                 

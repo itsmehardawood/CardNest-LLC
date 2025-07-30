@@ -1,3 +1,4 @@
+import { apiFetch } from '@/app/lib/api.js';
 import React, { useState, useEffect } from 'react';
 
 function DevelopersScreen() {
@@ -8,7 +9,6 @@ function DevelopersScreen() {
   const [error, setError] = useState(null);
 
   // Base URL for API calls
-  const baseURL = 'https://cardsecuritysystem-8xdez.ondigitalocean.app';
 
   // Fetch documentation
   const fetchDocuments = async () => {
@@ -16,7 +16,7 @@ function DevelopersScreen() {
     setError(null);
     
     try {
-      const response = await fetch(`${baseURL}/api/superadmin/getDocumentation`, {
+      const response = await apiFetch(`/superadmin/getDocumentation`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

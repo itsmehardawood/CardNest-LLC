@@ -151,7 +151,7 @@ export default function LoginPage() {
         console.log("Sending login request:", JSON.stringify(requestBody, null, 2));
 
         const response = await fetch(
-          "https://cardsecuritysystem-8xdez.ondigitalocean.app/api/login",
+          "http://35.175.120.34:8001/api/login",
           {
             method: "POST",
             headers: {

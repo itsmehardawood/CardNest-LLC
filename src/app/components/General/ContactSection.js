@@ -1,3 +1,4 @@
+import { apiFetch } from '@/app/lib/api.js';
 import Link from 'next/link';
 import React, { useState } from 'react';
 
@@ -42,7 +43,7 @@ const ContactSection = () => {
         description: formData.message
       };
 
-      const response = await fetch('https://cardsecuritysystem-8xdez.ondigitalocean.app/api/contact-us', {
+      const response = await apiFetch('/contact-us', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
