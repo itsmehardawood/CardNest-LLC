@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Check, CreditCard, Shield, Zap, Phone, RotateCcw, Lock, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
+import { apiFetch } from '@/app/lib/api.js';
 
 const CreditCardFeatureSelector = () => {
   const [selectedFeatures, setSelectedFeatures] = useState({
@@ -73,8 +74,8 @@ const CreditCardFeatureSelector = () => {
               console.log(`Trying GET with parameter: ${param}`);
               
               try {
-                const response = await fetch(
-                  `http://35.175.120.34:8001/api/Subscriptions/GetByUserIDorMerchantID?${param}`,
+                const response = await apiFetch(
+                  `/Subscriptions/GetByUserIDorMerchantID?${param}`,
                   {
                     method: 'GET',
                     headers: {
@@ -154,7 +155,7 @@ const CreditCardFeatureSelector = () => {
 
       console.log('Sending request to API:', requestBody);
 
-      const response = await fetch('http://35.175.120.34:8001/api/feature/store', {
+      const response = await apiFetch('/feature/store', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

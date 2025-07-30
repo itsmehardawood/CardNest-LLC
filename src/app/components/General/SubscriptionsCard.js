@@ -394,6 +394,7 @@
 import React, { useState, useEffect } from 'react';
 import { Check, X, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
+import { apiFetch } from '@/app/lib/api.js';
 
 const PricingSection = ({ isDark = false }) => {
   const [plans, setPlans] = useState([]);
@@ -486,8 +487,8 @@ const PricingSection = ({ isDark = false }) => {
           // Fetch business verification status
           if (userObj.id) {
             setVerificationLoading(true);
-            const verificationResponse = await fetch(
-              `http://35.175.120.34:8001/api/business-profile/business-verification-status?user_id=${userObj.id}`
+            const verificationResponse = await apiFetch(
+              `/business-profile/business-verification-status?user_id=${userObj.id}`
             );
             
             if (verificationResponse.ok) {
@@ -513,7 +514,7 @@ const PricingSection = ({ isDark = false }) => {
     const fetchPlans = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://35.175.120.34:8001/api/Packages');
+        const response = await apiFetch('/Packages');
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

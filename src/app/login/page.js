@@ -12,6 +12,7 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
 } from "firebase/auth";
+import { apiFetch } from "../lib/api.js";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -150,8 +151,8 @@ export default function LoginPage() {
 
         console.log("Sending login request:", JSON.stringify(requestBody, null, 2));
 
-        const response = await fetch(
-          "http://35.175.120.34:8001/api/login",
+        const response = await apiFetch(
+          "/login",
           {
             method: "POST",
             headers: {
