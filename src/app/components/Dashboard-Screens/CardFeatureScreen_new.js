@@ -291,10 +291,10 @@ const CreditCardFeatureSelector = () => {
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Card Design Studio</h1>
           <p className="text-gray-600 max-w-lg mx-auto">Customize your card features with our intuitive designer</p>
-          <div className="mt-4 flex justify-center space-x-4">
+          <div className="mt-4 flex space-y-2 lg:space-y-0 md:space-y-0 items-center justify-center flex-col lg:flex-row md:flex-row space-x-4">
             <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium inline-flex items-center">
               <Shield className="h-4 w-4 mr-2" />
-              <span>Premium Features Enabled</span>
+              <span> Features Enabled</span>
             </div>
             {hasExistingFeatures && (
               <div className="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium inline-flex items-center">

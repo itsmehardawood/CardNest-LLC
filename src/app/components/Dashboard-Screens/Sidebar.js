@@ -10,6 +10,9 @@ import {
   Zap,
   ChevronLeft,
   ChevronRight,
+  History,
+  Receipt,
+  Settings,
 } from 'lucide-react';
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen, activeTab, setActiveTab, status }) => {
@@ -33,8 +36,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, activeTab, setActiveTab, status 
     { id: 'profile', label: 'Business Profile', icon: <User className="w-5 h-5" /> },
     { id: 'subscriptions', label: 'Subscriptions', icon: <ClipboardList className="w-5 h-5" /> },
     { id: 'Card', label: 'Feature Settings', icon: <BadgeDollarSign className="w-5 h-5" /> },
+    { id: 'scanshistory', label: 'Scan History', icon: <History className="w-5 h-5" /> },
+    { id: 'billing', label: 'Billing Logs', icon: <Receipt className="w-5 h-5" /> },
     { id: 'documents', label: 'Documents', icon: <FileText className="w-5 h-5" /> },
+    { id: 'displaysettings', label: 'Display Settings', icon: <Settings className="w-5 h-5" /> },
     { id: 'developers', label: 'Developers', icon: <Zap className="w-5 h-5" /> },
+
   ];
 
   const statusColor = {

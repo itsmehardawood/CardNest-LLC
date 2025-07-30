@@ -1,5 +1,5 @@
-'use client';
-import React, { useState, useEffect } from 'react';
+"use client";
+import React, { useState, useEffect } from "react";
 import {
   Home,
   Building2,
@@ -9,10 +9,17 @@ import {
   BookOpen,
   ChevronLeft,
   CheckCircle,
-} from 'lucide-react';
+  History,
+  Receipt,
+} from "lucide-react";
 
-const NavigationSidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
-  const [userEmail, setUserEmail] = useState('');
+const NavigationSidebar = ({
+  activeTab,
+  setActiveTab,
+  sidebarOpen,
+  setSidebarOpen,
+}) => {
+  const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
     try {
@@ -27,19 +34,23 @@ const NavigationSidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpe
         }
       }
     } catch (err) {
-      console.error('Error reading userData:', err);
+      console.error("Error reading userData:", err);
     }
   }, []);
 
   const tabs = [
-    { id: 'home', label: 'Home', icon: Home },
-    { id: 'enterprise', label: 'Enterprise Approval', icon: Building2 },
-    { id: 'pricing', label: 'Pricing', icon: DollarSign },
-    { id: 'activity', label: 'User Activity', icon: BarChart2 },
-    { id: 'content', label: 'Content Management', icon: FileText },
-    { id: 'api-docs', label: 'API Documentation', icon: BookOpen },
-    { id: 'access', label: 'Access Grant', icon: CheckCircle  }
+    { id: "home", label: "Home", icon: Home },
+    { id: "enterprise", label: "Enterprise Approval", icon: Building2 },
+    { id: "pricing", label: "Pricing", icon: DollarSign },
+    { id: "scanhistory", label: "Scan History", icon: History },
 
+    { id: "billing", label: "Billing Logs", icon: Receipt },
+
+    { id: "content", label: "Content Management", icon: FileText },
+    { id: "activity", label: "User Activity", icon: BarChart2 },
+
+    { id: "api-docs", label: "API Documentation", icon: BookOpen },
+    { id: "access", label: "Access Grant", icon: CheckCircle },
   ];
 
   const handleTabClick = (tabId, tabLabel) => {
@@ -50,17 +61,17 @@ const NavigationSidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpe
   return (
     <>
       {/* Main Sidebar */}
-      <div 
+      <div
         className={`
           sidebar-container fixed left-0 bg-white shadow-lg border-r border-gray-200 
           transition-all duration-300 ease-in-out flex flex-col z-40
-          ${sidebarOpen ? 'w-4/5 sm:w-64' : 'w-16'}
+          ${sidebarOpen ? "w-4/5 sm:w-64" : "w-16"}
           top-16 h-[calc(100vh-4rem)] h-[calc(100dvh-4rem)] min-h-0
         `}
       >
         {/* Mobile overlay */}
         {sidebarOpen && (
-          <div 
+          <div
             className="fixed inset-0 z-30 sm:hidden"
             onClick={() => setSidebarOpen(false)}
           />
@@ -75,10 +86,12 @@ const NavigationSidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpe
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="p-2 rounded-md hover:bg-gray-100 transition"
-              title={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+              title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
             >
               <ChevronLeft
-                className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${sidebarOpen ? 'rotate-0' : 'rotate-180'}`}
+                className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${
+                  sidebarOpen ? "rotate-0" : "rotate-180"
+                }`}
               />
             </button>
           </div>
@@ -87,7 +100,7 @@ const NavigationSidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpe
         {/* Navigation */}
         <div className="flex-1 overflow-y-auto">
           <nav className="py-4">
-            <div className={`${sidebarOpen ? 'px-4' : 'px-2'} space-y-2`}>
+            <div className={`${sidebarOpen ? "px-4" : "px-2"} space-y-2`}>
               {tabs.map(({ id, label, icon: Icon }) => {
                 const isActive = activeTab === label;
                 return (
@@ -96,10 +109,12 @@ const NavigationSidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpe
                     onClick={() => handleTabClick(id, label)}
                     className={`
                       relative w-full flex items-center text-left rounded-lg transition-all duration-200 group
-                      ${sidebarOpen ? 'px-4 py-3' : 'px-2 py-3 justify-center'}
-                      ${isActive
-                        ? 'bg-blue-600 text-white shadow-md'
-                        : 'text-gray-700 hover:bg-gray-100 hover:shadow-sm'}
+                      ${sidebarOpen ? "px-4 py-3" : "px-2 py-3 justify-center"}
+                      ${
+                        isActive
+                          ? "bg-blue-600 text-white shadow-md"
+                          : "text-gray-700 hover:bg-gray-100 hover:shadow-sm"
+                      }
                     `}
                     title={!sidebarOpen ? label : undefined}
                   >
@@ -143,7 +158,9 @@ const NavigationSidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpe
                   <span className="text-white text-xs font-medium">SA</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">Super Admin</p>
+                  <p className="text-sm font-medium text-gray-900 truncate">
+                    Super Admin
+                  </p>
                   <p className="text-xs text-gray-500 truncate">{userEmail}</p>
                 </div>
               </div>

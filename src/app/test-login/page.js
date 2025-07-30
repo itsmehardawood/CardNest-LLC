@@ -1,6 +1,7 @@
 // 'use client';
 // import { useState } from 'react';
 // import { useRouter } from 'next/navigation';
+// import { apiFetch } from '../lib/api.js';
 // export default function SignupPage() {
 //   const [loading, setLoading] = useState(false);
 //   const [error, setError] = useState('');
@@ -14,7 +15,7 @@
 //     setLoading(true);
 //     setError('');
 //     try {
-//       const response = await fetch('https://cardsecuritysystem-8xdez.ondigitalocean.app/api/signup', {
+//       const response = await apiFetch('/signup', {
 //         method: 'POST',
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -115,17 +116,25 @@
 
 
 
+
+
+
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiFetch } from '../lib/api.js';
+
 export default function LoginPage() {
+  const [countryCode, setCountryCode] = useState('+92');
+  const [loginInput, setLoginInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const router = useRouter()
+  const router = useRouter();
+
   const handleLogin = async () => {
     setLoading(true);
     setError('');
+
     try {
       const response = await apiFetch('/login', {
         method: 'POST',
@@ -133,20 +142,14 @@ export default function LoginPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          country_code: '+92',
-          login_input: '3020447030'
+          country_code: countryCode,
+          login_input: loginInput,
         }),
       });
+
       const data = await response.json();
       if (data.status === true) {
-        // In your actual Next.js project, use:
         localStorage.setItem('userData', JSON.stringify(data));
-        // For demo purposes in this environment:
-        // console.log('Login successful:', data);
-        // alert('Login successful! Redirecting to dashboard...');
-        // In your actual Next.js project, use:
-        // window.location.href = '/dashboard';
-        // or with Next.js router:
         router.push('/dashboard');
       } else {
         setError(data.message || 'Login failed');
@@ -158,6 +161,7 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
@@ -172,20 +176,21 @@ export default function LoginPage() {
             </label>
             <input
               type="text"
-              value="+92"
-              readOnly
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+              value={countryCode}
+              onChange={(e) => setCountryCode(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900"
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Login Input
+              Phone Number
             </label>
             <input
               type="text"
-              value="3084352638"
-              readOnly
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+              value={loginInput}
+              onChange={(e) => setLoginInput(e.target.value)}
+              placeholder="e.g., 3001234567"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900"
             />
           </div>
           {error && (
@@ -209,18 +214,9 @@ export default function LoginPage() {
           </button>
         </div>
         <div className="mt-6 text-center text-sm text-gray-500">
-          Demo login with static credentials
+          Enter your phone number to log in
         </div>
       </div>
     </div>
   );
 }
-
-
-
-
-
-
-
-
-

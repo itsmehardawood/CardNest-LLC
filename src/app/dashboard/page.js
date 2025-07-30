@@ -9,6 +9,9 @@ import CardFeatureScreen from '../components/Dashboard-Screens/CardFeatureScreen
 import SubscriptionsScreen from '../components/Dashboard-Screens/SubscriptionScreen_new';
 import MainBusinessScreen from '../components/Dashboard-Screens/BusinessDataScreen/MainBusinessScreen';
 import { apiFetch } from '../lib/api.js';
+import ScanHistorySection from '../components/Dashboard-Screens/Scanhistory/ScanHistory';
+import BillingLogsSection from '../components/Dashboard-Screens/BillingLogsSection/BillingLogsSection';
+import DisplaySettings from '../components/Dashboard-Screens/DisplaySettings';
 
 
 // Loading component for Suspense fallback
@@ -221,13 +224,19 @@ const [businessInfo, setBusinessInfo] = useState({
 
   // Sidebar items for header title lookup
   const sidebarItems = [
-    { id: 'home', label: 'Home', icon: '🏠' },
-    { id: 'profile', label: 'Business Profile', icon: '👤' },
-    { id: 'balance', label: 'Balance', icon: '💰' },
-    { id: 'subscriptions', label: 'Subscriptions', icon: '📋' },
-    { id: 'documents', label: 'Documents', icon: '📄' },
-    { id: 'support', label: 'Support', icon: '💬' },
-    { id: 'developers', label: 'Developers', icon: '⚡' }
+    { id: 'home', label: 'Home'},
+    { id: 'profile', label: 'Business Profile' },
+    { id: 'balance', label: 'Balance' },
+    { id: 'subscriptions', label: 'Subscriptions' },
+    { id: 'documents', label: 'Documents'},
+    { id: 'support', label: 'Support'},
+         { id: 'scanshistory', label: 'Scan History'},
+                  { id: 'billing', label: 'Billing Logs'},
+         { id: 'displaysettings', label: 'Display Settings'},
+
+    { id: 'developers', label: 'Developers', icon: '⚡' },
+
+    
   ];
 
   const handleInputChange = (e) => {
@@ -619,6 +628,12 @@ const checkBusinessStatus = async () => {
         );
         
  
+        case 'scanshistory':
+        return <ScanHistorySection/>;
+         case 'billing':
+        return <BillingLogsSection/>;
+        case 'displaysettings':
+        return <DisplaySettings />;
 
       case 'developers':
         return <DevelopersScreen />;

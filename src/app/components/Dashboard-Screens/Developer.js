@@ -65,38 +65,15 @@ function DevelopersScreen() {
     document.body.removeChild(link);
   };
 
-  const handleGenerateApiKey = () => {
-    // Generate API key logic here
-    const newApiKey = 'sk_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    setApiKey(newApiKey);
-    console.log('Generated API Key:', newApiKey);
-  };
-
-  const handleCopyApiKey = () => {
-    navigator.clipboard.writeText(apiKey);
-    alert('API Key copied to clipboard!');
-  };
-
-  const handleConfigureWebhooks = () => {
-    if (!webhookUrl.trim()) {
-      alert('Please enter a valid webhook URL');
-      return;
-    }
-    // Configure webhooks logic here
-    console.log('Configuring webhook:', webhookUrl);
-    alert('Webhook configured successfully!');
-  };
-
-
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-4 md:p-6 min-h-screen">
+    <div className="bg-white rounded-lg shadow-sm  p-4 md:p-6 min-h-screen">
       <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-6">Developers</h2>
       
       <div className="space-y-6 md:space-y-8">
         {/* API Management Section */}
-        <div className="bg-gray-50 rounded-lg p-4 md:p-6">
+        {/* <div className="bg-gray-50 rounded-lg p-4 md:p-6">
           <h3 className="text-lg md:text-xl font-medium text-gray-800 mb-4">API Management</h3>
-        </div>
+        </div> */}
 
     
 
@@ -141,7 +118,7 @@ function DevelopersScreen() {
               {/* Desktop Grid View */}
               <div className="hidden md:grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                 {documents.map((doc) => (
-                  <div key={doc.id} className="bg-white rounded-lg shadow-sm border p-4 hover:shadow-md transition-shadow">
+                  <div key={doc.id} className="bg-white rounded-lg shadow-sm  p-4 hover:shadow-md transition-shadow">
                     <div className="flex justify-between items-start mb-3">
                       <h4 className="font-semibold text-gray-900 text-base leading-tight">{doc.title}</h4>
                       <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium ml-2 shrink-0">

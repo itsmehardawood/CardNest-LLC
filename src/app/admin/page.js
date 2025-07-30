@@ -12,6 +12,8 @@ import DashboardFooter from '../components/Super Admin/AdminFooter';
 import HomePage from '../components/Super Admin/HomePage';
 import GrantAccessForm from '../components/Super Admin/GrantAcess';
 import BusinessApprovalSectionUpdated from '../components/Super Admin/ApprovalScreen/MainBusinessApproval';
+import CardScanHistory from '../components/Super Admin/ScanhistorySection/CardScanHistory';
+import BillingLogsSection from '../components/Super Admin/BillingLogs/BillingLogs';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('Home');
@@ -97,16 +99,6 @@ const AdminDashboard = () => {
     );
   }
 
-  // const getPageDescription = (tabName) => {
-  //   const descriptions = {
-  //     'Enterprise Approval': 'Review and manage enterprise client approval requests and business verifications',
-  //     'Pricing': 'Configure pricing plans, subscription tiers, and billing settings for all user types',
-  //     'User Activity': 'Monitor user engagement, API usage statistics, and platform activity in real-time',
-  //     'Content Management': 'Create, edit, and moderate content across the platform with publishing controls',
-  //     'API Documentation': 'Manage API documentation, integration guides, and developer resources'
-  //   };
-  //   return descriptions[tabName] || `Manage and monitor your ${tabName.toLowerCase()} settings`;
-  // };
 
   const renderTabContent = () => {
     if (isLoading) {
@@ -128,6 +120,10 @@ const AdminDashboard = () => {
         return <APIDocumentationSection />;
       case 'Access Grant':
         return <GrantAccessForm />;
+      case 'Scan History':
+      return <CardScanHistory/>
+      case 'Billing Logs':
+        return <BillingLogsSection/>
       default:
         return (
           <div className="bg-white rounded-lg shadow-sm border p-6">
