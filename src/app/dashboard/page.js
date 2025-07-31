@@ -87,6 +87,12 @@ const getUserDataFromStorage = () => {
   }
 };
 
+
+
+
+
+
+
 useEffect(() => {
   // Check authentication and authorization
   const checkAuth = () => {
@@ -334,10 +340,9 @@ const missingFields = requiredFields.filter(field => !businessInfo[field] || bus
       console.log(`${key}: ${value}`);
     }
     // Make API call
-    const response = await apiFetch('/business-profile', {
+    const response = await fetch('https://admin.cardnest.io/api/business-profile', {
       method: 'POST',
       body: formData,
-      // Don't set Content-Type header - let browser set it for FormData
     });
     // Check if response is successful
     if (response.ok) {
@@ -420,6 +425,12 @@ const missingFields = requiredFields.filter(field => !businessInfo[field] || bus
     setIsSubmitting(false);
   }
 };
+
+
+
+
+
+
 
 // API function to check business verification status
 const checkBusinessVerificationStatus = async (userId) => {

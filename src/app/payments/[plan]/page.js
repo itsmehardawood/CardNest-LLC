@@ -917,7 +917,7 @@ export default function PaymentPage({ params }) {
 
     // Override for custom pricing ONLY for plan 3
     if (customPricing && customPricing.isCustomPlan && apiPlan.id === 3) {
-      planPrice = `${customPricing.totalPrice.toFixed(2)}`;
+planPrice = `${customPricing.customPrice.toFixed(2)}`;
       planSubtitle = "CUSTOM PACKAGE";
       apiScans = `${customPricing.apiCount.toLocaleString()} API SCANS`;
     }
@@ -1033,7 +1033,9 @@ export default function PaymentPage({ params }) {
           country: formData.country,
           ...(plan.customPricing && {
             custom_api_count: plan.customPricing.apiCount,
-            custom_price: plan.customPricing.totalPrice,
+            // custom_price: plan.customPricing.totalPrice,
+            custom_price: plan.customPricing.customPrice,
+
           }),
         };
 
@@ -1075,7 +1077,8 @@ export default function PaymentPage({ params }) {
         scan_id: scanData?.scanID,
         ...(plan.customPricing && {
           custom_api_count: plan.customPricing.apiCount,
-          custom_monthly_price: plan.customPricing.totalPrice,
+          // custom_monthly_price: plan.customPricing.totalPrice,
+          custom_monthly_price: plan.customPricing.customPrice,
         }),
       };
 
@@ -1148,6 +1151,7 @@ export default function PaymentPage({ params }) {
         setLoading(true);
 
         // Check for custom API pricing data
+
         const customPricingData = localStorage.getItem("customApiPricing");
         if (customPricingData) {
           const parsedCustomPricing = JSON.parse(customPricingData);

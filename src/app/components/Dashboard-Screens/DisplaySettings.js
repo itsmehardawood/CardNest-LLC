@@ -1,4 +1,3 @@
-import { apiFetch } from '@/app/lib/api.js';
 import React, { useState, useEffect } from 'react';
 
 const DisplaySettings = () => {
@@ -11,6 +10,7 @@ const DisplaySettings = () => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [merchantId, setMerchantId] = useState(null);
+  const [debugInfo, setDebugInfo] = useState('');
 
   useEffect(() => {
     // Get merchant_id from localStorage userData
@@ -18,7 +18,19 @@ const DisplaySettings = () => {
     if (userData) {
       try {
         const parsedUserData = JSON.parse(userData);
-        setMerchantId(parsedUserData.merchant_id || parsedUserData.merchantId);
+        // Check both possible structures
+        const userObj = parsedUserData.user || parsedUserData;
+        const merchantIdValue = userObj.merchant_id || userObj.merchantId;
+        
+        console.log('Parsed userData:', parsedUserData);
+        console.log('User object:', userObj);
+        console.log('Merchant ID found:', merchantIdValue);
+        
+        setMerchantId(merchantIdValue);
+        
+        if (!merchantIdValue) {
+          setSubmitError('Merchant ID not found in user data. Please contact support.');
+        }
       } catch (error) {
         console.error('Error parsing userData from localStorage:', error);
         setSubmitError('Unable to retrieve merchant information. Please log in again.');
@@ -39,14 +51,14 @@ const DisplaySettings = () => {
   const handleLogoChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      // Validate file type
-      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+      // Validate file type - match what API expects
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/svg+xml'];
       if (!validTypes.includes(file.type)) {
-        setSubmitError('Please upload a valid image file (JPG, PNG, GIF)');
+        setSubmitError('Please upload a valid image file (JPG, PNG, GIF, SVG)');
         return;
       }
 
-      // Validate file size (max 5MB)
+      // Validate file size (max 5MB since we're not converting to base64)
       const maxSize = 5 * 1024 * 1024; // 5MB in bytes
       if (file.size > maxSize) {
         setSubmitError('Logo file size must be less than 5MB');
@@ -83,16 +95,13 @@ const DisplaySettings = () => {
     }
   };
 
-  const convertToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
-    });
-  };
+  // Removed convertToBase64 function as we'll use FormData instead
 
   const handleSubmit = async () => {
+    console.log('=== DISPLAY SETTINGS SUBMISSION ===');
+    console.log('Merchant ID:', merchantId);
+    console.log('Display Name:', formData.displayName);
+    console.log('Logo file:', formData.logo?.name);
     
     if (!merchantId) {
       setSubmitError('Merchant ID not found. Please log in again.');
@@ -107,52 +116,98 @@ const DisplaySettings = () => {
     setIsSubmitting(true);
     setSubmitError(null);
     setSubmitSuccess(false);
+    setDebugInfo('Starting submission...');
 
     try {
-      let logoBase64 = null;
+      // Prepare FormData for file upload
+      const formDataPayload = new FormData();
+      formDataPayload.append('merchant_id', merchantId);
+      formDataPayload.append('display_name', formData.displayName.trim());
       
-      // Convert logo to base64 if provided
+      // Only append logo if one is selected
       if (formData.logo) {
-        logoBase64 = await convertToBase64(formData.logo);
+        console.log('Adding logo to FormData...');
+        setDebugInfo('Adding logo to FormData...');
+        formDataPayload.append('display_logo', formData.logo);
       }
 
-      const payload = {
-        merchantId: merchantId,
-        displayName: formData.displayName.trim(),
-        ...(logoBase64 && { logo: logoBase64 })
-      };
+      console.log('FormData entries:');
+      for (let [key, value] of formDataPayload.entries()) {
+        console.log(key, value instanceof File ? `File: ${value.name}` : value);
+      }
+      setDebugInfo('Sending FormData to API...');
 
-      const response = await apiFetch('/merchant/display-settings', {
+      // Use FormData instead of JSON
+      const response = await fetch('https://admin.cardnest.io/api/updateMerchantScanInfo', {
         method: 'POST',
+        // Don't set Content-Type header - let browser set it with boundary for FormData
         headers: {
-          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          // Remove Content-Type to let browser set it automatically for FormData
         },
-        body: JSON.stringify(payload)
+        body: formDataPayload // Send FormData instead of JSON
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      console.log('API Response status:', response.status);
+      console.log('API Response ok:', response.ok);
+      setDebugInfo(`API responded with status: ${response.status}`);
+
+      // Handle different response types and show detailed error info
+      let result;
+      const contentType = response.headers.get('content-type');
+      
+      if (contentType && contentType.includes('application/json')) {
+        result = await response.json();
+      } else {
+        const textResult = await response.text();
+        console.log('Non-JSON response:', textResult);
+        
+        // Try to parse as JSON anyway (some APIs return JSON with wrong content-type)
+        try {
+          result = JSON.parse(textResult);
+        } catch {
+          result = { message: textResult };
+        }
       }
 
-      const result = await response.json();
+      console.log('API Response result:', result);
       
-      if (result.status) {
+      if (!response.ok) {
+        // Handle detailed validation errors
+        if (result.errors && result.errors.display_logo) {
+          const logoErrors = Array.isArray(result.errors.display_logo) 
+            ? result.errors.display_logo.join(', ') 
+            : result.errors.display_logo;
+          throw new Error(`Logo validation failed: ${logoErrors}`);
+        }
+        throw new Error(result.message || result.error || `HTTP error! status: ${response.status}`);
+      }
+      
+      if (result.status === true || result.success === true || response.ok) {
+        console.log('✅ Update successful');
         setSubmitSuccess(true);
+        setDebugInfo('Update successful!');
         // Reset success message after 3 seconds
-        setTimeout(() => setSubmitSuccess(false), 3000);
+        setTimeout(() => {
+          setSubmitSuccess(false);
+          setDebugInfo('');
+        }, 3000);
       } else {
-        setSubmitError(result.message || 'Failed to update display settings');
+        console.error('❌ API returned failure:', result);
+        setSubmitError(result.message || result.error || 'Failed to update display settings');
+        setDebugInfo('API returned failure');
       }
     } catch (error) {
-      console.error('Error updating display settings:', error);
-      setSubmitError('Failed to update display settings. Please try again.');
+      console.error('❌ Error updating display settings:', error);
+      setSubmitError(`Failed to update display settings: ${error.message}`);
+      setDebugInfo(`Error: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto">
       <h2 className="text-xl font-semibold text-gray-800 mb-6">
         Display Settings
       </h2>
@@ -255,16 +310,16 @@ const DisplaySettings = () => {
           {/* File Input */}
           <input
             type="file"
-            accept="image/jpeg,image/jpg,image/png,image/gif"
+            accept="image/jpeg,image/png,image/jpg,image/gif,image/svg+xml"
             onChange={handleLogoChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <p className="text-xs text-gray-500 mt-1">
-            Upload your business logo (JPG, PNG, GIF - Max 5MB). Recommended size: 200x200px
+            Upload your business logo (JPG, PNG, GIF, SVG - Max 5MB). Recommended size: 200x200px
           </p>
         </div>
 
-        {/* Merchant ID Display (for verification) */}
+        {/* Merchant ID Display */}
         {merchantId && (
           <div className="bg-gray-50 p-3 rounded-md">
             <p className="text-xs text-gray-600">
@@ -272,6 +327,17 @@ const DisplaySettings = () => {
             </p>
           </div>
         )}
+
+        {/* Debug Info */}
+        <div className="bg-blue-50 p-3 rounded-md">
+          <p className="text-xs text-blue-600">
+            <span className="font-medium">Debug Info:</span><br/>
+            Merchant ID: {merchantId || 'Not found'}<br/>
+            Display Name: {formData.displayName || 'Empty'}<br/>
+            Logo: {formData.logo ? formData.logo.name : 'None'}<br/>
+            Status: {debugInfo || 'Ready'}
+          </p>
+        </div>
 
         {/* Submit Button */}
         <div className="flex justify-end pt-4">

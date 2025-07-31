@@ -1,8 +1,151 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   XCircle, CheckCircle, AlertCircle, Download, Eye, ShieldCheck, 
-  Briefcase, MapPin, User, Home, CreditCard, FileText, Mail 
+  Briefcase, MapPin, User, Home, CreditCard, FileText, Mail, ExternalLink 
 } from 'lucide-react';
+import Image from 'next/image';
+
+// Document Preview Component
+const DocumentPreview = ({ 
+  documentPath, 
+  documentName, 
+  documentType = 'registration', // 'registration' or 'id'
+  onDownload,
+  downloadLoading = false 
+}) => {
+  const [imageError, setImageError] = useState(false);
+  const [showFullScreen, setShowFullScreen] = useState(false);
+  
+  const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(documentPath);
+  const isPDF = /\.pdf$/i.test(documentPath);
+  
+  const Icon = documentType === 'id' ? CreditCard : FileText;
+  const gradientColor = documentType === 'id' ? 'from-purple-600 to-purple-700' : 'from-indigo-600 to-indigo-700';
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  const openInNewTab = () => {
+    window.open(documentPath, '_blank');
+  };
+
+  return (
+    <>
+      <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
+        <div className={`bg-gradient-to-r ${gradientColor} text-white p-4`}>
+          <h4 className="text-sm font-semibold flex items-center">
+            <Icon className="h-4 w-4 mr-2" />
+            {documentType === 'id' ? 'Account Holder ID Document' : 'Business Registration Document'}
+          </h4>
+        </div>
+        
+        <div className="p-4">
+          {/* File info and actions */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 space-y-3 sm:space-y-0">
+            <div className="flex items-center min-w-0 bg-gray-50 rounded-lg p-3 flex-1 mr-3">
+              <Icon className="h-4 w-4 text-gray-400 mr-2 flex-shrink-0" />
+              <span className="text-gray-700 text-sm truncate font-medium">
+                {documentName}
+              </span>
+            </div>
+            
+            <div className="flex space-x-2 flex-shrink-0">
+              <button
+                onClick={openInNewTab}
+                className="flex items-center px-3 py-2 bg-gray-700 text-white text-xs font-medium rounded-lg hover:bg-gray-800 transition-colors duration-200 shadow-sm"
+              >
+                <ExternalLink className="h-3 w-3 mr-1" />
+                Open
+              </button>
+              
+              {onDownload && (
+                <button
+                  onClick={onDownload}
+                  disabled={downloadLoading}
+                  className="flex items-center px-3 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors duration-200 shadow-sm"
+                >
+                  {downloadLoading ? (
+                    <div className="animate-spin rounded-full h-3 w-3 border border-white border-t-transparent mr-1"></div>
+                  ) : (
+                    <Download className="h-3 w-3 mr-1" />
+                  )}
+                  Download
+                </button>
+              )}
+            </div>
+          </div>
+          
+          {/* Document preview area */}
+          <div className="bg-gray-50 rounded-xl p-4">
+            {isImage && !imageError ? (
+              <div className="relative">
+                <img
+                  src={documentPath}
+                  alt={`${documentType} document`}
+                  className="w-full h-48 object-contain rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                  onError={handleImageError}
+                  onClick={() => setShowFullScreen(true)}
+                />
+                <button
+                  onClick={() => setShowFullScreen(true)}
+                  className="absolute top-2 right-2 p-2 bg-black/50 text-white rounded-lg hover:bg-black/70 transition-colors"
+                >
+                  <Eye className="h-4 w-4" />
+                </button>
+              </div>
+            ) : isPDF ? (
+              <div className="text-center py-8">
+                <FileText className="h-16 w-16 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-600 text-sm font-medium mb-3">PDF Document</p>
+                <p className="text-gray-500 text-xs mb-4">Click Open to view the PDF in a new tab</p>
+                <button
+                  onClick={openInNewTab}
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Open PDF
+                </button>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <AlertCircle className="h-16 w-16 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-600 text-sm font-medium mb-3">Preview not available</p>
+                <p className="text-gray-500 text-xs mb-4">Click Open to view the document</p>
+                <button
+                  onClick={openInNewTab}
+                  className="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors"
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Open Document
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Full screen image modal */}
+      {showFullScreen && isImage && !imageError && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+          <div className="relative max-w-7xl max-h-full">
+            <button
+              onClick={() => setShowFullScreen(false)}
+              className="absolute -top-12 right-0 text-white hover:text-gray-300 text-lg font-bold"
+            >
+              ✕ Close
+            </button>
+            <img
+              src={documentPath}
+              alt={`${documentType} document full view`}
+              className="max-w-full max-h-full object-contain rounded-lg"
+            />
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
 
 const BusinessModal = ({
   isModalOpen,
@@ -234,154 +377,28 @@ const BusinessModal = ({
             {activeTab === "pending" && (
               <div className="space-y-6">
                 {/* Registration Document */}
-                <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
-                  <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white p-4">
-                    <h4 className="text-sm font-semibold flex items-center">
-                      <FileText className="h-4 w-4 mr-2" />
-                      Business Registration Document
-                    </h4>
-                  </div>
-                  
-                  <div className="p-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 space-y-3 sm:space-y-0">
-                      <div className="flex items-center min-w-0 bg-gray-50 rounded-lg p-3 flex-1 mr-3">
-                        <FileText className="h-4 w-4 text-gray-400 mr-2 flex-shrink-0" />
-                        <span className="text-gray-700 text-sm truncate font-medium">
-                          {selectedBusiness.registration_document_path.split('/').pop()}
-                        </span>
-                      </div>
-                      <div className="flex space-x-2 flex-shrink-0">
-                        <button
-                          onClick={() => window.open(`${selectedBusiness.registration_document_path}`, '_blank')}
-                          className="flex items-center px-3 py-2 bg-gray-700 text-white text-xs font-medium rounded-lg hover:bg-gray-800 transition-colors duration-200 shadow-sm"
-                        >
-                          <Eye className="h-3 w-3 mr-1" />
-                          View
-                        </button>
-                        <button
-                          onClick={() => handleDownloadDocument(
-                            selectedBusiness.registration_document_path,
-                            `${selectedBusiness.business_name}_registration_document.${selectedBusiness.registration_document_path.split('.').pop()}`
-                          )}
-                          disabled={downloadLoading}
-                          className="flex items-center px-3 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors duration-200 shadow-sm"
-                        >
-                          {downloadLoading ? (
-                            <div className="animate-spin rounded-full h-3 w-3 border border-white border-t-transparent mr-1"></div>
-                          ) : (
-                            <Download className="h-3 w-3 mr-1" />
-                          )}
-                          Download
-                        </button>
-                      </div>
-                    </div>
-                    
-                    {/* Document Preview */}
-                    <div className="bg-gray-50 rounded-xl p-4">
-                      <div className="aspect-w-16 aspect-h-9">
-                        {selectedBusiness.registration_document_path.toLowerCase().includes('.pdf') ? (
-                          <iframe
-                            src={`${selectedBusiness.registration_document_path}`}
-                            className="w-full h-48 border-0 rounded-lg shadow-inner"
-                            title="Registration Document Preview"
-                          />
-                        ) : (
-                          <img
-                            src={`${selectedBusiness.registration_document_path}`}
-                            alt="Registration Document"
-                            className="w-full h-48 object-contain rounded-lg"
-                            onError={(e) => {
-                              e.target.style.display = 'none';
-                              e.target.nextSibling.style.display = 'flex';
-                            }}
-                          />
-                        )}
-                        <div className="hidden w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-                          <div className="text-center">
-                            <FileText className="h-12 w-12 text-gray-300 mx-auto mb-2" />
-                            <p className="text-gray-500 text-sm font-medium">Preview not available</p>
-                            <p className="text-gray-400 text-xs">Click view to open in new tab</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <DocumentPreview
+                  documentPath={selectedBusiness.registration_document_path}
+                  documentName={selectedBusiness.registration_document_path.split('/').pop()}
+                  documentType="registration"
+                  onDownload={() => handleDownloadDocument(
+                    selectedBusiness.registration_document_path,
+                    `${selectedBusiness.business_name}_registration_document.${selectedBusiness.registration_document_path.split('.').pop()}`
+                  )}
+                  downloadLoading={downloadLoading}
+                />
 
                 {/* ID Document */}
-                <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
-                  <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-4">
-                    <h4 className="text-sm font-semibold flex items-center">
-                      <CreditCard className="h-4 w-4 mr-2" />
-                      Account Holder ID Document
-                    </h4>
-                  </div>
-                  
-                  <div className="p-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 space-y-3 sm:space-y-0">
-                      <div className="flex items-center min-w-0 bg-gray-50 rounded-lg p-3 flex-1 mr-3">
-                        <CreditCard className="h-4 w-4 text-gray-400 mr-2 flex-shrink-0" />
-                        <span className="text-gray-700 text-sm truncate font-medium">
-                          {selectedBusiness.account_holder_id_document_path.split('/').pop()}
-                        </span>
-                      </div>
-                      <div className="flex space-x-2 flex-shrink-0">
-                        <button
-                          onClick={() => window.open(`${selectedBusiness.account_holder_id_document_path}`, '_blank')}
-                          className="flex items-center px-3 py-2 bg-gray-700 text-white text-xs font-medium rounded-lg hover:bg-gray-800 transition-colors duration-200 shadow-sm"
-                        >
-                          <Eye className="h-3 w-3 mr-1" />
-                          View
-                        </button>
-                        <button
-                          onClick={() => handleDownloadDocument(
-                            selectedBusiness.account_holder_id_document_path,
-                            `${selectedBusiness.account_holder_first_name}_${selectedBusiness.account_holder_last_name}_id_document.${selectedBusiness.account_holder_id_document_path.split('.').pop()}`
-                          )}
-                          disabled={downloadLoading}
-                          className="flex items-center px-3 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors duration-200 shadow-sm"
-                        >
-                          {downloadLoading ? (
-                            <div className="animate-spin rounded-full h-3 w-3 border border-white border-t-transparent mr-1"></div>
-                          ) : (
-                            <Download className="h-3 w-3 mr-1" />
-                          )}
-                          Download
-                        </button>
-                      </div>
-                    </div>
-                    
-                    {/* Document Preview */}
-                    <div className="bg-gray-50 rounded-xl p-4">
-                      <div className="aspect-w-16 aspect-h-9">
-                        {selectedBusiness.account_holder_id_document_path.toLowerCase().includes('.pdf') ? (
-                          <iframe
-                            src={`${selectedBusiness.account_holder_id_document_path}`}
-                            className="w-full h-48 border-0 rounded-lg shadow-inner"
-                            title="ID Document Preview"
-                          />
-                        ) : (
-                          <img
-                            src={`${selectedBusiness.account_holder_id_document_path}`}
-                            alt="ID Document"
-                            className="w-full h-48 object-contain rounded-lg"
-                            onError={(e) => {
-                              e.target.style.display = 'none';
-                              e.target.nextSibling.style.display = 'flex';
-                            }}
-                          />
-                        )}
-                        <div className="hidden w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-                          <div className="text-center">
-                            <CreditCard className="h-12 w-12 text-gray-300 mx-auto mb-2" />
-                            <p className="text-gray-500 text-sm font-medium">Preview not available</p>
-                            <p className="text-gray-400 text-xs">Click view to open in new tab</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <DocumentPreview
+                  documentPath={selectedBusiness.account_holder_id_document_path}
+                  documentName={selectedBusiness.account_holder_id_document_path.split('/').pop()}
+                  documentType="id"
+                  onDownload={() => handleDownloadDocument(
+                    selectedBusiness.account_holder_id_document_path,
+                    `${selectedBusiness.account_holder_first_name}_${selectedBusiness.account_holder_last_name}_id_document.${selectedBusiness.account_holder_id_document_path.split('.').pop()}`
+                  )}
+                  downloadLoading={downloadLoading}
+                />
               </div>
             )}
 
