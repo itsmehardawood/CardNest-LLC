@@ -84,6 +84,11 @@ const BillingLogsSection = () => {
     return new Intl.NumberFormat().format(num);
   };
 
+  // Helper function to get the appropriate API limit based on package_id
+  const getApiLimit = (subscription) => {
+    return subscription.package_id === 3 ? subscription.custom_api_count : subscription.api_calls_limit;
+  };
+
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
@@ -97,7 +102,7 @@ const BillingLogsSection = () => {
         </div>
       </div>
     );
-  }
+  };
 
   return (
     <>
@@ -149,7 +154,7 @@ const BillingLogsSection = () => {
                   <div>
                     <div className="text-gray-600 text-xs">API Usage</div>
                     <div className="font-medium text-gray-900">
-                      {formatNumber(subscription.api_calls_used)} / {formatNumber(subscription.api_calls_limit)}
+                      {formatNumber(subscription.api_calls_used)} / {formatNumber(getApiLimit(subscription))}
                     </div>
                     {subscription.overage_calls > 0 && (
                       <div className="text-red-600 text-xs">
@@ -240,7 +245,7 @@ const BillingLogsSection = () => {
 
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">
-                      <div>{formatNumber(subscription.api_calls_used)} / {formatNumber(subscription.api_calls_limit)}</div>
+                      <div>{formatNumber(subscription.api_calls_used)} / {formatNumber(getApiLimit(subscription))}</div>
                       {subscription.overage_calls > 0 && (
                         <div className="text-red-600 text-xs">
                           +{formatNumber(subscription.overage_calls)} overage
@@ -297,6 +302,7 @@ const BillingLogsSection = () => {
         getStatusColor={getStatusColor}
         getStatusText={getStatusText}
         formatNumber={formatNumber}
+        getApiLimit={getApiLimit}
       />
     </>
   );

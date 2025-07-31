@@ -9,9 +9,12 @@ const BillingLogsModal = ({
   getPackageType,
   getStatusColor,
   getStatusText,
-  formatNumber
+  formatNumber,
+  getApiLimit
 }) => {
   if (!isOpen || !subscription) return null;
+
+  const apiLimit = getApiLimit(subscription);
 
   return (
     <div className="fixed inset-0 text-gray-900 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -92,7 +95,7 @@ const BillingLogsModal = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="flex flex-col sm:flex-row sm:justify-between">
                     <span className="text-gray-600 text-sm">Limit:</span>
-                    <span className="font-medium text-sm sm:text-base">{formatNumber(subscription.api_calls_limit)}</span>
+                    <span className="font-medium text-sm sm:text-base">{formatNumber(apiLimit)}</span>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:justify-between">
                     <span className="text-gray-600 text-sm">Used:</span>
@@ -101,7 +104,7 @@ const BillingLogsModal = ({
                   <div className="flex flex-col sm:flex-row sm:justify-between">
                     <span className="text-gray-600 text-sm">Remaining:</span>
                     <span className="font-medium text-green-600 text-sm sm:text-base">
-                      {formatNumber(subscription.api_calls_limit - subscription.api_calls_used)}
+                      {formatNumber(apiLimit - subscription.api_calls_used)}
                     </span>
                   </div>
                   {subscription.overage_calls > 0 && (
@@ -167,6 +170,21 @@ const BillingLogsModal = ({
                       <span className="text-gray-600 text-sm">Custom API Count:</span>
                       <span className="font-medium text-sm sm:text-base">{subscription.custom_api_count || 'N/A'}</span>
                     </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Package ID 3 Special Indicator */}
+            {subscription.package_id === 3 && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-medium text-yellow-800">Package 3 Configuration</p>
+                    <p className="text-yellow-700 mt-1">
+                      This subscription uses custom API count ({formatNumber(subscription.custom_api_count)}) instead of standard API limit for usage calculations.
+                    </p>
                   </div>
                 </div>
               </div>
