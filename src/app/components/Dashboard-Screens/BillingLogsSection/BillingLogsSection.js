@@ -216,8 +216,8 @@ const BillingLogsSection = () => {
       setError(null);
       
       // Get merchant_id from localStorage
-      const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-      const merchantId = userData.merchant_id;
+       const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    const merchantId = userData.user?.merchant_id;  
 
       if (!merchantId) {
         setError('Merchant ID not found. Please log in again.');

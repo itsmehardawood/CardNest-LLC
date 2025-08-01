@@ -21,9 +21,12 @@ const ScanHistorySection = () => {
       setLoading(true);
       setError(null);
       
+
+  
+
       // Extract merchant_id from userData in localStorage
       const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-      const merchantId = userData.merchant_id; // Changed from userData.id to userData.merchant_id
+    const merchantId = userData.user?.merchant_id;  
       
       if (!merchantId) {
         throw new Error('Merchant ID not found in user data');
