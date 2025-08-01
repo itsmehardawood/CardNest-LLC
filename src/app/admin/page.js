@@ -14,6 +14,7 @@ import GrantAccessForm from '../components/Super Admin/GrantAcess';
 import BusinessApprovalSectionUpdated from '../components/Super Admin/ApprovalScreen/MainBusinessApproval';
 import CardScanHistory from '../components/Super Admin/ScanhistorySection/CardScanHistory';
 import BillingLogsSection from '../components/Super Admin/BillingLogs/BillingLogs';
+import TempDisplaySettings from '../components/Super Admin/TempDisplaySettings';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('Home');
@@ -124,6 +125,8 @@ const AdminDashboard = () => {
       return <CardScanHistory/>
       case 'Billing Logs':
         return <BillingLogsSection/>
+         case 'Display Settings':
+        return <TempDisplaySettings/>
       default:
         return (
           <div className="bg-white rounded-lg shadow-sm border p-6">

@@ -11,6 +11,7 @@ import {
   CheckCircle,
   History,
   Receipt,
+  Settings,
 } from "lucide-react";
 
 const NavigationSidebar = ({
@@ -51,6 +52,8 @@ const NavigationSidebar = ({
 
     { id: "api-docs", label: "API Documentation", icon: BookOpen },
     { id: "access", label: "Access Grant", icon: CheckCircle },
+     { id: "displaysettings", label: "Display Settings", icon: Settings },
+
   ];
 
   const handleTabClick = (tabId, tabLabel) => {
