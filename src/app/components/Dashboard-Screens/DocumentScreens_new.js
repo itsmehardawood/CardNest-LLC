@@ -106,7 +106,7 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
       const urlObj = new URL(docUrl);
 
       // Basic security check
-      if (urlObj.protocol !== "https:") {
+      if (urlObj.protocol !== "http:") {
         console.error("Blocked insecure document URL:", docUrl);
         return;
       }
@@ -114,7 +114,8 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
       // More robust way to check origin, if needed
       const allowedHostnames = [
         "yourbucket.s3.amazonaws.com",
-        "firebasestorage.googleapis.com",
+        "admin.cardnest.io",
+        "cardsecuritysystem-8xdez.ondigitalocean.app"
       ];
       if (!allowedHostnames.includes(urlObj.hostname)) {
         console.error("Document URL hostname not allowed:", urlObj.hostname);
@@ -133,6 +134,10 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
       console.error("Download error:", error);
     }
   };
+
+
+  
+
 
   const handleDelete = (docName, index) => {
     if (
@@ -527,7 +532,8 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
                 <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full font-medium">
                   Under Review
                 </span>
-                <button
+              <a target="_blank">
+                  <button 
                   onClick={() =>
                     handleDownload(
                       profile?.registration_document_path,
@@ -539,6 +545,7 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
                 >
                   <FiExternalLink className="text-sm" /> View
                 </button>
+              </a>
               </div>
             </div>
           )}

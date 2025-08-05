@@ -42,18 +42,14 @@ const NavigationSidebar = ({
   const tabs = [
     { id: "home", label: "Home", icon: Home },
     { id: "enterprise", label: "Enterprise Approval", icon: Building2 },
+        { id: "scanhistory", label: "Scan History", icon: History },
     { id: "pricing", label: "Pricing", icon: DollarSign },
-    { id: "scanhistory", label: "Scan History", icon: History },
-
     { id: "billing", label: "Billing Logs", icon: Receipt },
-
-    { id: "content", label: "Content Management", icon: FileText },
-    { id: "activity", label: "User Activity", icon: BarChart2 },
-
     { id: "api-docs", label: "API Documentation", icon: BookOpen },
     { id: "access", label: "Access Grant", icon: CheckCircle },
-     { id: "displaysettings", label: "Display Settings", icon: Settings },
-
+    { id: "displaysettings", label: "Display Settings", icon: Settings },
+    { id: "content", label: "Content Management", icon: FileText },
+    { id: "activity", label: "User Activity", icon: BarChart2 },
   ];
 
   const handleTabClick = (tabId, tabLabel) => {

@@ -113,7 +113,7 @@ const ScanHistorySection = () => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
         <div className="text-center py-6 sm:py-8">
           <AlertCircle className="w-10 h-10 sm:w-12 sm:h-12 text-red-500 mx-auto mb-4" />
-          <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">Error Loading Scan History</h3>
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No History Found</h3>
           <p className="text-sm sm:text-base text-gray-600 mb-4 px-4">{error}</p>
           <button
             onClick={fetchScanHistory}
@@ -146,13 +146,13 @@ const ScanHistorySection = () => {
       </div>
 
       <div className="p-4 sm:p-6">
-        {scanHistory.length === 0 ? (
-          <div className="text-center py-6 sm:py-8">
-            <CreditCard className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No Scan History</h3>
-            <p className="text-sm sm:text-base text-gray-600">No card scans found for this merchant.</p>
-          </div>
-        ) : (
+     {scanHistory.length === 0 ? (
+  <div className="text-center py-6 sm:py-8">
+    <CreditCard className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-4" />
+    <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No Scan History Found</h3>
+    <p className="text-sm sm:text-base text-gray-600">No scan history found against this merchant.</p>
+  </div>
+) : (
           <div className="space-y-3">
             {scanHistory.map((scan) => (
               <div

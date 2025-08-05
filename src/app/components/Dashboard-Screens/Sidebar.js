@@ -59,7 +59,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, activeTab, setActiveTab, status 
       } bg-white shadow-lg border-r border-gray-200 transition-all duration-300 ease-in-out flex flex-col h-screen z-40`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-100">
+      <div className="flex items-center justify-between p-3.5 border-b border-gray-100">
         {sidebarOpen && <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}

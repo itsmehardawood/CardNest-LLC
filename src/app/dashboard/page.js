@@ -673,7 +673,7 @@ const checkBusinessStatus = async () => {
       {/* Main Content Area - Scrollable */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Fixed Header */}
-        <header className="flex-shrink-0 bg-white shadow-sm border-b">
+        <header className="flex-shrink-0 bg-white shadow-sm border-b border-gray-200">
           <div className="px-6 py-4">
             <div className="flex justify-between items-center">
               {/* Mobile menu button - only show on small screens */}
@@ -701,7 +701,7 @@ const checkBusinessStatus = async () => {
 
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto">
-          <div className=" p-3">
+          <div className=" p-3 bg-gray-50">
             {renderContent()}
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { apiFetch } from '@/app/lib/api.js';
 import React, { useState, useEffect } from 'react';
 
 const DisplaySettings = () => {
@@ -6,38 +7,115 @@ const DisplaySettings = () => {
     logo: null
   });
   const [logoPreview, setLogoPreview] = useState(null);
+  const [existingLogoUrl, setExistingLogoUrl] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [merchantId, setMerchantId] = useState(null);
   const [debugInfo, setDebugInfo] = useState('');
 
-  useEffect(() => {
-    // Get merchant_id from localStorage userData
-    const userData = localStorage.getItem('userData');
-    if (userData) {
+  // Function to fetch existing merchant display info
+const fetchMerchantDisplayInfo = async (merchantIdValue) => {
+  try {
+    setDebugInfo('Fetching existing display info...');
+    
+    const response = await fetch(`https://admin.cardnest.io/api/getmerchantDisplayInfo?merchantId=${encodeURIComponent(merchantIdValue)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    console.log('GET API Response status:', response.status);
+    
+    let result;
+    const contentType = response.headers.get('content-type');
+    
+    if (contentType && contentType.includes('application/json')) {
+      result = await response.json();
+    } else {
+      const textResult = await response.text();
+      console.log('Non-JSON response:', textResult);
+      
       try {
-        const parsedUserData = JSON.parse(userData);
-        // Check both possible structures
-        const userObj = parsedUserData.user || parsedUserData;
-        const merchantIdValue = userObj.merchant_id || userObj.merchantId;
+        result = JSON.parse(textResult);
+      } catch {
+        result = { message: textResult };
+      }
+    }
+
+    console.log('GET API Response result:', result);
+
+    if (response.ok && (result.status === true || result.success === true)) {
+      // Pre-populate form with existing data
+      if (result.data) {
+        const { display_name, display_logo } = result.data;
         
-        console.log('Parsed userData:', parsedUserData);
-        console.log('User object:', userObj);
-        console.log('Merchant ID found:', merchantIdValue);
-        
-        setMerchantId(merchantIdValue);
-        
-        if (!merchantIdValue) {
-          setSubmitError('Merchant ID not found in user data. Please contact support.');
+        if (display_name) {
+          setFormData(prev => ({
+            ...prev,
+            displayName: display_name
+          }));
         }
-      } catch (error) {
-        console.error('Error parsing userData from localStorage:', error);
-        setSubmitError('Unable to retrieve merchant information. Please log in again.');
+        
+        if (display_logo) {
+          setExistingLogoUrl(display_logo);
+          setLogoPreview(display_logo);
+        }
+        
+        setDebugInfo('Existing data loaded successfully');
+      } else {
+        setDebugInfo('No existing data found');
       }
     } else {
-      setSubmitError('User data not found. Please log in again.');
+      console.log('No existing data or API error:', result.message || 'Unknown error');
+      setDebugInfo('No existing data found or API error');
     }
+  } catch (error) {
+    console.error('Error fetching merchant display info:', error);
+    setDebugInfo(`Error fetching data: ${error.message}`);
+    // Don't set this as a submit error since it's just for loading existing data
+  }
+};
+
+  useEffect(() => {
+    const initializeComponent = async () => {
+      setIsLoading(true);
+      
+      // Get merchant_id from localStorage userData
+      const userData = localStorage.getItem('userData');
+      if (userData) {
+        try {
+          const parsedUserData = JSON.parse(userData);
+          // Check both possible structures
+          const userObj = parsedUserData.user || parsedUserData;
+          const merchantIdValue = userObj.merchant_id || userObj.merchantId;
+          
+          console.log('Parsed userData:', parsedUserData);
+          console.log('User object:', userObj);
+          console.log('Merchant ID found:', merchantIdValue);
+          
+          setMerchantId(merchantIdValue);
+          
+          if (merchantIdValue) {
+            // Fetch existing display info
+            await fetchMerchantDisplayInfo(merchantIdValue);
+          } else {
+            setSubmitError('Merchant ID not found in user data. Please contact support.');
+          }
+        } catch (error) {
+          console.error('Error parsing userData from localStorage:', error);
+          setSubmitError('Unable to retrieve merchant information. Please log in again.');
+        }
+      } else {
+        setSubmitError('User data not found. Please log in again.');
+      }
+      
+      setIsLoading(false);
+    };
+
+    initializeComponent();
   }, []);
 
   const handleInputChange = (e) => {
@@ -74,6 +152,7 @@ const DisplaySettings = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         setLogoPreview(e.target.result);
+        setExistingLogoUrl(null); // Clear existing logo URL when new file is selected
       };
       reader.readAsDataURL(file);
       
@@ -88,14 +167,13 @@ const DisplaySettings = () => {
       logo: null
     }));
     setLogoPreview(null);
+    setExistingLogoUrl(null);
     // Reset file input
     const fileInput = document.querySelector('input[type="file"]');
     if (fileInput) {
       fileInput.value = '';
     }
   };
-
-  // Removed convertToBase64 function as we'll use FormData instead
 
   const handleSubmit = async () => {
     console.log('=== DISPLAY SETTINGS SUBMISSION ===');
@@ -187,6 +265,24 @@ const DisplaySettings = () => {
         console.log('✅ Update successful');
         setSubmitSuccess(true);
         setDebugInfo('Update successful!');
+        
+        // Update existing logo URL if a new logo was uploaded
+        if (formData.logo && result.data && result.data.display_logo) {
+          setExistingLogoUrl(result.data.display_logo);
+        }
+        
+        // Reset file input but keep the display name and existing logo
+        setFormData(prev => ({
+          ...prev,
+          logo: null
+        }));
+        
+        // Reset file input
+        const fileInput = document.querySelector('input[type="file"]');
+        if (fileInput) {
+          fileInput.value = '';
+        }
+        
         // Reset success message after 3 seconds
         setTimeout(() => {
           setSubmitSuccess(false);
@@ -205,6 +301,18 @@ const DisplaySettings = () => {
       setIsSubmitting(false);
     }
   };
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto">
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
+          <span className="text-gray-600">Loading display settings...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto">
@@ -277,23 +385,30 @@ const DisplaySettings = () => {
             Logo (Optional)
           </label>
           
-          {/* Logo Preview */}
-          {logoPreview && (
+          {/* Logo Preview - Show either existing logo or new upload preview */}
+          {(logoPreview || existingLogoUrl) && (
             <div className="mb-4 p-4 border border-gray-200 rounded-md bg-gray-50">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <img
-                    src={logoPreview}
+                    src={logoPreview || existingLogoUrl}
                     alt="Logo preview"
                     className="h-16 w-16 object-contain rounded-md border border-gray-300"
                   />
                   <div className="ml-3">
                     <p className="text-sm font-medium text-gray-900">
-                      {formData.logo?.name}
+                      {formData.logo?.name || (existingLogoUrl ? 'Current Logo' : 'Logo Preview')}
                     </p>
-                    <p className="text-xs text-gray-500">
-                      {(formData.logo?.size / 1024).toFixed(1)} KB
-                    </p>
+                    {formData.logo && (
+                      <p className="text-xs text-gray-500">
+                        {(formData.logo.size / 1024).toFixed(1)} KB
+                      </p>
+                    )}
+                    {existingLogoUrl && !formData.logo && (
+                      <p className="text-xs text-gray-500">
+                        Existing logo
+                      </p>
+                    )}
                   </div>
                 </div>
                 <button
@@ -316,6 +431,11 @@ const DisplaySettings = () => {
           />
           <p className="text-xs text-gray-500 mt-1">
             Upload your business logo (JPG, PNG, GIF, SVG - Max 5MB). Recommended size: 200x200px
+            {existingLogoUrl && !formData.logo && (
+              <span className="block text-blue-600 mt-1">
+                A logo is already uploaded. Choose a new file to replace it.
+              </span>
+            )}
           </p>
         </div>
 
@@ -334,7 +454,7 @@ const DisplaySettings = () => {
             <span className="font-medium">Debug Info:</span><br/>
             Merchant ID: {merchantId || 'Not found'}<br/>
             Display Name: {formData.displayName || 'Empty'}<br/>
-            Logo: {formData.logo ? formData.logo.name : 'None'}<br/>
+            Logo: {formData.logo ? formData.logo.name : (existingLogoUrl ? 'Existing logo loaded' : 'None')}<br/>
             Status: {debugInfo || 'Ready'}
           </p>
         </div>

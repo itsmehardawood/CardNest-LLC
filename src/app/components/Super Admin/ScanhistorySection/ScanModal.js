@@ -138,11 +138,11 @@ const ScanDetailsModal = ({ merchantId, scanData, onClose }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-medium text-gray-500">Merchant ID:</span>
-                <span className="text-sm font-mono bg-white px-2 py-1 rounded border">{merchantInfo?.merchant_id}</span>
+                <span className="text-sm font-mono bg-white text-gray-600 px-2 py-1 rounded border">{merchantInfo?.merchant_id}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-medium text-gray-500">Merchant Key:</span>
-                <span className="text-xs font-mono bg-white px-2 py-1 rounded border truncate max-w-xs">{merchantInfo?.merchant_key}</span>
+                <span className="text-xs font-mono  text-gray-600 bg-white px-2 py-1 rounded border truncate max-w-xs">{merchantInfo?.merchant_key}</span>
               </div>
             </div>
           </div>

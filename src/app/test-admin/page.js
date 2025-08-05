@@ -18,7 +18,7 @@ export default function AdminLoginPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          country_code: '+1',
+          country_code: '+92',
           login_input: Email
         }),
       });
