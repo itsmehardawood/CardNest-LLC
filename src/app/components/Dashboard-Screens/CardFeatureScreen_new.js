@@ -325,7 +325,7 @@ if (loading) {
                 </div>
                 <h2 className="font-semibold text-white text-lg">Card Front</h2>
               </div>
-              <div className="relative aspect-[1.58] rounded-xl overflow-hidden border-2 border-gray-700 bg-gradient-to-br from-gray-900 to-gray-800 shadow-inner">
+              <div className="relative aspect-[1.58] rounded-xl overflow-hidden border-2 border-gray-700 bg-white  shadow-inner">
                 <Image 
                   src="/images/cardfront.png"
                   fill
@@ -384,7 +384,7 @@ if (loading) {
                 </div>
                 <h2 className="font-semibold text-white text-lg">Card Back</h2>
               </div>
-              <div className="relative aspect-[1.58] rounded-xl overflow-hidden border-2 border-gray-700 bg-gradient-to-br from-gray-900 to-gray-800 shadow-inner">
+              <div className="relative aspect-[1.58] rounded-xl overflow-hidden border-2 border-gray-700  bg-white  shadow-inner">
                   <Image 
                     src="/images/cardback.png"
                     fill
