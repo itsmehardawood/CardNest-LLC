@@ -200,24 +200,23 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
         return <FiFileText className="text-gray-500 text-xl" />;
     }
   };
-
-  const renderCredentialsSection = () => {
+const renderCredentialsSection = () => {
     const profile = verificationData?.data?.business_profile;
     const aesKey = verificationData?.data?.aes_key;
 
     if (!aesKey) return null;
 
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-6">
+      <div className="bg-black rounded-xl shadow-sm border border-gray-800 p-6 mt-6">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-11 h-11 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center">
+          <div className="w-11 h-11 bg-purple-900 text-purple-300 rounded-full flex items-center justify-center">
             <FaShieldAlt className="text-xl" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-gray-800">
+            <h3 className="text-xl font-semibold text-white">
               API Credentials
             </h3>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-400 mt-1">
               Secure credentials for API integration. Keep them confidential.
             </p>
           </div>
@@ -225,17 +224,17 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
 
         <div className="space-y-4">
           {userData?.merchant_id && (
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <div className="rounded-lg border border-gray-700 bg-gray-900 p-4">
               <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-300">
                   Merchant ID
                 </label>
-                <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">
+                <span className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded">
                   Public
                 </span>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <div className="flex-1 px-4 py-2 text-sm font-mono bg-white border rounded-lg break-all">
+                <div className="flex-1 px-4 py-2 text-sm font-mono bg-black border border-gray-700 rounded-lg break-all text-white">
                   {userData.merchant_id}
                 </div>
                 <button
@@ -253,17 +252,17 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
           )}
 
           {aesKey && (
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <div className="rounded-lg border border-gray-700 bg-gray-900 p-4">
               <div className="flex justify-between items-center mb-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-300">
                   AES Encryption Key
                 </label>
-                <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">
+                <span className="text-xs bg-red-900 text-red-300 px-2 py-1 rounded">
                   Private
                 </span>
               </div>
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                <div className="flex-1 px-4 py-2 text-sm font-mono bg-white border rounded-lg break-all">
+                <div className="flex-1 px-4 py-2 text-sm font-mono bg-black border border-gray-700 rounded-lg break-all text-white">
                   {maskEncryptionKey(aesKey)}
                 </div>
                 <button
@@ -275,7 +274,7 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
                   {copiedField === "aesKey" ? "Copied" : "Copy"}
                 </button>
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-gray-400 mt-2">
                 <strong>Security Notice:</strong> This key grants full API
                 access. Never share it or expose it in client-side code.
               </p>
@@ -291,56 +290,56 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
 
     return (
       <div className="space-y-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-black rounded-xl shadow-sm border border-gray-800 p-6">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-green-900 text-green-400 rounded-full flex items-center justify-center">
                 <FiCheckCircle className="text-xl" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-gray-800">
+                <h2 className="text-xl font-semibold text-white">
                   Verified Documents
                 </h2>
-                <p className="text-sm text-green-600">
+                <p className="text-sm text-green-400">
                   All documents have been approved
                 </p>
               </div>
             </div>
-            <div className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full font-medium">
+            <div className="px-3 py-1 bg-green-900 text-green-300 text-sm rounded-full font-medium">
               VERIFIED
             </div>
           </div>
 
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div className="mb-6 p-4 bg-green-900 border border-green-700 rounded-lg">
             <div className="flex items-center gap-2 mb-2">
-              <FiCheckCircle className="text-green-600" />
-              <h3 className="font-medium text-green-800">
+              <FiCheckCircle className="text-green-400" />
+              <h3 className="font-medium text-green-300">
                 Verification Complete
               </h3>
             </div>
-            <p className="text-green-700 text-sm">
+            <p className="text-green-200 text-sm">
               Your business documents have been successfully verified and your
               account is fully active.
             </p>
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-800">
+            <h3 className="text-lg font-semibold text-white">
               Submitted Documents
             </h3>
 
             {profile?.registration_document_path && (
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-gray-900 rounded-lg border border-gray-700 gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                  <div className="w-10 h-10 bg-blue-900 text-blue-400 rounded-lg flex items-center justify-center">
                     <FiFileText className="text-xl" />
                   </div>
                   <div>
-                    <p className="font-medium text-gray-800">
+                    <p className="font-medium text-white">
                       Business Registration Document
                     </p>
-                    <p className="text-sm text-gray-600">Required Document</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-sm text-gray-300">Required Document</p>
+                    <p className="text-xs text-gray-400">
                       Verified on{" "}
                       {new Date(profile?.updated_at).toLocaleDateString(
                         "en-US",
@@ -354,7 +353,7 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full font-medium">
+                  <span className="px-2 py-1 bg-green-900 text-green-300 text-xs rounded-full font-medium">
                     Verified
                   </span>
                   <button
@@ -364,7 +363,7 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
                         "Business_Registration_Document"
                       )
                     }
-                    className="px-3 py-1 text-blue-600 hover:text-blue-800 text-sm hover:bg-blue-50 rounded flex items-center gap-1 transition-colors"
+                    className="px-3 py-1 text-blue-400 hover:text-blue-300 text-sm hover:bg-blue-900 rounded flex items-center gap-1 transition-colors"
                     aria-label="View document"
                   >
                     <FiExternalLink className="text-sm" /> View
@@ -374,33 +373,33 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
             )}
           </div>
 
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <h4 className="font-medium text-gray-800 mb-3">
+          <div className="mt-6 p-4 bg-gray-900 rounded-lg border border-gray-700">
+            <h4 className="font-medium text-white mb-3">
               Verified Business Information
             </h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="text-gray-600">Business Name</p>
-                <p className="font-medium text-gray-800 break-words">
+                <p className="text-gray-300">Business Name</p>
+                <p className="font-medium text-white break-words">
                   {profile?.business_name}
                 </p>
               </div>
               <div>
-                <p className="text-gray-600">Registration Number</p>
-                <p className="font-medium text-gray-800 break-words">
+                <p className="text-gray-300">Registration Number</p>
+                <p className="font-medium text-white break-words">
                   {profile?.business_registration_number}
                 </p>
               </div>
               <div>
-                <p className="text-gray-600">Account Holder</p>
-                <p className="font-medium text-gray-800 break-words">
+                <p className="text-gray-300">Account Holder</p>
+                <p className="font-medium text-white break-words">
                   {profile?.account_holder_first_name}{" "}
                   {profile?.account_holder_last_name}
                 </p>
               </div>
               <div>
-                <p className="text-gray-600">Verification Date</p>
-                <p className="font-medium text-gray-800">
+                <p className="text-gray-300">Verification Date</p>
+                <p className="font-medium text-white">
                   {new Date(profile?.updated_at).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
@@ -415,29 +414,29 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
         {renderCredentialsSection()}
 
         {securityReminderVisible && (
-          <div className="bg-white rounded-xl shadow-sm border border-blue-200 p-6">
+          <div className="bg-black rounded-xl shadow-sm border border-blue-700 p-6">
             <div className="flex items-start gap-3">
               <div className="mt-1">
-                <FaShieldAlt className="text-blue-600 text-xl" />
+                <FaShieldAlt className="text-blue-400 text-xl" />
               </div>
               <div className="flex-1">
                 <div className="flex justify-between items-start">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  <h3 className="text-lg font-semibold text-white mb-2">
                     Security Reminder
                   </h3>
                   <button
                     onClick={() => setSecurityReminderVisible(false)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-gray-400 hover:text-gray-300"
                     aria-label="Dismiss security reminder"
                   >
                     ×
                   </button>
                 </div>
-                <p className="text-sm text-gray-600 mb-3">
+                <p className="text-sm text-gray-300 mb-3">
                   Your documents contain sensitive information. Please ensure
                   you:
                 </p>
-                <ul className="text-sm text-gray-700 space-y-2">
+                <ul className="text-sm text-gray-300 space-y-2">
                   <li className="flex items-start gap-2">
                     <span>•</span>
                     <span>
@@ -470,32 +469,32 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
     const profile = verificationData?.data?.business_profile;
 
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-black rounded-xl shadow-sm border border-gray-800 p-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-yellow-900 text-yellow-400 rounded-full flex items-center justify-center">
               <FiClock className="text-xl" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-800">
+              <h2 className="text-xl font-semibold text-white">
                 Documents Under Review
               </h2>
-              <p className="text-sm text-yellow-600">
+              <p className="text-sm text-yellow-400">
                 Your documents are being verified
               </p>
             </div>
           </div>
-          <div className="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full font-medium">
+          <div className="px-3 py-1 bg-yellow-900 text-yellow-300 text-sm rounded-full font-medium">
             IN REVIEW
           </div>
         </div>
 
-        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <div className="mb-6 p-4 bg-yellow-900 border border-yellow-700 rounded-lg">
           <div className="flex items-center gap-2 mb-2">
-            <FiClock className="text-yellow-600" />
-            <h3 className="font-medium text-yellow-800">Review in Progress</h3>
+            <FiClock className="text-yellow-400" />
+            <h3 className="font-medium text-yellow-300">Review in Progress</h3>
           </div>
-          <p className="text-yellow-700 text-sm">
+          <p className="text-yellow-200 text-sm">
             Your business documents have been submitted and are currently being
             reviewed by our team. This process typically takes 1-3 business
             days. You will receive a notification once completed.
@@ -503,22 +502,22 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-800">
+          <h3 className="text-lg font-semibold text-white">
             Submitted Documents
           </h3>
 
           {profile?.registration_document_path && (
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-gray-900 rounded-lg border border-gray-700 gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-blue-900 text-blue-400 rounded-lg flex items-center justify-center">
                   <FiFileText className="text-xl" />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-800">
+                  <p className="font-medium text-white">
                     Business Registration Document
                   </p>
-                  <p className="text-sm text-gray-600">Required Document</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-sm text-gray-300">Required Document</p>
+                  <p className="text-xs text-gray-400">
                     Submitted on{" "}
                     {new Date(profile?.created_at).toLocaleDateString("en-US", {
                       year: "numeric",
@@ -529,7 +528,7 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full font-medium">
+                <span className="px-2 py-1 bg-yellow-900 text-yellow-300 text-xs rounded-full font-medium">
                   Under Review
                 </span>
               <a target="_blank">
@@ -540,7 +539,7 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
                       "Business_Registration_Document"
                     )
                   }
-                  className="px-3 py-1 text-blue-600 hover:text-blue-800 text-sm hover:bg-blue-50 rounded flex items-center gap-1 transition-colors"
+                  className="px-3 py-1 text-blue-400 hover:text-blue-300 text-sm hover:bg-blue-900 rounded flex items-center gap-1 transition-colors"
                   aria-label="View document"
                 >
                   <FiExternalLink className="text-sm" /> View
@@ -551,33 +550,33 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
           )}
         </div>
 
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <h4 className="font-medium text-gray-800 mb-3">
+        <div className="mt-6 p-4 bg-gray-900 rounded-lg border border-gray-700">
+          <h4 className="font-medium text-white mb-3">
             Submitted Business Information
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="text-gray-600">Business Name</p>
-              <p className="font-medium text-gray-800 break-words">
+              <p className="text-gray-300">Business Name</p>
+              <p className="font-medium text-white break-words">
                 {profile?.business_name}
               </p>
             </div>
             <div>
-              <p className="text-gray-600">Registration Number</p>
-              <p className="font-medium text-gray-800 break-words">
+              <p className="text-gray-300">Registration Number</p>
+              <p className="font-medium text-white break-words">
                 {profile?.business_registration_number}
               </p>
             </div>
             <div>
-              <p className="text-gray-600">Account Holder</p>
-              <p className="font-medium text-gray-800 break-words">
+              <p className="text-gray-300">Account Holder</p>
+              <p className="font-medium text-white break-words">
                 {profile?.account_holder_first_name}{" "}
                 {profile?.account_holder_last_name}
               </p>
             </div>
             <div>
-              <p className="text-gray-600">Submission Date</p>
-              <p className="font-medium text-gray-800">
+              <p className="text-gray-300">Submission Date</p>
+              <p className="font-medium text-white">
                 {new Date(profile?.created_at).toLocaleDateString("en-US", {
                   year: "numeric",
                   month: "long",
@@ -588,14 +587,14 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
           </div>
         </div>
 
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+        <div className="mt-6 p-4 bg-blue-900 rounded-lg border border-blue-700">
           <div className="flex items-center gap-3">
-            <FiAlertCircle className="text-blue-600 flex-shrink-0" />
+            <FiAlertCircle className="text-blue-400 flex-shrink-0" />
             <div>
-              <h4 className="font-medium text-blue-800 mb-1">
+              <h4 className="font-medium text-blue-300 mb-1">
                 Need to update your documents?
               </h4>
-              <p className="text-blue-700 text-sm">
+              <p className="text-blue-200 text-sm">
                 If you need to submit updated documents, please contact our
                 support team.
               </p>
@@ -608,13 +607,13 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
 
   const renderRegularDocumentsScreen = () => {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-black rounded-xl shadow-sm border border-gray-800 p-6">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-white">
               Business Documents
             </h2>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-400">
               Upload and manage your business verification documents
             </p>
           </div>
@@ -634,7 +633,7 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
             )}
             <button
               onClick={handleUploadNew}
-              className="px-4 py-2 bg-white border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 text-sm transition-colors flex items-center justify-center gap-2"
+              className="px-4 py-2 bg-black border border-blue-600 text-blue-400 rounded-lg hover:bg-blue-900 text-sm transition-colors flex items-center justify-center gap-2"
               aria-label="Upload new documents"
             >
               <FiFileText className="text-sm" /> Upload New
@@ -647,17 +646,17 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
             {documents.map((doc, index) => (
               <div
                 key={index}
-                className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 gap-4"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-gray-900 rounded-lg border border-gray-700 gap-4"
               >
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="w-10 h-10 bg-blue-100 rounded flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-blue-900 rounded flex items-center justify-center flex-shrink-0">
                     {getFileIcon(doc.name)}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-800 truncate">
+                    <p className="text-sm font-medium text-white truncate">
                       {doc.name}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-400">
                       {(doc.size / 1024 / 1024).toFixed(2)} MB • Uploaded{" "}
                       {new Date().toLocaleDateString()}
                     </p>
@@ -666,14 +665,14 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleDownload(doc.url, doc.name)}
-                    className="px-3 py-1 text-blue-600 hover:text-blue-800 text-sm hover:bg-blue-50 rounded transition-colors flex items-center gap-1"
+                    className="px-3 py-1 text-blue-400 hover:text-blue-300 text-sm hover:bg-blue-900 rounded transition-colors flex items-center gap-1"
                     aria-label={`Download ${doc.name}`}
                   >
                     <FiDownload className="text-sm" /> Download
                   </button>
                   <button
                     onClick={() => handleDelete(doc.name, index)}
-                    className="px-3 py-1 text-red-600 hover:text-red-800 text-sm hover:bg-red-50 rounded transition-colors flex items-center gap-1"
+                    className="px-3 py-1 text-red-400 hover:text-red-300 text-sm hover:bg-red-900 rounded transition-colors flex items-center gap-1"
                     aria-label={`Delete ${doc.name}`}
                   >
                     <FiTrash2 className="text-sm" /> Delete
@@ -684,11 +683,11 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
           </div>
         ) : (
           <div className="text-center py-8">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
               <FiFileText className="text-2xl text-gray-400" />
             </div>
-            <p className="text-gray-600 mb-4">No documents uploaded yet</p>
-            <p className="text-gray-500 text-sm mb-6 px-4 max-w-md mx-auto">
+            <p className="text-gray-300 mb-4">No documents uploaded yet</p>
+            <p className="text-gray-400 text-sm mb-6 px-4 max-w-md mx-auto">
               Upload your business registration documents to complete your
               profile verification process and access all features.
             </p>
@@ -701,7 +700,7 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
                 <FiFileText /> Go to Business Profile
               </button>
               {handleFileUpload && (
-                <label className="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 text-sm cursor-pointer transition-colors flex items-center justify-center gap-2">
+                <label className="px-4 py-2 border border-blue-600 text-blue-400 rounded-lg hover:bg-blue-900 text-sm cursor-pointer transition-colors flex items-center justify-center gap-2">
                   <FiUpload /> Quick Upload Here
                   <input
                     type="file"
@@ -717,15 +716,15 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
           </div>
         )}
 
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        <div className="mt-8 pt-6 border-t border-gray-700">
+          <h3 className="text-lg font-semibold text-white mb-4">
             Document Requirements
           </h3>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="font-medium text-blue-800 mb-2">
+          <div className="bg-blue-900 border border-blue-700 rounded-lg p-4">
+            <h4 className="font-medium text-blue-300 mb-2">
               Upload Guidelines
             </h4>
-            <ul className="text-blue-700 text-sm space-y-2">
+            <ul className="text-blue-200 text-sm space-y-2">
               <li className="flex items-start gap-2">
                 <span>•</span>
                 <span>
@@ -755,23 +754,23 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
         </div>
 
         {securityReminderVisible && (
-          <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="mt-6 bg-yellow-900 border border-yellow-700 rounded-lg p-4">
             <div className="flex items-start gap-3">
-              <FaShieldAlt className="text-yellow-600 mt-0.5 flex-shrink-0" />
+              <FaShieldAlt className="text-yellow-400 mt-0.5 flex-shrink-0" />
               <div>
                 <div className="flex justify-between items-start">
-                  <h4 className="font-medium text-yellow-800 mb-1">
+                  <h4 className="font-medium text-yellow-300 mb-1">
                     Security Notice
                   </h4>
                   <button
                     onClick={() => setSecurityReminderVisible(false)}
-                    className="text-yellow-600 hover:text-yellow-800"
+                    className="text-yellow-400 hover:text-yellow-300"
                     aria-label="Dismiss security notice"
                   >
                     ×
                   </button>
                 </div>
-                <p className="text-yellow-700 text-sm">
+                <p className="text-yellow-200 text-sm">
                   All uploaded documents are encrypted and stored securely. Only
                   authorized personnel can access them for verification
                   purposes.
@@ -786,13 +785,13 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-black rounded-xl shadow-sm   p-6">
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">
+          <p className="text-gray-300">
             Loading document verification status...
           </p>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-sm text-gray-400 mt-2">
             This may take a few moments
           </p>
         </div>
@@ -802,16 +801,16 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
 
   if (apiError) {
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div className="bg-black rounded-xl shadow-sm border border-gray-800 p-6">
         <div className="text-center py-12">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FiAlertCircle className="text-2xl text-red-600" />
+          <div className="w-16 h-16 bg-red-900 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FiAlertCircle className="text-2xl text-red-400" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">
+          <h2 className="text-xl font-semibold text-white mb-2">
             Error Loading Data
           </h2>
-          <p className="text-gray-600 mb-4">{apiError}</p>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-gray-300 mb-4">{apiError}</p>
+          <p className="text-sm text-gray-400 mb-6">
             If this problem persists, please contact our support team.
           </p>
           <button

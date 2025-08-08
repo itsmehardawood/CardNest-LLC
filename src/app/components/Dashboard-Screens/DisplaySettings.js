@@ -303,35 +303,35 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
   };
 
   // Show loading state
-  if (isLoading) {
+ if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto">
+      <div className="bg-black rounded-lg shadow-md  p-6 max-w-2xl mx-auto">
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mr-3"></div>
-          <span className="text-gray-600">Loading display settings...</span>
+          <span className="text-gray-300">Loading display settings...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto">
-      <h2 className="text-xl font-semibold text-gray-800 mb-6">
+    <div className="bg-black rounded-lg shadow-md border border-gray-800 p-6 max-w-2xl mx-auto">
+      <h2 className="text-xl font-semibold text-white mb-6">
         Display Settings
       </h2>
 
       {/* Error Message */}
       {submitError && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-md p-4">
+        <div className="mb-6 bg-red-900 border border-red-700 rounded-md p-4">
           <div className="flex">
             <div className="flex-shrink-0">
-              <span className="text-red-400">✕</span>
+              <span className="text-red-300">✕</span>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">
+              <h3 className="text-sm font-medium text-red-200">
                 Error
               </h3>
-              <div className="mt-2 text-sm text-red-700">
+              <div className="mt-2 text-sm text-red-300">
                 <p>{submitError}</p>
               </div>
             </div>
@@ -341,16 +341,16 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
 
       {/* Success Message */}
       {submitSuccess && (
-        <div className="mb-6 bg-green-50 border border-green-200 rounded-md p-4">
+        <div className="mb-6 bg-green-900 border border-green-700 rounded-md p-4">
           <div className="flex">
             <div className="flex-shrink-0">
-              <span className="text-green-400">✓</span>
+              <span className="text-green-300">✓</span>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-green-800">
+              <h3 className="text-sm font-medium text-green-200">
                 Success
               </h3>
-              <div className="mt-2 text-sm text-green-700">
+              <div className="mt-2 text-sm text-green-300">
                 <p>Display settings updated successfully!</p>
               </div>
             </div>
@@ -361,7 +361,7 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
       <div className="space-y-6">
         {/* Display Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Display Name *
           </label>
           <input
@@ -370,42 +370,42 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
             value={formData.displayName}
             onChange={handleInputChange}
             placeholder="Enter your business display name"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-700 bg-black text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
             maxLength="100"
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-400 mt-1">
             This name will be displayed to your customers
           </p>
         </div>
 
         {/* Logo Upload */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-300 mb-2">
             Logo (Optional)
           </label>
           
           {/* Logo Preview - Show either existing logo or new upload preview */}
           {(logoPreview || existingLogoUrl) && (
-            <div className="mb-4 p-4 border border-gray-200 rounded-md bg-gray-50">
+            <div className="mb-4 p-4 border border-gray-700 rounded-md bg-gray-900">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <img
                     src={logoPreview || existingLogoUrl}
                     alt="Logo preview"
-                    className="h-16 w-16 object-contain rounded-md border border-gray-300"
+                    className="h-16 w-16 object-contain rounded-md border border-gray-600"
                   />
                   <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-white">
                       {formData.logo?.name || (existingLogoUrl ? 'Current Logo' : 'Logo Preview')}
                     </p>
                     {formData.logo && (
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-400">
                         {(formData.logo.size / 1024).toFixed(1)} KB
                       </p>
                     )}
                     {existingLogoUrl && !formData.logo && (
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-400">
                         Existing logo
                       </p>
                     )}
@@ -414,7 +414,7 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
                 <button
                   type="button"
                   onClick={handleRemoveLogo}
-                  className="text-red-600 hover:text-red-800 text-sm font-medium"
+                  className="text-red-400 hover:text-red-300 text-sm font-medium"
                 >
                   Remove
                 </button>
@@ -427,12 +427,12 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
             type="file"
             accept="image/jpeg,image/png,image/jpg,image/gif,image/svg+xml"
             onChange={handleLogoChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-gray-700 bg-black text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-400 mt-1">
             Upload your business logo (JPG, PNG, GIF, SVG - Max 5MB). Recommended size: 200x200px
             {existingLogoUrl && !formData.logo && (
-              <span className="block text-blue-600 mt-1">
+              <span className="block text-blue-400 mt-1">
                 A logo is already uploaded. Choose a new file to replace it.
               </span>
             )}
@@ -441,16 +441,16 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
 
         {/* Merchant ID Display */}
         {merchantId && (
-          <div className="bg-gray-50 p-3 rounded-md">
-            <p className="text-xs text-gray-600">
+          <div className="bg-gray-900 p-3 rounded-md">
+            <p className="text-xs text-gray-300">
               <span className="font-medium">Merchant ID:</span> {merchantId}
             </p>
           </div>
         )}
 
         {/* Debug Info */}
-        <div className="bg-blue-50 p-3 rounded-md">
-          <p className="text-xs text-blue-600">
+        <div className="bg-blue-900 p-3 rounded-md">
+          <p className="text-xs text-blue-300">
             <span className="font-medium">Debug Info:</span><br/>
             Merchant ID: {merchantId || 'Not found'}<br/>
             Display Name: {formData.displayName || 'Empty'}<br/>

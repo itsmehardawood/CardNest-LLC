@@ -100,11 +100,11 @@ function HomeScreen({ status, setActiveTab }) {
   const statusStyling = getStatusStyling(status);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-6 py-5 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-800">Welcome to Your Dashboard</h2>
-          <p className="text-gray-600 mt-1">Manage your account and access services</p>
+   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="bg-black rounded-xl shadow-sm border border-gray-800 overflow-hidden">
+        <div className="bg-gradient-to-r from-gray-900 to-gray-800 px-6 py-5 border-b border-gray-700">
+          <h2 className="text-2xl font-bold text-white">Welcome to Your Dashboard</h2>
+          <p className="text-gray-300 mt-1">Manage your account and access services</p>
         </div>
         
         <div className="p-3">
@@ -113,7 +113,7 @@ function HomeScreen({ status, setActiveTab }) {
             {/* Status Card */}
             <div className={`${statusStyling.bgColor} ${statusStyling.borderColor} p-5 rounded-lg border transition-all hover:shadow-md`}>
               <div className="flex items-center mb-3">
-                <div className="p-2 rounded-full bg-white shadow-sm mr-3">
+                <div className="p-2 rounded-full bg-black shadow-sm mr-3">
                   {statusStyling.icon}
                 </div>
                 <h3 className={`font-semibold ${statusStyling.titleColor}`}>Account Status</h3>
@@ -163,31 +163,31 @@ function HomeScreen({ status, setActiveTab }) {
             </div>
 
             {/* Quick Actions Card */}
-            <div className="bg-green-50 p-5 rounded-lg border border-green-200 transition-all hover:shadow-md">
+            <div className="bg-gray-900 p-5 rounded-lg border border-gray-700 transition-all hover:shadow-md">
               <div className="flex items-center mb-3">
-                <div className="p-2 rounded-full bg-white shadow-sm mr-3">
+                <div className="p-2 rounded-full bg-black shadow-sm mr-3">
                   <FiZap className="text-green-500 text-xl" />
                 </div>
-                <h3 className="font-semibold text-green-800">Quick Actions</h3>
+                <h3 className="font-semibold text-white">Quick Actions</h3>
               </div>
               <div className="space-y-3">
                 <button 
                   onClick={() => setActiveTab('profile')}
-                  className="w-full flex items-center justify-between text-green-700 hover:text-green-900 text-sm font-medium p-2 hover:bg-green-100 rounded transition-colors"
+                  className="w-full flex items-center justify-between text-gray-300 hover:text-white text-sm font-medium p-2 hover:bg-gray-800 rounded transition-colors"
                 >
                   <span>{status === 'approved' || status === 'active' ? 'View Profile' : 'Complete Profile'}</span>
                   <span>→</span>
                 </button>
                 <button 
                   onClick={() => setActiveTab('documents')}
-                  className="w-full flex items-center justify-between text-green-700 hover:text-green-900 text-sm font-medium p-2 hover:bg-green-100 rounded transition-colors"
+                  className="w-full flex items-center justify-between text-gray-300 hover:text-white text-sm font-medium p-2 hover:bg-gray-800 rounded transition-colors"
                 >
                   <span>{status === 'approved' || status === 'active' ? 'View Documents' : 'Upload Documents'}</span>
                   <span>→</span>
                 </button>
                 <button 
                   onClick={() => setActiveTab('developers')}
-                  className="w-full flex items-center justify-between text-green-700 hover:text-green-900 text-sm font-medium p-2 hover:bg-green-100 rounded transition-colors"
+                  className="w-full flex items-center justify-between text-gray-300 hover:text-white text-sm font-medium p-2 hover:bg-gray-800 rounded transition-colors"
                 >
                   <span>API Access</span>
                   <span>→</span>
@@ -196,19 +196,19 @@ function HomeScreen({ status, setActiveTab }) {
             </div>
 
             {/* Support Card - Simplified */}
-            <div className="bg-purple-50 p-5 rounded-lg border border-purple-200 transition-all hover:shadow-md">
+            <div className="bg-gray-900 p-5 rounded-lg border border-gray-700 transition-all hover:shadow-md">
               <div className="flex items-center mb-3">
-                <div className="p-2 rounded-full bg-white shadow-sm mr-3">
+                <div className="p-2 rounded-full bg-black shadow-sm mr-3">
                   <FiMail className="text-purple-500 text-xl" />
                 </div>
-                <h3 className="font-semibold text-purple-800">Need Help?</h3>
+                <h3 className="font-semibold text-white">Need Help?</h3>
               </div>
-              <p className="text-purple-700 text-sm mb-4">
+              <p className="text-gray-300 text-sm mb-4">
                 Our support team is here to assist you with any questions or issues.
               </p>
               <a 
                 href="mailto:support@cardnest.io"
-                className="flex items-center text-purple-700 hover:text-purple-900 text-sm font-medium p-2 hover:bg-purple-100 rounded transition-colors"
+                className="flex items-center text-gray-300 hover:text-white text-sm font-medium p-2 hover:bg-gray-800 rounded transition-colors"
               >
                 <FiMail className="mr-2" />
                 support@cardnest.io
@@ -218,29 +218,29 @@ function HomeScreen({ status, setActiveTab }) {
 
           {/* Status-specific information */}
           {status === 'incomplete-profile' && (
-            <div className="mt-8 p-5 bg-orange-50 border border-orange-200 rounded-lg">
-              <h3 className="font-semibold text-orange-800 mb-3 flex items-center">
+            <div className="mt-8 p-5 bg-gray-900 border border-gray-700 rounded-lg">
+              <h3 className="font-semibold text-white mb-3 flex items-center">
                 <FiAlertCircle className="mr-2" />
                 Complete Your Business Profile
               </h3>
-              <p className="text-orange-700 text-sm mb-4">
+              <p className="text-gray-300 text-sm mb-4">
                 Welcome! To get started, please complete your business profile.
               </p>
-              <ul className="space-y-2 text-orange-700 text-sm">
+              <ul className="space-y-2 text-gray-300 text-sm">
                 <li className="flex items-start">
-                  <span className="inline-block bg-orange-200 text-orange-800 rounded-full p-1 mr-2">✓</span>
+                  <span className="inline-block bg-gray-700 text-white rounded-full p-1 mr-2">✓</span>
                   Business name and registration details
                 </li>
                 <li className="flex items-start">
-                  <span className="inline-block bg-orange-200 text-orange-800 rounded-full p-1 mr-2">✓</span>
+                  <span className="inline-block bg-gray-700 text-white rounded-full p-1 mr-2">✓</span>
                   Contact information and address
                 </li>
                 <li className="flex items-start">
-                  <span className="inline-block bg-orange-200 text-orange-800 rounded-full p-1 mr-2">✓</span>
+                  <span className="inline-block bg-gray-700 text-white rounded-full p-1 mr-2">✓</span>
                   Upload business registration document
                 </li>
                 <li className="flex items-start">
-                  <span className="inline-block bg-orange-200 text-orange-800 rounded-full p-1 mr-2">✓</span>
+                  <span className="inline-block bg-gray-700 text-white rounded-full p-1 mr-2">✓</span>
                   Bank account information
                 </li>
               </ul>
@@ -248,42 +248,42 @@ function HomeScreen({ status, setActiveTab }) {
           )}
 
           {status === 'incomplete' && (
-            <div className="mt-8 p-5 bg-red-50 border border-red-200 rounded-lg">
-              <h3 className="font-semibold text-red-800 mb-3 flex items-center">
+            <div className="mt-8 p-5 bg-gray-900 border border-gray-700 rounded-lg">
+              <h3 className="font-semibold text-white mb-3 flex items-center">
                 <FiAlertCircle className="mr-2" />
                 Profile Update Required
               </h3>
               {verificationReason && (
-                <div className="mb-4 p-3 bg-white rounded border border-red-100">
-                  <p className="text-red-600 text-sm font-semibold mb-1">Feedback:</p>
-                  <p className="text-red-700 text-sm">{verificationReason}</p>
+                <div className="mb-4 p-3 bg-black rounded border border-gray-700">
+                  <p className="text-red-400 text-sm font-semibold mb-1">Feedback:</p>
+                  <p className="text-red-300 text-sm">{verificationReason}</p>
                 </div>
               )}
-              <p className="text-red-700 text-sm mb-4">
+              <p className="text-gray-300 text-sm mb-4">
                 Please update your profile based on the feedback above.
               </p>
             </div>
           )}
 
           {status === 'pending' && (
-            <div className="mt-8 p-5 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <h3 className="font-semibold text-yellow-800 mb-3 flex items-center">
+            <div className="mt-8 p-5 bg-gray-900 border border-gray-700 rounded-lg">
+              <h3 className="font-semibold text-white mb-3 flex items-center">
                 <FiClock className="mr-2" />
                 Review in Progress
               </h3>
-              <p className="text-yellow-700 text-sm mb-3">
+              <p className="text-gray-300 text-sm mb-3">
                 We are reviewing your application. This typically takes 1-3 business days.
               </p>
             </div>
           )}
 
           {status === 'approved' && (
-            <div className="mt-8 p-5 bg-blue-50 border border-blue-200 rounded-lg">
-              <h3 className="font-semibold text-blue-800 mb-3 flex items-center">
+            <div className="mt-8 p-5 bg-gray-900 border border-gray-700 rounded-lg">
+              <h3 className="font-semibold text-white mb-3 flex items-center">
                 <FiCheckCircle className="mr-2" />
                 Account Approved!
               </h3>
-              <p className="text-blue-700 text-sm mb-4">
+              <p className="text-gray-300 text-sm mb-4">
         Congratulations! Your account has been approved. If you have not subscribed yet, you can now choose a subscription plan and start using our services.
               </p>
               

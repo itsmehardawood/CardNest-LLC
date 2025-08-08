@@ -147,10 +147,10 @@ function MainBusinessScreen({
   // Show loading state while fetching data
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm  p-6">
+      <div className="bg-black rounded-lg shadow-sm  p-6">
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-12 w-12  border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">
+          <p className="text-white">
             Loading business verification status...
           </p>
         </div>
@@ -161,15 +161,15 @@ function MainBusinessScreen({
   // Show error state if API call failed
   if (apiError) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border p-6">
+      <div className="bg-black rounded-lg shadow-sm border border-gray-800 p-6">
         <div className="text-center py-8">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-red-900 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-2xl">❌</span>
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-xl font-semibold text-white mb-2">
             Error Loading Data
           </h2>
-          <p className="text-gray-600 mb-6">{apiError}</p>
+          <p className="text-gray-300 mb-6">{apiError}</p>
           <button
             onClick={handleManualReload} // Use the manual reload function
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"

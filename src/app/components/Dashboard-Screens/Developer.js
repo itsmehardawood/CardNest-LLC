@@ -66,21 +66,14 @@ function DevelopersScreen() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm  p-4 md:p-6 min-h-screen">
-      <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-6">Developers</h2>
+<div className="bg-black rounded-lg shadow-sm border border-gray-800 p-4 md:p-6 min-h-screen">
+      <h2 className="text-xl md:text-2xl font-semibold text-white mb-6">Developers</h2>
       
       <div className="space-y-6 md:space-y-8">
-        {/* API Management Section */}
-        {/* <div className="bg-gray-50 rounded-lg p-4 md:p-6">
-          <h3 className="text-lg md:text-xl font-medium text-gray-800 mb-4">API Management</h3>
-        </div> */}
-
-    
-
-        {/* Documentation Section */}
-        <div className="bg-gray-50 rounded-lg p-4 md:p-6">
+          {/* Documentation Section */}
+        <div className="bg-gray-900 rounded-lg border border-gray-700 p-4 md:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
-            <h3 className="text-lg md:text-xl font-medium text-gray-800 mb-2 sm:mb-0">
+            <h3 className="text-lg md:text-xl font-medium text-white mb-2 sm:mb-0">
               Documentation & Guides
             </h3>
             <button
@@ -93,7 +86,7 @@ function DevelopersScreen() {
           </div>
 
           {error && (
-            <div className="bg-red-100 text-red-700 p-3 rounded-md border border-red-300 mb-4 text-sm">
+            <div className="bg-red-900 text-red-300 p-3 rounded-md border border-red-700 mb-4 text-sm">
               {error}
             </div>
           )}
@@ -101,10 +94,10 @@ function DevelopersScreen() {
           {isLoading ? (
             <div className="text-center py-8">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-2 text-gray-600">Loading documentation...</p>
+              <p className="mt-2 text-gray-300">Loading documentation...</p>
             </div>
           ) : documents.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-gray-400">
               <div className="mb-4">
                 <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -118,16 +111,16 @@ function DevelopersScreen() {
               {/* Desktop Grid View */}
               <div className="hidden md:grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                 {documents.map((doc) => (
-                  <div key={doc.id} className="bg-white rounded-lg shadow-sm  p-4 hover:shadow-md transition-shadow">
+                  <div key={doc.id} className="bg-black rounded-lg shadow-sm border border-gray-800 p-4 hover:shadow-md transition-shadow">
                     <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-semibold text-gray-900 text-base leading-tight">{doc.title}</h4>
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium ml-2 shrink-0">
+                      <h4 className="font-semibold text-white text-base leading-tight">{doc.title}</h4>
+                      <span className="bg-blue-900 text-blue-300 px-2 py-1 rounded-full text-xs font-medium ml-2 shrink-0">
                         {doc.type}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-3">{doc.description}</p>
+                    <p className="text-sm text-gray-300 mb-4 line-clamp-3">{doc.description}</p>
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500">{formatDate(doc.created_at)}</span>
+                      <span className="text-xs text-gray-400">{formatDate(doc.created_at)}</span>
                       <button
                         onClick={() => handleDownload(doc.file_url, doc.title)}
                         className="bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs font-medium transition-colors"
@@ -142,16 +135,16 @@ function DevelopersScreen() {
               {/* Mobile List View */}
               <div className="md:hidden space-y-3">
                 {documents.map((doc) => (
-                  <div key={doc.id} className="bg-white rounded-lg shadow-sm border p-4">
+                  <div key={doc.id} className="bg-black rounded-lg shadow-sm border border-gray-800 p-4">
                     <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-medium text-gray-900 text-sm pr-2">{doc.title}</h4>
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs shrink-0">
+                      <h4 className="font-medium text-white text-sm pr-2">{doc.title}</h4>
+                      <span className="bg-blue-900 text-blue-300 px-2 py-1 rounded-full text-xs shrink-0">
                         {doc.type}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-3">{doc.description}</p>
+                    <p className="text-sm text-gray-300 mb-3">{doc.description}</p>
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500">{formatDate(doc.created_at)}</span>
+                      <span className="text-xs text-gray-400">{formatDate(doc.created_at)}</span>
                       <button
                         onClick={() => handleDownload(doc.file_url, doc.title)}
                         className="bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs transition-colors"
@@ -167,13 +160,13 @@ function DevelopersScreen() {
         </div>
 
         {/* Quick Links */}
-        <div className="bg-blue-50 rounded-lg p-4">
-          <h4 className="text-sm font-medium text-blue-800 mb-3">Quick Links & Resources:</h4>
+        <div className="bg-blue-900 rounded-lg border border-blue-700 p-4">
+          <h4 className="text-sm font-medium text-blue-300 mb-3">Quick Links & Resources:</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-            <a href="#" className="text-blue-700 hover:text-blue-900 transition-colors">• API Reference</a>
-            <a href="#" className="text-blue-700 hover:text-blue-900 transition-colors">• Integration Guide</a>
-            <a href="#" className="text-blue-700 hover:text-blue-900 transition-colors">• Code Examples</a>
-            <a href="#" className="text-blue-700 hover:text-blue-900 transition-colors">• Support Forum</a>
+            <a href="#" className="text-blue-200 hover:text-blue-100 transition-colors">• API Reference</a>
+            <a href="#" className="text-blue-200 hover:text-blue-100 transition-colors">• Integration Guide</a>
+            <a href="#" className="text-blue-200 hover:text-blue-100 transition-colors">• Code Examples</a>
+            <a href="#" className="text-blue-200 hover:text-blue-100 transition-colors">• Support Forum</a>
           </div>
         </div>
       </div>

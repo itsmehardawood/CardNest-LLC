@@ -166,14 +166,14 @@ function NavbarHomepage() {
     >
       Terms & Agreement
     </a>
-    <a
+    {/* <a
       href="https://d2puivvgaibigt.cloudfront.net/CardNest%20API%20Integration%20(Web%20Version).pdf"
       target="_blank"
       rel="noopener noreferrer"
       className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
     >
       Web API Integration
-    </a>
+    </a> */}
   </div>
 </div>
 
@@ -335,14 +335,14 @@ function NavbarHomepage() {
                 >
                     Terms & Agreement
                 </a>
-                <a
+                {/* <a
                     href="https://d2puivvgaibigt.cloudfront.net/CardNest%20API%20Integration%20(Web%20Version).pdf"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block text-left text-white hover:text-teal-300 hover:bg-gray-800 transition-all duration-200 font-medium py-3 px-4 rounded-lg w-full"
                 >
                     Web API Integration
-                </a>
+                </a> */}
                 </div>
 
                 {/* Sign In Link */}

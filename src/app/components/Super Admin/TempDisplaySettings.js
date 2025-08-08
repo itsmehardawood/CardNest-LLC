@@ -207,8 +207,8 @@ const TempDisplaySettings = () => {
   };
 
   return (
-    <div className="bg-white text-black rounded-lg shadow-md p-6 max-w-2xl mx-auto">
-      <h2 className="text-xl font-semibold text-gray-800 mb-6">
+    <div className="bg-black text-white  rounded-lg shadow-md p-6 max-w-2xl mx-auto">
+      <h2 className="text-xl font-semibold text-white mb-6">
         Display Settings
       </h2>
 
@@ -320,16 +320,16 @@ const TempDisplaySettings = () => {
         </div>
 
         {/* Merchant ID Display */}
-        {merchantId && (
+        {/* {merchantId && (
           <div className="bg-gray-50 p-3 rounded-md">
             <p className="text-xs text-gray-600">
               <span className="font-medium">Merchant ID:</span> {merchantId}
             </p>
           </div>
-        )}
+        )} */}
 
         {/* Debug Info */}
-        <div className="bg-blue-50 p-3 rounded-md">
+        {/* <div className="bg-blue-50 p-3 rounded-md">
           <p className="text-xs text-blue-600">
             <span className="font-medium">Debug Info:</span><br/>
             Merchant ID: {merchantId || 'Not found'}<br/>
@@ -337,7 +337,7 @@ const TempDisplaySettings = () => {
             Logo: {formData.logo ? formData.logo.name : 'None'}<br/>
             Status: {debugInfo || 'Ready'}
           </p>
-        </div>
+        </div> */}
 
         {/* Submit Button */}
         <div className="flex justify-end pt-4">

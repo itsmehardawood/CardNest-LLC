@@ -215,12 +215,12 @@ const CreditCardFeatureSelector = () => {
     checkSubscription();
   }, []);
 
-  if (loading) {
+if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50">
+      <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="text-center space-y-4">
           <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-gray-600 font-medium">Preparing your customization panel...</p>
+          <p className="text-gray-300 font-medium">Preparing your customization panel...</p>
         </div>
       </div>
     );
@@ -228,8 +228,8 @@ const CreditCardFeatureSelector = () => {
 
   if (!hasActiveSubscription) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 transform transition-all hover:shadow-2xl">
+      <div className="min-h-screen flex items-center justify-center  bg-black p-4">
+        <div className="max-w-md w-full bg-black rounded-2xl shadow-xl overflow-hidden border border-gray-800 transform transition-all hover:shadow-2xl">
           <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 text-center text-white relative overflow-hidden">
             <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-blue-400 bg-opacity-10"></div>
             <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-blue-400 bg-opacity-10"></div>
@@ -246,29 +246,29 @@ const CreditCardFeatureSelector = () => {
             <div className="mb-8 space-y-4">
               <div className="flex items-start space-x-4">
                 <div className="flex-shrink-0 mt-1">
-                  <Check className="h-5 w-5 text-green-500" />
+                  <Check className="h-5 w-5 text-green-400" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-gray-800">Complete Design Control</h3>
-                  <p className="text-gray-500 text-sm mt-1">Customize every aspect of your card appearance</p>
+                  <h3 className="font-medium text-white">Complete Design Control</h3>
+                  <p className="text-gray-400 text-sm mt-1">Customize every aspect of your card appearance</p>
                 </div>
               </div>
               <div className="flex items-start space-x-4">
                 <div className="flex-shrink-0 mt-1">
-                  <Check className="h-5 w-5 text-green-500" />
+                  <Check className="h-5 w-5 text-green-400" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-gray-800">Real-time 3D Preview</h3>
-                  <p className="text-gray-500 text-sm mt-1">See changes instantly before saving</p>
+                  <h3 className="font-medium text-white">Real-time 3D Preview</h3>
+                  <p className="text-gray-400 text-sm mt-1">See changes instantly before saving</p>
                 </div>
               </div>
               <div className="flex items-start space-x-4">
                 <div className="flex-shrink-0 mt-1">
-                  <Check className="h-5 w-5 text-green-500" />
+                  <Check className="h-5 w-5 text-green-400" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-gray-800">Advanced Security</h3>
-                  <p className="text-gray-500 text-sm mt-1">Enterprise-grade protection features</p>
+                  <h3 className="font-medium text-white">Advanced Security</h3>
+                  <p className="text-gray-400 text-sm mt-1">Enterprise-grade protection features</p>
                 </div>
               </div>
             </div>
@@ -286,18 +286,18 @@ const CreditCardFeatureSelector = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-black py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Card Design Studio</h1>
-          <p className="text-gray-600 max-w-lg mx-auto">Customize your card features with our intuitive designer</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Card Design Studio</h1>
+          <p className="text-gray-300 max-w-lg mx-auto">Customize your card features with our intuitive designer</p>
           <div className="mt-4 flex space-y-2 lg:space-y-0 md:space-y-0 items-center justify-center flex-col lg:flex-row md:flex-row space-x-4">
-            <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium inline-flex items-center">
+            <div className="bg-blue-900 text-blue-300 px-4 py-2 rounded-full text-sm font-medium inline-flex items-center">
               <Shield className="h-4 w-4 mr-2" />
               <span> Features Enabled</span>
             </div>
             {hasExistingFeatures && (
-              <div className="bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium inline-flex items-center">
+              <div className="bg-green-900 text-green-300 px-4 py-2 rounded-full text-sm font-medium inline-flex items-center">
                 <Check className="h-4 w-4 mr-2" />
                 <span>Previously Saved Design</span>
               </div>
@@ -307,10 +307,10 @@ const CreditCardFeatureSelector = () => {
         
         {/* Loading indicator for features */}
         {isLoadingFeatures && (
-          <div className="mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <div className="mb-6 bg-black p-4 rounded-lg shadow-sm border border-gray-800">
             <div className="flex items-center justify-center">
               <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mr-3"></div>
-              <span className="text-gray-600">Loading your saved features...</span>
+              <span className="text-gray-300">Loading your saved features...</span>
             </div>
           </div>
         )}
@@ -318,14 +318,14 @@ const CreditCardFeatureSelector = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Front Preview with Front Features */}
           <div className="flex flex-col gap-8">
-            <div className="bg-white p-6 rounded-2xl shadow-xl transform transition-all hover:shadow-2xl">
+            <div className="bg-black p-6 rounded-2xl shadow-xl border border-gray-800 transform transition-all hover:shadow-2xl">
               <div className="flex items-center space-x-3 mb-6">
-                <div className="bg-blue-100 p-2 rounded-lg">
-                  <CreditCard className="h-5 w-5 text-blue-600" />
+                <div className="bg-blue-900 p-2 rounded-lg">
+                  <CreditCard className="h-5 w-5 text-blue-400" />
                 </div>
-                <h2 className="font-semibold text-gray-800 text-lg">Card Front</h2>
+                <h2 className="font-semibold text-white text-lg">Card Front</h2>
               </div>
-              <div className="relative aspect-[1.58] rounded-xl overflow-hidden border-2 border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100 shadow-inner">
+              <div className="relative aspect-[1.58] rounded-xl overflow-hidden border-2 border-gray-700 bg-gradient-to-br from-gray-900 to-gray-800 shadow-inner">
                 <Image 
                   src="/images/cardfront.png"
                   fill
@@ -333,13 +333,13 @@ const CreditCardFeatureSelector = () => {
                   className="object-contain"
                   priority
                 />
-                <div className="absolute inset-0 rounded-xl pointer-events-none border border-white/30" />
-                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/20 to-transparent" />
+                <div className="absolute inset-0 rounded-xl pointer-events-none border border-white/10" />
+                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/40 to-transparent" />
               </div>
             </div>
             
-            <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 h-full">
-              <h2 className="font-semibold text-gray-800 text-lg mb-6">Front Features</h2>
+            <div className="bg-black p-6 rounded-2xl shadow-xl border border-gray-800 h-full">
+              <h2 className="font-semibold text-white text-lg mb-6">Front Features</h2>
               <div className="space-y-3">
                 {frontFeatures.map((feature) => (
                   <div 
@@ -347,14 +347,14 @@ const CreditCardFeatureSelector = () => {
                     onClick={() => handleFeatureToggle(feature.key)}
                     className={`p-4 rounded-xl flex items-start cursor-pointer transition-all ${
                       selectedFeatures[feature.key] 
-                        ? 'bg-blue-50 border-2 border-blue-200 shadow-sm' 
-                        : 'hover:bg-gray-50 border-2 border-transparent hover:border-gray-200'
+                        ? 'bg-blue-900 border-2 border-blue-700 shadow-sm' 
+                        : 'hover:bg-gray-900 border-2 border-transparent hover:border-gray-700'
                     }`}
                   >
                     <div className={`h-6 w-6 rounded-md border-2 flex items-center justify-center mr-4 mt-0.5 transition-colors ${
                       selectedFeatures[feature.key] 
                         ? 'bg-blue-500 border-blue-500 shadow-sm' 
-                        : 'border-gray-300'
+                        : 'border-gray-600'
                     }`}>
                       {selectedFeatures[feature.key] && <Check className="h-3 w-3 text-white" />}
                     </div>
@@ -364,8 +364,8 @@ const CreditCardFeatureSelector = () => {
                           <feature.icon className="h-5 w-5" />
                         </div>
                         <div>
-                          <h3 className="text-sm font-medium text-gray-800">{feature.label}</h3>
-                          <p className="text-xs text-gray-500 mt-1">{feature.desc}</p>
+                          <h3 className="text-sm font-medium text-white">{feature.label}</h3>
+                          <p className="text-xs text-gray-400 mt-1">{feature.desc}</p>
                         </div>
                       </div>
                     </div>
@@ -377,14 +377,14 @@ const CreditCardFeatureSelector = () => {
           
           {/* Back Preview with Back Features */}
           <div className="flex flex-col gap-8">
-            <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 transform transition-all hover:shadow-2xl">
+            <div className="bg-black p-6 rounded-2xl shadow-xl border border-gray-800 transform transition-all hover:shadow-2xl">
               <div className="flex items-center space-x-3 mb-6">
-                <div className="bg-blue-100 p-2 rounded-lg">
-                  <CreditCard className="h-5 w-5 text-blue-600" />
+                <div className="bg-blue-900 p-2 rounded-lg">
+                  <CreditCard className="h-5 w-5 text-blue-400" />
                 </div>
-                <h2 className="font-semibold text-gray-800 text-lg">Card Back</h2>
+                <h2 className="font-semibold text-white text-lg">Card Back</h2>
               </div>
-              <div className="relative aspect-[1.58] rounded-xl overflow-hidden border-2 border-gray-200 bg-gradient-to-br from-gray-50 to-gray-100 shadow-inner">
+              <div className="relative aspect-[1.58] rounded-xl overflow-hidden border-2 border-gray-700 bg-gradient-to-br from-gray-900 to-gray-800 shadow-inner">
                   <Image 
                     src="/images/cardback.png"
                     fill
@@ -393,13 +393,13 @@ const CreditCardFeatureSelector = () => {
                     priority
                   />
 
-                <div className="absolute inset-0 rounded-xl pointer-events-none border border-white/30" />
-                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/20 to-transparent" />
+                <div className="absolute inset-0 rounded-xl pointer-events-none border border-white/10" />
+                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black/40 to-transparent" />
               </div>
             </div>
             
-            <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 h-full">
-              <h2 className="font-semibold text-gray-800 text-lg mb-6">Back Features</h2>
+            <div className="bg-black p-6 rounded-2xl shadow-xl border border-gray-800 h-full">
+              <h2 className="font-semibold text-white text-lg mb-6">Back Features</h2>
               <div className="space-y-3">
                 {backFeatures.map((feature) => (
                   <div 
@@ -407,14 +407,14 @@ const CreditCardFeatureSelector = () => {
                     onClick={() => handleFeatureToggle(feature.key)}
                     className={`p-4 rounded-xl flex items-start cursor-pointer transition-all ${
                       selectedFeatures[feature.key] 
-                        ? 'bg-blue-50 border-2 border-blue-200 shadow-sm' 
-                        : 'hover:bg-gray-50 border-2 border-transparent hover:border-gray-200'
+                        ? 'bg-blue-900 border-2 border-blue-700 shadow-sm' 
+                        : 'hover:bg-gray-900 border-2 border-transparent hover:border-gray-700'
                     }`}
                   >
                     <div className={`h-6 w-6 rounded-md border-2 flex items-center justify-center mr-4 mt-0.5 transition-colors ${
                       selectedFeatures[feature.key] 
                         ? 'bg-blue-500 border-blue-500 shadow-sm' 
-                        : 'border-gray-300'
+                        : 'border-gray-600'
                     }`}>
                       {selectedFeatures[feature.key] && <Check className="h-3 w-3 text-white" />}
                     </div>
@@ -424,8 +424,8 @@ const CreditCardFeatureSelector = () => {
                           <feature.icon className="h-5 w-5" />
                         </div>
                         <div>
-                          <h3 className="text-sm font-medium text-gray-800">{feature.label}</h3>
-                          <p className="text-xs text-gray-500 mt-1">{feature.desc}</p>
+                          <h3 className="text-sm font-medium text-white">{feature.label}</h3>
+                          <p className="text-xs text-gray-400 mt-1">{feature.desc}</p>
                         </div>
                       </div>
                     </div>
@@ -437,17 +437,17 @@ const CreditCardFeatureSelector = () => {
         </div>
         
         {/* Summary and Submit */}
-        <div className="mt-12 bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+        <div className="mt-12 bg-black p-8 rounded-2xl shadow-xl border border-gray-800">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-800">Design Summary</h3>
-              <p className="text-sm text-gray-500 mt-1">
+              <h3 className="text-lg font-semibold text-white">Design Summary</h3>
+              <p className="text-sm text-gray-400 mt-1">
                 {hasExistingFeatures ? 'Review and update your features' : 'Review your selected features'}
               </p>
             </div>
             <div className="mt-4 sm:mt-0">
-              <div className="bg-blue-50 px-4 py-2 rounded-full inline-flex items-center">
-                <span className="text-sm font-medium text-blue-700 mr-2">
+              <div className="bg-blue-900 px-4 py-2 rounded-full inline-flex items-center">
+                <span className="text-sm font-medium text-blue-300 mr-2">
                   {getSelectedCount()} of {frontFeatures.length + backFeatures.length} features selected
                 </span>
                 <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse"></div>
@@ -458,8 +458,8 @@ const CreditCardFeatureSelector = () => {
           {message && (
             <div className={`mb-6 p-4 rounded-lg text-sm flex items-start ${
               message.includes('Error') 
-                ? 'bg-red-50 text-red-700 border border-red-200' 
-                : 'bg-green-50 text-green-700 border border-green-200'
+                ? 'bg-red-900 text-red-300 border border-red-700' 
+                : 'bg-green-900 text-green-300 border border-green-700'
             }`}>
               {message.includes('Error') ? (
                 <AlertCircle className="h-5 w-5 mr-3 mt-0.5 flex-shrink-0" />
@@ -475,7 +475,7 @@ const CreditCardFeatureSelector = () => {
             disabled={isSubmitting || isLoadingFeatures}
             className={`w-full py-2 px-6 rounded-xl font-medium text-white transition-all flex items-center justify-center ${
               (isSubmitting || isLoadingFeatures)
-                ? 'bg-gray-400 cursor-not-allowed' 
+                ? 'bg-gray-600 cursor-not-allowed' 
                 : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0'
             }`}
           >

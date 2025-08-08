@@ -461,7 +461,9 @@ const LandingPage = () => {
 
       {/* Pricing Section */}
       <section id="pricing">
-        <PricingSection isDark={true} />
+        {/* <PricingSection isDark={true} /> */}
+                <PricingSection isDark={true} />
+
       </section>
 
       {/* Pricing Section */}

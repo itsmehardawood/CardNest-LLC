@@ -53,22 +53,22 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, activeTab, setActiveTab, status 
   };
 
   return (
-    <div
+<div
       className={`${
         sidebarOpen ? 'w-64' : 'w-16'
-      } bg-white shadow-lg border-r border-gray-200 transition-all duration-300 ease-in-out flex flex-col h-screen z-40`}
+      } bg-gray-900 shadow-lg border-r border-gray-700 transition-all duration-300 ease-in-out flex flex-col h-screen z-40`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-3.5 border-b border-gray-100">
-        {sidebarOpen && <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>}
+      <div className="flex items-center justify-between p-3.5 border-b border-gray-700">
+        {sidebarOpen && <h1 className="text-xl font-bold" style={{color: '#e0aa3e'}}>Dashboard</h1>}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 rounded hover:bg-gray-100 transition-colors"
+          className="p-2 rounded hover:bg-gray-800 transition-colors"
         >
           {sidebarOpen ? (
-            <ChevronLeft className="w-5 h-5 text-gray-600" />
+            <ChevronLeft className="w-5 h-5" style={{color: '#e0aa3e'}} />
           ) : (
-            <ChevronRight className="w-5 h-5 text-gray-600" />
+            <ChevronRight className="w-5 h-5" style={{color: '#e0aa3e'}} />
           )}
         </button>
       </div>
@@ -84,9 +84,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, activeTab, setActiveTab, status 
                 sidebarOpen ? 'px-4 py-3' : 'px-2 py-3 justify-center'
               } text-left rounded-lg transition-colors ${
                 activeTab === item.id
-                  ? 'bg-blue-100 text-blue-700 border border-blue-200'
-                  : 'text-gray-700 hover:bg-gray-100'
+                  ? 'bg-gray-800 border border-gray-600'
+                  : 'hover:bg-gray-800'
               }`}
+              style={{color: activeTab === item.id ? '#e0aa3e' : '#e0aa3e'}}
             >
               {item.icon}
               {sidebarOpen && <span className="ml-3 font-medium">{item.label}</span>}
@@ -101,12 +102,12 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, activeTab, setActiveTab, status 
       </div>
 
       {/* Status & User Info */}
-      <div className="flex-shrink-0 p-4 border-t border-gray-100 space-y-3">
+      <div className="flex-shrink-0 p-4 border-t border-gray-700 space-y-3">
         {sidebarOpen && (
           <>
             <div
               className={`text-sm font-medium text-center rounded-full px-3 py-2 ${
-                statusColor[status] || 'bg-gray-100 text-gray-800'
+                statusColor[status] || 'bg-gray-800 text-gray-200'
               }`}
             >
               Status:{' '}
@@ -114,13 +115,13 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, activeTab, setActiveTab, status 
                 ? 'Incomplete Profile'
                 : status?.charAt(0).toUpperCase() + status?.slice(1)}
             </div>
-            <div className="flex items-center space-x-2 bg-gray-50 px-3 py-2 rounded-lg">
+            <div className="flex items-center space-x-2 bg-gray-800 px-3 py-2 rounded-lg">
               <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-medium">
                 U
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">User Account</p>
-                <p className="text-xs text-gray-500 truncate">{email || 'Loading...'}</p>
+                <p className="text-sm font-medium truncate" style={{color: '#e0aa3e'}}>User Account</p>
+                <p className="text-xs text-gray-400 truncate">{email || 'Loading...'}</p>
               </div>
             </div>
           </>

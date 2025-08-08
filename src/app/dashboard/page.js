@@ -235,7 +235,8 @@ const [businessInfo, setBusinessInfo] = useState({
     { id: 'balance', label: 'Balance' },
     { id: 'subscriptions', label: 'Subscriptions' },
     { id: 'documents', label: 'Documents'},
-    { id: 'support', label: 'Support'},
+             { id: 'Card', label: 'Features Settings'},
+
          { id: 'scanshistory', label: 'Scan History'},
                   { id: 'billing', label: 'Billing Logs'},
          { id: 'displaysettings', label: 'Display Settings'},
@@ -659,7 +660,7 @@ const checkBusinessStatus = async () => {
   }
 
   return (
-    <div className="h-screen bg-gray-50 text-black flex overflow-hidden">
+    <div className="h-screen bg-black text-black flex overflow-hidden">
       {/* Fixed Sidebar - No scrolling */}
       <Sidebar
         sidebarOpen={sidebarOpen}
@@ -673,13 +674,13 @@ const checkBusinessStatus = async () => {
       {/* Main Content Area - Scrollable */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Fixed Header */}
-        <header className="flex-shrink-0 bg-white shadow-sm border-b border-gray-200">
+        <header className="flex-shrink-0 bg-gray-900 text-white shadow-sm border-b border-gray-700">
           <div className="px-6 py-4">
             <div className="flex justify-between items-center">
               {/* Mobile menu button - only show on small screens */}
               <div className="flex items-center space-x-4">
           
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-2xl font-bold">
                   {sidebarItems.find(item => item.id === activeTab)?.label || 'Dashboard'}
                 </h2>
               </div>
@@ -689,7 +690,7 @@ const checkBusinessStatus = async () => {
   </div> */}
   <button
     onClick={handleLogout}
-    className="text-sm text-gray-600 hover:text-red-600 transition"
+    className="text-sm text-red-400 hover:text-red-600 transition"
   >
     Logout
   </button>
@@ -701,7 +702,7 @@ const checkBusinessStatus = async () => {
 
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto">
-          <div className=" p-3 bg-gray-50">
+          <div className=" p-3 bg-black">
             {renderContent()}
           </div>
         </div>
