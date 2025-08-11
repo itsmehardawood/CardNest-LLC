@@ -3,6 +3,7 @@
 // import React, { useState } from "react";
 // import { useRouter } from "next/navigation";
 // import { Building2, Plus, Trash2, Calculator, ArrowRight } from "lucide-react";
+
 // export default function EnterpriseSelection() {
 //   const router = useRouter();
 //   const [isEnterprisePackage, setIsEnterprisePackage] = useState(false);
@@ -111,15 +112,48 @@
 //         throw new Error("Please enter a valid API count");
 //       }
 
-//       // TODO: Get price per API from admin settings
-//       const pricePerApi = 0.50; // This should come from API/admin settings
-//       const totalPrice = parseInt(apiCount) * pricePerApi;
+//       // Get user data from localStorage
+//       const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+//       const merchantId = userData.merchant_id;
+
+//       if (!merchantId) {
+//         throw new Error("User data not found. Please login again.");
+//       }
+
+//       // Prepare API request data
+//       const requestData = {
+//         merchant_id: merchantId,
+//         package_id: "3",
+//         subscription_date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
+//         custom_api_count: apiCount
+//       };
+
+//       // Call the custom subscription API
+//       const response = await fetch('https://admin.cardnest.io/api/Subscriptions/customStore', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify(requestData),
+//       });
+
+//       const result = await response.json();
+
+//       if (!response.ok || !result.status) {
+//         throw new Error(result.message || 'Failed to create custom subscription');
+//       }
+
+//       // Extract custom price from API response
+//       const customPrice = result.data.subscription.custom_price;
+//       const perApiPrice = result.data.per_api_price;
       
 //       // Store the custom pricing data for the payment page
 //       localStorage.setItem("customApiPricing", JSON.stringify({
 //         apiCount: parseInt(apiCount),
-//         pricePerApi: pricePerApi,
-//         totalPrice: totalPrice,
+//         customPrice: customPrice,
+//         perApiPrice: parseFloat(perApiPrice),
+//         subscriptionId: result.data.subscription.id,
+//         merchantId: result.data.merchant_id,
 //         isCustomPlan: true
 //       }));
 
@@ -350,27 +384,14 @@
 //                         />
 //                       </div>
                       
-//                       {apiCount && parseInt(apiCount) > 0 && (
-//                         <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6">
-//                           <h4 className="font-semibold text-emerald-900 mb-3">Pricing Breakdown</h4>
-//                           <div className="space-y-2 text-sm text-emerald-800">
-//                             <div className="flex justify-between">
-//                               <span>API Count:</span>
-//                               <span className="font-semibold">{parseInt(apiCount).toLocaleString()}</span>
-//                             </div>
-//                             <div className="flex justify-between">
-//                               <span>Price per API:</span>
-//                               <span className="font-semibold">$0.50</span>
-//                             </div>
-//                             <div className="border-t border-emerald-300 pt-2 mt-3">
-//                               <div className="flex justify-between text-lg font-bold text-emerald-900">
-//                                 <span>Monthly Total:</span>
-//                                 <span>${(parseInt(apiCount) * 0.50).toLocaleString()}</span>
-//                               </div>
-//                             </div>
-//                           </div>
+//                       <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6">
+//                         <h4 className="font-semibold text-emerald-900 mb-3">Information</h4>
+//                         <div className="space-y-2 text-sm text-emerald-800">
+//                           <p>• Custom pricing will be calculated based on your API usage</p>
+//                           <p>• Final price will be shown on the next page</p>
+//                           <p>• No commitment required - cancel anytime</p>
 //                         </div>
-//                       )}
+//                       </div>
                       
 //                       <button
 //                         onClick={handleApiCountSubmit}
@@ -384,7 +405,7 @@
 //                           </>
 //                         ) : (
 //                           <>
-//                             <span>Proceed to Payment</span>
+//                             <span>Get Custom Pricing</span>
 //                             <ArrowRight className="w-5 h-5" />
 //                           </>
 //                         )}
@@ -410,6 +431,10 @@
 // }
 
 
+
+
+
+
 "use client";
 
 import React, { useState } from "react";
@@ -418,7 +443,7 @@ import { Building2, Plus, Trash2, Calculator, ArrowRight } from "lucide-react";
 
 export default function EnterpriseSelection() {
   const router = useRouter();
-  const [isEnterprisePackage, setIsEnterprisePackage] = useState(false);
+  const [businessTypeAnswer, setBusinessTypeAnswer] = useState(null); // null, 'yes', 'no'
   const [apiCount, setApiCount] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -433,8 +458,8 @@ export default function EnterpriseSelection() {
     }
   ]);
 
-  const handleCheckboxChange = (e) => {
-    setIsEnterprisePackage(e.target.checked);
+  const handleBusinessTypeSelection = (answer) => {
+    setBusinessTypeAnswer(answer);
     setError(null);
   };
 
@@ -449,6 +474,7 @@ export default function EnterpriseSelection() {
       ...businesses,
       {
         businessName: "",
+        email: "",
         businessRegNum: "",
         address: ""
       }
@@ -471,6 +497,7 @@ export default function EnterpriseSelection() {
       const isValid = businesses.every(
         (business) =>
           business.businessName.trim() &&
+          business.email.trim() &&
           business.businessRegNum.trim() &&
           business.address.trim()
       );
@@ -580,6 +607,20 @@ export default function EnterpriseSelection() {
     }
   };
 
+  const resetSelection = () => {
+    setBusinessTypeAnswer(null);
+    setError(null);
+    setApiCount("");
+    setBusinesses([
+      {
+        businessName: "",
+        email: "",
+        businessRegNum: "",
+        address: ""
+      }
+    ]);
+  };
+
   return (
     <>
       {/* Simple Navbar with Logo */}
@@ -587,7 +628,7 @@ export default function EnterpriseSelection() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-20">
             <video autoPlay loop muted playsInline width="70">
-<source src="https://dw1u598x1c0uz.cloudfront.net/CardNest%20Logo%20WebM%20version.webm" alt="CardNest Logo" />
+              <source src="https://dw1u598x1c0uz.cloudfront.net/CardNest%20Logo%20WebM%20version.webm" alt="CardNest Logo" />
               Your browser does not support the video tag.
             </video>
           </div>
@@ -616,38 +657,54 @@ export default function EnterpriseSelection() {
                 </div>
               )}
 
-              {/* Enterprise Package Checkbox */}
-              <div className="mb-10">
-                <label className="flex items-start space-x-4 cursor-pointer group">
-                  <div className="flex-shrink-0 mt-1">
-                    <input
-                      type="checkbox"
-                      checked={isEnterprisePackage}
-                      onChange={handleCheckboxChange}
-                      className="w-5 h-5 text-indigo-600 bg-white border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 transition-colors"
-                      disabled={submitting}
-                    />
+              {businessTypeAnswer === null ? (
+                /* Initial Question */
+                <div className="text-center space-y-8">
+                  <div className="max-w-3xl mx-auto">
+                    <h2 className="text-2xl font-semibold text-gray-900 mb-6 leading-relaxed">
+                      Are you a business that has an affiliate, provides services to merchants, or other businesses and would you like to resell our solution/service to these businesses that seek services from you?
+                    </h2>
                   </div>
-                  <div className="flex-1">
-                    <span className="text-xl font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                      Full Enterprise Package
-                    </span>
-                    <p className="text-gray-600 mt-2 leading-relaxed">
-                      Select this option if you need comprehensive enterprise features including multiple business support, 
-                      premium customer service, and custom integrations. Our sales team will work with you to create 
-                      a tailored solution.
-                    </p>
+                  
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+                    <button
+                      onClick={() => handleBusinessTypeSelection('yes')}
+                      className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+                    >
+                      <span>Yes</span>
+                      <ArrowRight className="w-5 h-5" />
+                    </button>
+                    
+                    <button
+                      onClick={() => handleBusinessTypeSelection('no')}
+                      className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+                    >
+                      <span>No</span>
+                      <ArrowRight className="w-5 h-5" />
+                    </button>
                   </div>
-                </label>
-              </div>
-
-              {/* Conditional Content */}
-              {isEnterprisePackage ? (
+                  
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 max-w-2xl mx-auto">
+                    <div className="space-y-3 text-sm text-gray-700">
+                      <p><strong>Yes:</strong> You will be directed to our Enterprise Reseller Package for managing multiple businesses and clients.</p>
+                      <p><strong>No:</strong> You will be shown our Custom API Package for your specific business needs.</p>
+                    </div>
+                  </div>
+                </div>
+              ) : businessTypeAnswer === 'yes' ? (
                 /* Enterprise Form */
                 <div className="space-y-8">
-                  <div className="border-l-4 border-indigo-500 pl-6">
-                    <h2 className="text-2xl font-semibold text-gray-900 mb-2">Business Information</h2>
-                    <p className="text-gray-600">Please provide details for all businesses that will be included in your enterprise package.</p>
+                  <div className="flex items-center justify-between border-b border-gray-200 pb-6">
+                    <div className="border-l-4 border-indigo-500 pl-6">
+                      <h2 className="text-2xl font-semibold text-gray-900 mb-2">Enterprise Reseller Package</h2>
+                      <p className="text-gray-600">Please provide details for all businesses that will be included in your enterprise package.</p>
+                    </div>
+                    <button
+                      onClick={resetSelection}
+                      className="text-gray-500 hover:text-gray-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-all duration-200"
+                    >
+                      ← Back to Question
+                    </button>
                   </div>
                   
                   <div className="space-y-6 text-black">
@@ -686,12 +743,13 @@ export default function EnterpriseSelection() {
                               disabled={submitting}
                             />
                           </div>
-                            <div>
+                          
+                          <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
                               Business Email *
                             </label>
                             <input
-                              type="text"
+                              type="email"
                               value={business.email}
                               onChange={(e) => handleBusinessChange(index, "email", e.target.value)}
                               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white"
@@ -768,14 +826,22 @@ export default function EnterpriseSelection() {
               ) : (
                 /* API Count Form */
                 <div className="space-y-8">
-                  <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-6">
-                      <Calculator className="w-8 h-8 text-emerald-600" />
+                  <div className="flex items-center justify-between border-b border-gray-200 pb-6">
+                    <div className="text-start flex-1">
+                      <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-4">
+                        <Calculator className="w-8 h-8 text-emerald-600" />
+                      </div>
+                      <h2 className="text-2xl font-semibold text-gray-900 mb-3">Custom API Package</h2>
+                      <p className="text-gray-600">
+                        Perfect for businesses with specific API requirements. Enter your monthly API usage and get custom pricing.
+                      </p>
                     </div>
-                    <h2 className="text-2xl font-semibold text-gray-900 mb-3">Custom API Package</h2>
-                    <p className="text-gray-600 max-w-lg mx-auto">
-                      Perfect for businesses with specific API requirements. Enter your monthly API usage and get custom pricing.
-                    </p>
+                    <button
+                      onClick={resetSelection}
+                      className="text-gray-500 hover:text-gray-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-all duration-200 ml-4"
+                    >
+                      ← Back to Question
+                    </button>
                   </div>
                   
                   <div className="max-w-md mx-auto">
@@ -785,7 +851,7 @@ export default function EnterpriseSelection() {
                           Monthly API Count *
                         </label>
                         <input
-                          type="text"
+                          type="number"
                           value={apiCount}
                           onChange={(e) => setApiCount(e.target.value)}
                           className="w-full px-4 py-4 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 text-center text-lg font-medium bg-white"

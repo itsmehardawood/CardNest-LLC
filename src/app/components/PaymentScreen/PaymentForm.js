@@ -507,11 +507,12 @@ export default function PaymentForm({
                 <div className="bg-white border border-gray-200 rounded-lg p-6 text-center">
                   <h4 className="font-semibold text-gray-900 mb-3">Scan to Complete Payment</h4>
                   <div className="flex justify-center mb-4">
-                    <QRCode 
-                      value={scanData.scanURL} 
-                      size={200}
-                      level="H"
-                    />
+                 <QRCode 
+  value={scanData?.scanURL || ""} 
+  size={200}
+  level="H"
+/>
+
                   </div>
                   <p className="text-sm text-gray-600">Scan this code with your mobile device</p>
                   {pollingRef.current && (

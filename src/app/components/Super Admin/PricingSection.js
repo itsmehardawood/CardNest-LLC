@@ -591,7 +591,7 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { Edit, Save, X, AlertCircle, CheckCircle, RefreshCw, DollarSign, Calendar, Users, Settings } from 'lucide-react';
+import { Edit, Save, X, AlertCircle, CheckCircle, RefreshCw, DollarSign, Calendar, Users, Settings, Building2, Info, InfoIcon, Building } from 'lucide-react';
 import { apiFetch } from '@/app/lib/api.js';
 
 function PricingSectionAdmin() {
@@ -835,69 +835,88 @@ function PricingSectionAdmin() {
     }
   };
 
-  const renderCustomPricingCard = () => {
-    const design = getPackageDesign('custom');
+const renderCustomPricingCard = () => {
+  const design = getPackageDesign('custom');
 
-    return (
-      <div className={`text-white relative overflow-hidden rounded-xl border-2 ${design.borderColor} ${design.bgGradient} shadow-lg hover:shadow-xl transition-all duration-300`}>
-        {/* Header accent bar */}
-        <div className={`h-1 ${design.accentColor}`}></div>
-        
-        <div className="p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-0 mb-4">
-            <div className="flex items-center space-x-2">
-              <Settings className={`w-5 h-5 sm:w-6 sm:h-6 ${design.colorClass}`} />
-              <h3 className="font-bold text-lg sm:text-xl text-white">Custom Package Pricing</h3>
-            </div>
-            {!editingCustom && (
-              <button
-                onClick={handleCustomEdit}
-                className={`self-start p-2 rounded-lg ${design.accentColor} text-white hover:opacity-80 transition-opacity shadow-md`}
-                disabled={loading}
-              >
-                <Edit size={16} />
-              </button>
-            )}
+  return (
+    <div className={`text-white relative overflow-hidden rounded-xl border-2 ${design.borderColor} ${design.bgGradient} shadow-lg hover:shadow-xl transition-all duration-300`}>
+      {/* Header accent bar */}
+      <div className={`h-1 ${design.accentColor}`}></div>
+      
+      <div className="p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-0 mb-4">
+          <div className="flex items-center space-x-2">
+            <Settings className={`w-5 h-5 sm:w-6 sm:h-6 ${design.colorClass}`} />
+            <h3 className="font-bold text-lg sm:text-xl text-white">Custom Package Pricing</h3>
           </div>
+          {!editingCustom && (
+            <button
+              onClick={handleCustomEdit}
+              className={`self-start p-2 rounded-lg ${design.accentColor} text-white hover:opacity-80 transition-opacity shadow-md`}
+              disabled={loading}
+            >
+              <Edit size={16} />
+            </button>
+          )}
+        </div>
 
-          {editingCustom ? (
-            <div className="space-y-4">
+        {editingCustom ? (
+          <div className="space-y-6">
+            {/* Business Users Section */}
+            <div className="bg-black bg-opacity-40 rounded-lg p-4 border border-gray-600">
+              <h4 className="text-lg font-semibold text-blue-400 mb-3 flex items-center">
+                <Users className="w-5 h-5 mr-2" />
+                Business Users Configuration
+              </h4>
+              <p className="text-gray-300 text-sm mb-4">
+                Standard business users with per-API cost pricing
+              </p>
+              
+              <div>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                  <DollarSign className="inline w-4 h-4 mr-1" />
+                  Per API Cost ($)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={customPricing.business_user_per_custom_api_cost}
+                  onChange={(e) => handleCustomInputChange('business_user_per_custom_api_cost', e.target.value)}
+                  className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm sm:text-base bg-black text-white"
+                  placeholder="Enter cost per API call"
+                />
+              </div>
+            </div>
+
+            {/* Enterprise Users Section */}
+            <div className="bg-black bg-opacity-40 rounded-lg p-4 border border-purple-600">
+              <h4 className="text-lg font-semibold text-purple-400 mb-3 flex items-center">
+                <Building2 className="w-5 h-5 mr-2" />
+                Enterprise Users Configuration
+              </h4>
+              <p className="text-gray-300 text-sm mb-4">
+                Enterprise users who manage sub-businesses with advanced billing options
+              </p>
+              
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-300 mb-2">
                     <DollarSign className="inline w-4 h-4 mr-1" />
-                    Business User API Cost ($)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={customPricing.business_user_per_custom_api_cost}
-                    onChange={(e) => handleCustomInputChange('business_user_per_custom_api_cost', e.target.value)}
-                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all text-sm sm:text-base bg-black text-white"
-                    placeholder="Enter cost per business user"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-2">
-                    <DollarSign className="inline w-4 h-4 mr-1" />
-                    Enterprise User API Cost ($)
+                    Per API Cost ($)
                   </label>
                   <input
                     type="number"
                     step="0.01"
                     value={customPricing.enterprise_user_per_custom_api_cost}
                     onChange={(e) => handleCustomInputChange('enterprise_user_per_custom_api_cost', e.target.value)}
-                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all text-sm sm:text-base bg-black text-white"
-                    placeholder="Enter cost per enterprise user"
+                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-sm sm:text-base bg-black text-white"
+                    placeholder="Enter cost per API call"
                   />
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-300 mb-2">
-                    <DollarSign className="inline w-4 h-4 mr-1" />
+                    <Building className="inline w-4 h-4 mr-1" />
                     Sub Business Fee ($)
                   </label>
                   <input
@@ -905,117 +924,142 @@ function PricingSectionAdmin() {
                     step="0.01"
                     value={customPricing.sub_business_fee}
                     onChange={(e) => handleCustomInputChange('sub_business_fee', e.target.value)}
-                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all text-sm sm:text-base bg-black text-white"
-                    placeholder="Enter sub business fee"
+                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-sm sm:text-base bg-black text-white"
+                    placeholder="Fee per sub-business"
                   />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-300 mb-2">
-                    <Calendar className="inline w-4 h-4 mr-1" />
-                    Billing Cycle
-                  </label>
-                  <select
-                    value={customPricing.billing_cycle}
-                    onChange={(e) => handleCustomInputChange('billing_cycle', e.target.value)}
-                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all text-sm sm:text-base bg-black text-white"
-                  >
-                    <option value="monthly">Monthly</option>
-                    <option value="weekly">Weekly</option>
-                  </select>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Additional fee for each sub-business managed
+                  </p>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-2">
-                <button
-                  onClick={handleCustomSave}
-                  disabled={loading}
-                  className="w-full sm:flex-1 bg-green-600 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center justify-center space-x-2 font-semibold shadow-md transition-all text-sm sm:text-base"
+              <div className="mt-4">
+                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                  <Calendar className="inline w-4 h-4 mr-1" />
+                  Enterprise Billing Cycle
+                </label>
+                <select
+                  value={customPricing.billing_cycle}
+                  onChange={(e) => handleCustomInputChange('billing_cycle', e.target.value)}
+                  className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all text-sm sm:text-base bg-black text-white"
                 >
-                  <Save size={18} />
-                  <span>{loading ? 'Saving...' : 'Save Changes'}</span>
-                </button>
-                <button
-                  onClick={handleCustomCancel}
-                  disabled={loading}
-                  className="w-full sm:flex-1 bg-gray-500 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-gray-600 disabled:opacity-50 flex items-center justify-center space-x-2 font-semibold shadow-md transition-all text-sm sm:text-base"
-                >
-                  <X size={18} />
-                  <span>Cancel</span>
-                </button>
+                  <option value="monthly">Monthly</option>
+                  <option value="weekly">Weekly</option>
+                </select>
+                <p className="text-xs text-gray-400 mt-1">
+                  Billing frequency for enterprise accounts
+                </p>
               </div>
             </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 pt-2">
+              <button
+                onClick={handleCustomSave}
+                disabled={loading}
+                className="w-full sm:flex-1 bg-green-600 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center justify-center space-x-2 font-semibold shadow-md transition-all text-sm sm:text-base"
+              >
+                <Save size={18} />
+                <span>{loading ? 'Saving...' : 'Save Changes'}</span>
+              </button>
+              <button
+                onClick={handleCustomCancel}
+                disabled={loading}
+                className="w-full sm:flex-1 bg-gray-500 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-gray-600 disabled:opacity-50 flex items-center justify-center space-x-2 font-semibold shadow-md transition-all text-sm sm:text-base"
+              >
+                <X size={18} />
+                <span>Cancel</span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {/* Business Users Display */}
+            <div className="bg-black bg-opacity-40 rounded-lg p-4 border border-gray-600">
+              <h4 className="text-lg font-semibold text-blue-400 mb-3 flex items-center">
+                <Users className="w-5 h-5 mr-2" />
+                Business Users
+              </h4>
+              
+              <div className="text-center p-4 bg-black bg-opacity-60 rounded-lg border border-gray-700">
+                <p className={`text-2xl sm:text-3xl font-bold text-blue-400 mb-1`}>
+                  ${customPricing.business_user_per_custom_api_cost}
+                </p>
+                <p className="text-gray-300 text-sm font-medium">
+                  Per API Call
+                </p>
+                <p className="text-gray-400 text-xs mt-1">
+                  Standard business user pricing
+                </p>
+              </div>
+            </div>
+
+            {/* Enterprise Users Display */}
+            <div className="bg-black bg-opacity-40 rounded-lg p-4 border border-purple-600">
+              <h4 className="text-lg font-semibold text-purple-400 mb-3 flex items-center">
+                <Building2 className="w-5 h-5 mr-2" />
+                Enterprise Users
+              </h4>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div className="text-center p-4 bg-black bg-opacity-60 rounded-lg border border-gray-700">
-                  <p className={`text-2xl sm:text-3xl font-bold ${design.colorClass} mb-1`}>
-                    ${customPricing.business_user_per_custom_api_cost}
+                  <p className={`text-2xl sm:text-3xl font-bold text-purple-400 mb-1`}>
+                    ${customPricing.enterprise_user_per_custom_api_cost}
                   </p>
                   <p className="text-gray-300 text-sm font-medium">
-                    Business User API Cost
+                    Per API Call
+                  </p>
+                  <p className="text-gray-400 text-xs mt-1">
+                    Enterprise user pricing
                   </p>
                 </div>
                 
                 <div className="text-center p-4 bg-black bg-opacity-60 rounded-lg border border-gray-700">
-                  <p className={`text-2xl sm:text-3xl font-bold ${design.colorClass} mb-1`}>
-                    ${customPricing.enterprise_user_per_custom_api_cost}
+                  <p className={`text-2xl sm:text-3xl font-bold text-purple-400 mb-1`}>
+                    ${customPricing.sub_business_fee}
                   </p>
                   <p className="text-gray-300 text-sm font-medium">
-                    Enterprise User API Cost
+                    Sub Business Fee
+                  </p>
+                  <p className="text-gray-400 text-xs mt-1">
+                    Per managed sub-business
                   </p>
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-black bg-opacity-60 rounded-lg gap-2 sm:gap-0 border border-gray-700">
-                  <span className="text-gray-300 font-medium flex items-center text-sm sm:text-base">
-                    <DollarSign className="w-4 h-4 mr-2 text-gray-400" />
-                    Sub Business Fee
-                  </span>
-                  <span className="font-bold text-white text-sm sm:text-base">
-                    ${customPricing.sub_business_fee}
-                  </span>
-                </div>
-
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-black bg-opacity-60 rounded-lg gap-2 sm:gap-0 border border-gray-700">
-                  <span className="text-gray-300 font-medium flex items-center text-sm sm:text-base">
-                    <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                    Billing Cycle
-                  </span>
-                  <span className="font-bold text-white text-sm sm:text-base capitalize">
-                    {customPricing.billing_cycle}
-                  </span>
-                </div>
-
-              {/*  */}
-
-                {/* <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-black bg-opacity-60 rounded-lg gap-2 sm:gap-0 border border-gray-700">
-                  <span className="text-gray-300 font-medium flex items-center text-sm sm:text-base">
-                    <Settings className="w-4 h-4 mr-2 text-gray-400" />
-                    Package ID
-                  </span>
-                  <span className="font-bold text-white text-sm sm:text-base">
-                    3
-                  </span>
-                </div> */}
-
-              </div>
-
-
-
-              <div className="mt-4 p-3 bg-black bg-opacity-60 rounded-lg border border-gray-700">
-                <p className="text-gray-300 text-sm leading-relaxed">
-                  Custom pricing configuration for package ID 3. This includes separate rates for business and enterprise users, 
-                  along with sub-business fees and flexible billing cycles.
-                </p>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-black bg-opacity-60 rounded-lg gap-2 sm:gap-0 border border-gray-700">
+                <span className="text-gray-300 font-medium flex items-center text-sm sm:text-base">
+                  <Calendar className="w-4 h-4 mr-2 text-purple-400" />
+                  Enterprise Billing Cycle
+                </span>
+                <span className="font-bold text-white text-sm sm:text-base capitalize">
+                  {customPricing.billing_cycle}
+                </span>
               </div>
             </div>
-          )}
-        </div>
+
+            {/* Package Information */}
+            <div className="mt-4 p-4 bg-black bg-opacity-60 rounded-lg border border-gray-700">
+              <h5 className="text-white font-semibold mb-2 flex items-center">
+                <InfoIcon className="w-4 h-4 mr-2 text-gray-400" />
+                Package Details
+              </h5>
+              <div className="space-y-2 text-sm text-gray-300 leading-relaxed">
+                <p>
+                  <strong className="text-blue-400">Business Users:</strong> Pay per API call with simple pricing structure.
+                </p>
+                <p>
+                  <strong className="text-purple-400">Enterprise Users:</strong> Advanced users who can manage multiple sub-businesses. 
+                  They pay per API call plus additional fees for each sub-business they manage, with flexible billing cycles.
+                </p>
+               
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    );
-  };
+    </div>
+  );
+};
 
   const renderPackageCard = (packageData) => {
     const isEditing = editingPackage?.id === packageData.id;
