@@ -6,7 +6,7 @@
 
 // export default function EnterpriseSelection() {
 //   const router = useRouter();
-//   const [isEnterprisePackage, setIsEnterprisePackage] = useState(false);
+//   const [businessTypeAnswer, setBusinessTypeAnswer] = useState(null); // null, 'yes', 'no'
 //   const [apiCount, setApiCount] = useState("");
 //   const [submitting, setSubmitting] = useState(false);
 //   const [error, setError] = useState(null);
@@ -21,8 +21,8 @@
 //     }
 //   ]);
 
-//   const handleCheckboxChange = (e) => {
-//     setIsEnterprisePackage(e.target.checked);
+//   const handleBusinessTypeSelection = (answer) => {
+//     setBusinessTypeAnswer(answer);
 //     setError(null);
 //   };
 
@@ -37,6 +37,7 @@
 //       ...businesses,
 //       {
 //         businessName: "",
+//         email: "",
 //         businessRegNum: "",
 //         address: ""
 //       }
@@ -59,6 +60,7 @@
 //       const isValid = businesses.every(
 //         (business) =>
 //           business.businessName.trim() &&
+//           business.email.trim() &&
 //           business.businessRegNum.trim() &&
 //           business.address.trim()
 //       );
@@ -168,6 +170,20 @@
 //     }
 //   };
 
+//   const resetSelection = () => {
+//     setBusinessTypeAnswer(null);
+//     setError(null);
+//     setApiCount("");
+//     setBusinesses([
+//       {
+//         businessName: "",
+//         email: "",
+//         businessRegNum: "",
+//         address: ""
+//       }
+//     ]);
+//   };
+
 //   return (
 //     <>
 //       {/* Simple Navbar with Logo */}
@@ -175,7 +191,7 @@
 //         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 //           <div className="flex items-center h-20">
 //             <video autoPlay loop muted playsInline width="70">
-// <source src="https://dw1u598x1c0uz.cloudfront.net/CardNest%20Logo%20WebM%20version.webm" alt="CardNest Logo" />
+//               <source src="https://dw1u598x1c0uz.cloudfront.net/CardNest%20Logo%20WebM%20version.webm" alt="CardNest Logo" />
 //               Your browser does not support the video tag.
 //             </video>
 //           </div>
@@ -204,38 +220,54 @@
 //                 </div>
 //               )}
 
-//               {/* Enterprise Package Checkbox */}
-//               <div className="mb-10">
-//                 <label className="flex items-start space-x-4 cursor-pointer group">
-//                   <div className="flex-shrink-0 mt-1">
-//                     <input
-//                       type="checkbox"
-//                       checked={isEnterprisePackage}
-//                       onChange={handleCheckboxChange}
-//                       className="w-5 h-5 text-indigo-600 bg-white border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 transition-colors"
-//                       disabled={submitting}
-//                     />
+//               {businessTypeAnswer === null ? (
+//                 /* Initial Question */
+//                 <div className="text-center space-y-8">
+//                   <div className="max-w-3xl mx-auto">
+//                     <h2 className="text-2xl font-semibold text-gray-900 mb-6 leading-relaxed">
+//                       Are you a business that has an affiliate, provides services to merchants, or other businesses and would you like to resell our solution/service to these businesses that seek services from you?
+//                     </h2>
 //                   </div>
-//                   <div className="flex-1">
-//                     <span className="text-xl font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
-//                       Full Enterprise Package
-//                     </span>
-//                     <p className="text-gray-600 mt-2 leading-relaxed">
-//                       Select this option if you need comprehensive enterprise features including multiple business support, 
-//                       premium customer service, and custom integrations. Our sales team will work with you to create 
-//                       a tailored solution.
-//                     </p>
+                  
+//                   <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+//                     <button
+//                       onClick={() => handleBusinessTypeSelection('yes')}
+//                       className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+//                     >
+//                       <span>Yes</span>
+//                       <ArrowRight className="w-5 h-5" />
+//                     </button>
+                    
+//                     <button
+//                       onClick={() => handleBusinessTypeSelection('no')}
+//                       className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg flex items-center justify-center space-x-2"
+//                     >
+//                       <span>No</span>
+//                       <ArrowRight className="w-5 h-5" />
+//                     </button>
 //                   </div>
-//                 </label>
-//               </div>
-
-//               {/* Conditional Content */}
-//               {isEnterprisePackage ? (
+                  
+//                   <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 max-w-2xl mx-auto">
+//                     <div className="space-y-3 text-sm text-gray-700">
+//                       <p><strong>Yes:</strong> You will be directed to our Enterprise Reseller Package for managing multiple businesses and clients.</p>
+//                       <p><strong>No:</strong> You will be shown our Custom API Package for your specific business needs.</p>
+//                     </div>
+//                   </div>
+//                 </div>
+//               ) : businessTypeAnswer === 'yes' ? (
 //                 /* Enterprise Form */
 //                 <div className="space-y-8">
-//                   <div className="border-l-4 border-indigo-500 pl-6">
-//                     <h2 className="text-2xl font-semibold text-gray-900 mb-2">Business Information</h2>
-//                     <p className="text-gray-600">Please provide details for all businesses that will be included in your enterprise package.</p>
+//                   <div className="flex items-center justify-between border-b border-gray-200 pb-6">
+//                     <div className="border-l-4 border-indigo-500 pl-6">
+//                       <h2 className="text-2xl font-semibold text-gray-900 mb-2">Enterprise Reseller Package</h2>
+//                       <p className="text-gray-600">Please provide details for all businesses that will be included in your enterprise package.</p>
+//                     </div>
+//                     <button
+//                       onClick={resetSelection}
+//                       className="text-gray-500 hover:text-gray-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-all duration-200"
+//                     >
+//                       ← Back to Question
+//                     </button>
 //                   </div>
                   
 //                   <div className="space-y-6 text-black">
@@ -274,12 +306,13 @@
 //                               disabled={submitting}
 //                             />
 //                           </div>
-//                             <div>
+                          
+//                           <div>
 //                             <label className="block text-sm font-medium text-gray-700 mb-2">
 //                               Business Email *
 //                             </label>
 //                             <input
-//                               type="text"
+//                               type="email"
 //                               value={business.email}
 //                               onChange={(e) => handleBusinessChange(index, "email", e.target.value)}
 //                               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white"
@@ -356,14 +389,22 @@
 //               ) : (
 //                 /* API Count Form */
 //                 <div className="space-y-8">
-//                   <div className="text-center">
-//                     <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-6">
-//                       <Calculator className="w-8 h-8 text-emerald-600" />
+//                   <div className="flex items-center justify-between border-b border-gray-200 pb-6">
+//                     <div className="text-start flex-1">
+//                       <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-4">
+//                         <Calculator className="w-8 h-8 text-emerald-600" />
+//                       </div>
+//                       <h2 className="text-2xl font-semibold text-gray-900 mb-3">Custom API Package</h2>
+//                       <p className="text-gray-600">
+//                         Perfect for businesses with specific API requirements. Enter your monthly API usage and get custom pricing.
+//                       </p>
 //                     </div>
-//                     <h2 className="text-2xl font-semibold text-gray-900 mb-3">Custom API Package</h2>
-//                     <p className="text-gray-600 max-w-lg mx-auto">
-//                       Perfect for businesses with specific API requirements. Enter your monthly API usage and get custom pricing.
-//                     </p>
+//                     <button
+//                       onClick={resetSelection}
+//                       className="text-gray-500 hover:text-gray-700 text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-all duration-200 ml-4"
+//                     >
+//                       ← Back to Question
+//                     </button>
 //                   </div>
                   
 //                   <div className="max-w-md mx-auto">
@@ -373,7 +414,7 @@
 //                           Monthly API Count *
 //                         </label>
 //                         <input
-//                           type="text"
+//                           type="number"
 //                           value={apiCount}
 //                           onChange={(e) => setApiCount(e.target.value)}
 //                           className="w-full px-4 py-4 border text-black border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 text-center text-lg font-medium bg-white"
@@ -434,7 +475,6 @@
 
 
 
-
 "use client";
 
 import React, { useState } from "react";
@@ -448,13 +488,18 @@ export default function EnterpriseSelection() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   
-  // Enterprise form data
+  // Enterprise form data - Updated to match API structure
   const [businesses, setBusinesses] = useState([
     {
-      businessName: "",
-      email: "",
-      businessRegNum: "",
-      address: ""
+      sub_b_name: "",
+      sub_b_email: "",
+      sub_b_reg_no: "",
+      sub_b_street: "",
+      sub_b_street_line2: "",
+      sub_b_city: "",
+      sub_b_state: "",
+      sub_b_zip_code: "",
+      sub_b_country: ""
     }
   ]);
 
@@ -473,10 +518,15 @@ export default function EnterpriseSelection() {
     setBusinesses([
       ...businesses,
       {
-        businessName: "",
-        email: "",
-        businessRegNum: "",
-        address: ""
+        sub_b_name: "",
+        sub_b_email: "",
+        sub_b_reg_no: "",
+        sub_b_street: "",
+        sub_b_street_line2: "",
+        sub_b_city: "",
+        sub_b_state: "",
+        sub_b_zip_code: "",
+        sub_b_country: ""
       }
     ]);
   };
@@ -493,43 +543,53 @@ export default function EnterpriseSelection() {
     setError(null);
 
     try {
+      // Get user data from localStorage
+      const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+      const merchantId = userData.merchant_id;
+
+      if (!merchantId) {
+        throw new Error("User data not found. Please login again.");
+      }
+
       // Validate all business entries
       const isValid = businesses.every(
         (business) =>
-          business.businessName.trim() &&
-          business.email.trim() &&
-          business.businessRegNum.trim() &&
-          business.address.trim()
+          business.sub_b_name.trim() &&
+          business.sub_b_email.trim() &&
+          business.sub_b_reg_no.trim() &&
+          business.sub_b_street.trim() &&
+          business.sub_b_city.trim() &&
+          business.sub_b_state.trim() &&
+          business.sub_b_zip_code.trim() &&
+          business.sub_b_country.trim()
       );
 
       if (!isValid) {
-        throw new Error("Please fill in all business details");
+        throw new Error("Please fill in all required business details");
       }
 
-      // TODO: Replace with actual API endpoint when backend team creates it
+      // Prepare API request data
       const enterpriseData = {
-        businesses: businesses,
-        packageType: "enterprise",
-        timestamp: new Date().toISOString()
+        parent_id: merchantId,
+        sub_businesses: businesses
       };
 
       console.log("Enterprise data to be submitted:", enterpriseData);
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Call the sub-business API
+      const response = await fetch('https://admin.cardnest.io/api/superadmin/sub-business-store', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(enterpriseData),
+      });
 
-      // TODO: Replace with actual API call
-      // const response = await fetch('/api/enterprise-packages', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(enterpriseData),
-      // });
+      const result = await response.json();
 
-      // if (!response.ok) {
-      //   throw new Error('Failed to submit enterprise package details');
-      // }
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to submit enterprise package details');
+      }
 
       alert("Enterprise package details submitted successfully! Our sales team will contact you soon.");
       router.push("/dashboard");
@@ -613,10 +673,15 @@ export default function EnterpriseSelection() {
     setApiCount("");
     setBusinesses([
       {
-        businessName: "",
-        email: "",
-        businessRegNum: "",
-        address: ""
+        sub_b_name: "",
+        sub_b_email: "",
+        sub_b_reg_no: "",
+        sub_b_street: "",
+        sub_b_street_line2: "",
+        sub_b_city: "",
+        sub_b_state: "",
+        sub_b_zip_code: "",
+        sub_b_country: ""
       }
     ]);
   };
@@ -735,8 +800,8 @@ export default function EnterpriseSelection() {
                             </label>
                             <input
                               type="text"
-                              value={business.businessName}
-                              onChange={(e) => handleBusinessChange(index, "businessName", e.target.value)}
+                              value={business.sub_b_name}
+                              onChange={(e) => handleBusinessChange(index, "sub_b_name", e.target.value)}
                               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white"
                               placeholder="Enter business name"
                               required
@@ -750,8 +815,8 @@ export default function EnterpriseSelection() {
                             </label>
                             <input
                               type="email"
-                              value={business.email}
-                              onChange={(e) => handleBusinessChange(index, "email", e.target.value)}
+                              value={business.sub_b_email}
+                              onChange={(e) => handleBusinessChange(index, "sub_b_email", e.target.value)}
                               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white"
                               placeholder="Enter business email"
                               required
@@ -765,29 +830,105 @@ export default function EnterpriseSelection() {
                             </label>
                             <input
                               type="text"
-                              value={business.businessRegNum}
-                              onChange={(e) => handleBusinessChange(index, "businessRegNum", e.target.value)}
+                              value={business.sub_b_reg_no}
+                              onChange={(e) => handleBusinessChange(index, "sub_b_reg_no", e.target.value)}
                               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white"
                               placeholder="Enter registration number"
                               required
                               disabled={submitting}
                             />
                           </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Country *
+                            </label>
+                            <input
+                              type="text"
+                              value={business.sub_b_country}
+                              onChange={(e) => handleBusinessChange(index, "sub_b_country", e.target.value)}
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white"
+                              placeholder="Enter country"
+                              required
+                              disabled={submitting}
+                            />
+                          </div>
                         </div>
                         
-                        <div className="mt-6">
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Business Address *
-                          </label>
-                          <textarea
-                            value={business.address}
-                            onChange={(e) => handleBusinessChange(index, "address", e.target.value)}
-                            rows={3}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white"
-                            placeholder="Enter complete business address including city, state, and postal code"
-                            required
-                            disabled={submitting}
-                          />
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Street Address *
+                            </label>
+                            <input
+                              type="text"
+                              value={business.sub_b_street}
+                              onChange={(e) => handleBusinessChange(index, "sub_b_street", e.target.value)}
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white"
+                              placeholder="Enter street address"
+                              required
+                              disabled={submitting}
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Street Line 2 (Optional)
+                            </label>
+                            <input
+                              type="text"
+                              value={business.sub_b_street_line2}
+                              onChange={(e) => handleBusinessChange(index, "sub_b_street_line2", e.target.value)}
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white"
+                              placeholder="Apartment, suite, etc."
+                              disabled={submitting}
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              City *
+                            </label>
+                            <input
+                              type="text"
+                              value={business.sub_b_city}
+                              onChange={(e) => handleBusinessChange(index, "sub_b_city", e.target.value)}
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white"
+                              placeholder="Enter city"
+                              required
+                              disabled={submitting}
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              State/Province *
+                            </label>
+                            <input
+                              type="text"
+                              value={business.sub_b_state}
+                              onChange={(e) => handleBusinessChange(index, "sub_b_state", e.target.value)}
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white"
+                              placeholder="Enter state/province"
+                              required
+                              disabled={submitting}
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              ZIP/Postal Code *
+                            </label>
+                            <input
+                              type="text"
+                              value={business.sub_b_zip_code}
+                              onChange={(e) => handleBusinessChange(index, "sub_b_zip_code", e.target.value)}
+                              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white"
+                              placeholder="Enter ZIP/postal code"
+                              required
+                              disabled={submitting}
+                            />
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -898,8 +1039,8 @@ export default function EnterpriseSelection() {
           {/* Additional Information */}
           <div className="mt-8 text-center">
             <p className="text-gray-500 text-sm">
-              Need help choosing? Contact our sales team at <span className="text-indigo-600 font-medium">sales@cardnest.com</span> or call{" "}
-              <span className="text-indigo-600 font-medium">1-800-CARDNEST</span>
+              Need help choosing? Contact our sales team at <span className="text-indigo-600 font-medium">support@cardnest.io</span> or call{" "}
+              {/* <span className="text-indigo-600 font-medium">1-800-CARDNEST</span> */}
             </p>
           </div>
         </div>

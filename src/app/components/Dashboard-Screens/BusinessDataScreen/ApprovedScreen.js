@@ -393,7 +393,7 @@ const ApprovedStatus = ({ verificationData }) => {
                       href={profile?.account_holder_id_document_path}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-400 bg-blue-900 border border-blue-700 rounded-md hover:bg-blue-800 hover:border-blue-600 transition-colors"
+                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-200 bg-blue-900 border border-blue-700 rounded-md hover:bg-blue-800 hover:border-blue-600 transition-colors"
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       View Document
@@ -408,7 +408,7 @@ const ApprovedStatus = ({ verificationData }) => {
                       href={profile?.registration_document_path}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-400 bg-blue-900 border border-blue-700 rounded-md hover:bg-blue-800 hover:border-blue-600 transition-colors"
+                      className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-200 bg-blue-900 border border-blue-700 rounded-md hover:bg-blue-800 hover:border-blue-600 transition-colors"
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       View Document

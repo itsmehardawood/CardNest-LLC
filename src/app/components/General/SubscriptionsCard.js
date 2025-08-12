@@ -621,7 +621,7 @@ const PricingSection = ({ isDark = false }) => {
   // Loading state
   if (loading) {
     return (
-      <div className={`${isDark ? 'bg-black' : 'bg-white'} py-8 px-4`}>
+      <div className={`${isDark ? 'bg-slate-900' : 'bg-white'} py-8 px-4`}>
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <h2 className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${isDark ? 'text-white' : 'text-black'} mb-3`}>

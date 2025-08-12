@@ -243,8 +243,8 @@ const NavigationSidebar = ({
     { id: "api-docs", label: "API Documentation", icon: BookOpen },
     { id: "access", label: "Access Grant", icon: CheckCircle },
     { id: "displaysettings", label: "Display Settings", icon: Settings },
-    { id: "content", label: "Content Management", icon: FileText },
-    { id: "activity", label: "User Activity", icon: BarChart2 },
+    // { id: "content", label: "Content Management", icon: FileText },
+    // { id: "activity", label: "User Activity", icon: BarChart2 },
   ];
 
   const handleTabClick = (tabId, tabLabel) => {
@@ -260,7 +260,7 @@ const NavigationSidebar = ({
           sidebar-container fixed left-0 bg-gray-900 shadow-lg border-r border-gray-700 
           transition-all duration-300 ease-in-out flex flex-col z-40
           ${sidebarOpen ? "w-4/5 sm:w-64" : "w-16"}
-          top-16 h-[calc(100vh-4rem)] h-[calc(100dvh-4rem)] min-h-0
+          top-15.5 h-[calc(100vh-4rem)] h-[calc(100dvh-4rem)] min-h-0
         `}
       >
         {/* Mobile overlay */}

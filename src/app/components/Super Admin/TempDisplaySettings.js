@@ -343,6 +343,9 @@ export default TempDisplaySettings;
 
 
 
+
+
+
 // import React, { useState, useEffect } from 'react';
 // import { Settings, Eye, EyeOff, User, Image } from 'lucide-react';
 
@@ -360,7 +363,6 @@ export default TempDisplaySettings;
 //   const [showSettings, setShowSettings] = useState(false);
 //   const [userSettings, setUserSettings] = useState(null);
 //   const [settingsLoading, setSettingsLoading] = useState(false);
-//   const [searchUserId, setSearchUserId] = useState('');
 
 //   useEffect(() => {
 //     // Get user_id from localStorage userData
@@ -387,6 +389,13 @@ export default TempDisplaySettings;
 //       setSubmitError('User data not found. Please log in again.');
 //     }
 //   }, []);
+
+//   // Auto-fetch user settings when viewing settings and userId is available
+//   useEffect(() => {
+//     if (showSettings && userId) {
+//       fetchUserSettings(userId);
+//     }
+//   }, [showSettings, userId]);
 
 //   const handleInputChange = (e) => {
 //     const { name, value } = e.target;
@@ -463,18 +472,13 @@ export default TempDisplaySettings;
 //         throw new Error(data.message || 'Failed to fetch user settings.');
 //       }
 
-//       setUserSettings(data);
+//       // Extract the data from the nested response
+//       setUserSettings(data.data || data);
 //     } catch (error) {
 //       console.error('Error fetching user settings:', error);
 //       setSubmitError(`Failed to fetch user settings: ${error.message}`);
 //     } finally {
 //       setSettingsLoading(false);
-//     }
-//   };
-
-//   const handleShowSettings = () => {
-//     if (searchUserId.trim()) {
-//       fetchUserSettings(searchUserId);
 //     }
 //   };
 
@@ -586,6 +590,13 @@ export default TempDisplaySettings;
 //           fileInput.value = '';
 //         }
         
+//         // If we're currently viewing settings, refresh the settings data
+//         if (showSettings) {
+//           setTimeout(() => {
+//             fetchUserSettings(userId);
+//           }, 1000);
+//         }
+        
 //         // Reset success message after 3 seconds
 //         setTimeout(() => {
 //           setSubmitSuccess(false);
@@ -609,7 +620,12 @@ export default TempDisplaySettings;
 //     setShowSettings(!showSettings);
 //     if (!showSettings) {
 //       setUserSettings(null);
-//       setSearchUserId('');
+//     }
+//   };
+
+//   const refreshSettings = () => {
+//     if (userId) {
+//       fetchUserSettings(userId);
 //     }
 //   };
 
@@ -621,12 +637,12 @@ export default TempDisplaySettings;
 //           {showSettings ? (
 //             <>
 //               <Settings className="text-blue-400" />
-//               User Settings
+//               My Settings
 //             </>
 //           ) : (
 //             <>
 //               <User className="text-green-400" />
-//               Display Settings
+//               Update Display Settings
 //             </>
 //           )}
 //         </h2>
@@ -643,7 +659,7 @@ export default TempDisplaySettings;
 //           ) : (
 //             <>
 //               <Eye size={16} />
-//               View Settings
+//               View My Settings
 //             </>
 //           )}
 //         </button>
@@ -783,89 +799,88 @@ export default TempDisplaySettings;
 //       ) : (
 //         /* Settings View */
 //         <div className="space-y-6">
-//           {/* Search User */}
+//           {/* User Info Header */}
 //           <div className="bg-gray-900 p-4 rounded-lg border border-gray-700">
-//             <h3 className="text-lg font-medium mb-3 flex items-center gap-2">
-//               <User className="text-blue-400" />
-//               Search User Settings
-//             </h3>
-            
-//             <div className="flex gap-3">
-//               <input
-//                 type="text"
-//                 value={searchUserId}
-//                 onChange={(e) => setSearchUserId(e.target.value)}
-//                 placeholder="Enter User ID (e.g., 1, 2, 3...)"
-//                 className="flex-1 border border-gray-600 bg-black text-white rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500"
-//               />
+//             <div className="flex items-center justify-between">
+//               <div>
+//                 <h3 className="text-lg font-medium flex items-center gap-2">
+//                   <User className="text-blue-400" />
+//                   My Current Settings
+//                 </h3>
+//                 {/* <p className="text-sm text-gray-400 mt-1">User ID: {userId || 'Not found'}</p> */}
+//               </div>
+              
 //               <button
-//                 onClick={handleShowSettings}
-//                 disabled={settingsLoading || !searchUserId.trim()}
-//                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50"
+//                 onClick={refreshSettings}
+//                 disabled={settingsLoading || !userId}
+//                 className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50 text-sm"
 //               >
-//                 {settingsLoading ? 'Loading...' : 'Search'}
+//                 {settingsLoading ? 'Loading...' : 'Refresh'}
 //               </button>
 //             </div>
 //           </div>
 
+//           {/* Loading State */}
+//           {settingsLoading && (
+//             <div className="flex items-center justify-center py-8">
+//               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
+//               <span className="ml-3 text-gray-400">Loading your settings...</span>
+//             </div>
+//           )}
+
 //           {/* Settings Display */}
-//           {userSettings && (
+//           {userSettings && !settingsLoading && (
 //             <div className="bg-gray-900 p-4 rounded-lg border border-gray-700">
 //               <h3 className="text-lg font-medium mb-4 flex items-center gap-2">
 //                 <Settings className="text-green-400" />
-//                 User Settings
+//                 Current Settings
 //               </h3>
               
 //               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//                 <div className="space-y-3">
-//                   <div className="p-3 bg-black bg-opacity-60 rounded border border-gray-600">
-//                     <label className="text-sm text-gray-400 font-medium">User ID</label>
-//                     <p className="text-white font-semibold">{userSettings.user_id || 'N/A'}</p>
-//                   </div>
-                  
-//                   <div className="p-3 bg-black bg-opacity-60 rounded border border-gray-600">
-//                     <label className="text-sm text-gray-400 font-medium">Display Name</label>
-//                     <p className="text-white font-semibold">{userSettings.display_name || 'N/A'}</p>
-//                   </div>
+//                 <div className="p-3 bg-black bg-opacity-60 rounded border border-gray-600">
+//                   <label className="text-sm text-gray-400 font-medium">Display Name</label>
+//                   <p className="text-white font-semibold">{userSettings.display_name || 'Not set'}</p>
 //                 </div>
                 
-//                 <div className="space-y-3">
-//                   <div className="p-3 bg-black bg-opacity-60 rounded border border-gray-600">
-//                     <label className="text-sm text-gray-400 font-medium">Display Logo</label>
-//                     <div className="mt-2">
-//                       {userSettings.display_logo ? (
-//                         <div className="space-y-2">
-//                           <img 
-//                             src={userSettings.display_logo} 
-//                             alt="Display Logo" 
-//                             className="w-16 h-16 object-contain rounded border border-gray-600"
-//                             onError={(e) => {
-//                               e.target.style.display = 'none';
-//                               e.target.nextSibling.style.display = 'block';
-//                             }}
-//                           />
-//                           <div style={{ display: 'none' }} className="text-red-400 text-sm">
-//                             Failed to load image
-//                           </div>
-//                           <p className="text-xs text-gray-400 break-all">{userSettings.display_logo}</p>
-//                         </div>
-//                       ) : (
-//                         <p className="text-gray-500">No logo set</p>
-//                       )}
+//                 <div className="p-3 bg-black bg-opacity-60 rounded border border-gray-600">
+//                   <label className="text-sm text-gray-400 font-medium">Display Logo</label>
+//                   <div className="mt-2">
+//                     {userSettings.display_logo_url || userSettings.display_logo ? (
+//                       <img 
+//                         src={userSettings.display_logo_url || userSettings.display_logo} 
+//                         alt="Display Logo" 
+//                         className="w-20 h-20 object-contain rounded border border-gray-600"
+//                         onError={(e) => {
+//                           e.target.style.display = 'none';
+//                           e.target.nextSibling.style.display = 'block';
+//                         }}
+//                       />
+//                     ) : (
+//                       <p className="text-gray-500">No logo set</p>
+//                     )}
+//                     <div style={{ display: 'none' }} className="text-red-400 text-sm mt-2">
+//                       Failed to load image
 //                     </div>
 //                   </div>
 //                 </div>
 //               </div>
+//             </div>
+//           )}
 
-//               {/* Additional Settings Display */}
-//               {Object.keys(userSettings).length > 0 && (
-//                 <div className="mt-4 p-3 bg-black bg-opacity-40 rounded border border-gray-600">
-//                   <h4 className="text-sm font-medium text-gray-300 mb-2">Raw Data</h4>
-//                   <pre className="text-xs text-gray-400 overflow-x-auto">
-//                     {JSON.stringify(userSettings, null, 2)}
-//                   </pre>
-//                 </div>
-//               )}
+//           {/* No Settings Found */}
+//           {!userSettings && !settingsLoading && userId && (
+//             <div className="bg-gray-900 p-6 rounded-lg border border-gray-700 text-center">
+//               <Settings className="text-gray-500 mx-auto mb-3" size={48} />
+//               <h3 className="text-lg font-medium text-gray-300 mb-2">No Settings Found</h3>
+//               <p className="text-gray-400 mb-4">
+//                 You haven't set up your display settings yet. Click "Update Settings" to get started.
+//               </p>
+//               <button
+//                 onClick={() => setShowSettings(false)}
+//                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+//               >
+//                 Set Up Display Settings
+//               </button>
 //             </div>
 //           )}
 //         </div>

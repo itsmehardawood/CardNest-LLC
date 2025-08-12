@@ -285,8 +285,8 @@ export default function LoginPage() {
       // Only BUSINESS_USER is allowed
       const userRole = apiUserData?.user?.role;
       
-      if (userRole === "BUSINESS_USER") {
-        setTimeout(() => {
+if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {       
+   setTimeout(() => {
           router.push("/dashboard");
         }, 1500);
       } else {

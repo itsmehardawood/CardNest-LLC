@@ -10,36 +10,44 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleLogin = async () => {
-    setLoading(true);
-    setError('');
+const handleLogin = async () => {
+  setLoading(true);
+  setError('');
 
-    try {
-      const response = await apiFetch('/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          country_code: countryCode,
-          login_input: loginInput,
-        }),
-      });
+  try {
+    const response = await apiFetch('/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        country_code: countryCode,
+        login_input: loginInput,
+      }),
+    });
 
-      const data = await response.json();
-      if (data.status === true) {
+    const data = await response.json();
+    if (data.status === true) {
+      const userRole = data?.user?.role;
+      const allowedRoles = ["BUSINESS_USER", "ENTERPRISE_USER"];
+
+      if (allowedRoles.includes(userRole)) {
         localStorage.setItem('userData', JSON.stringify(data));
         router.push('/dashboard');
       } else {
-        setError(data.message || 'Login failed');
+        setError("Invalid user. Only business and enterprise users are allowed to access this platform.");
       }
-    } catch (err) {
-      setError('Network error. Please try again.');
-      console.error('Login error:', err);
-    } finally {
-      setLoading(false);
+    } else {
+      setError(data.message || 'Login failed');
     }
-  };
+  } catch (err) {
+    setError('Network error. Please try again.');
+    console.error('Login error:', err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center p-4">

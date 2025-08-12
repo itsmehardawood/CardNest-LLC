@@ -440,16 +440,16 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
         </div>
 
         {/* Merchant ID Display */}
-        {merchantId && (
+        {/* {merchantId && (
           <div className="bg-gray-900 p-3 rounded-md">
             <p className="text-xs text-gray-300">
               <span className="font-medium">Merchant ID:</span> {merchantId}
             </p>
           </div>
-        )}
+        )} */}
 
         {/* Debug Info */}
-        <div className="bg-blue-900 p-3 rounded-md">
+        {/* <div className="bg-blue-900 p-3 rounded-md">
           <p className="text-xs text-blue-300">
             <span className="font-medium">Debug Info:</span><br/>
             Merchant ID: {merchantId || 'Not found'}<br/>
@@ -457,7 +457,7 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
             Logo: {formData.logo ? formData.logo.name : (existingLogoUrl ? 'Existing logo loaded' : 'None')}<br/>
             Status: {debugInfo || 'Ready'}
           </p>
-        </div>
+        </div> */}
 
         {/* Submit Button */}
         <div className="flex justify-end pt-4">
