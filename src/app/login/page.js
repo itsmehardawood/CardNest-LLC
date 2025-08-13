@@ -171,8 +171,10 @@ export default function LoginPage() {
         }
 
       // Store full backend response in localStorage like simple login
-localStorage.setItem("userData", JSON.stringify(data));
-setApiUserData(data);
+const userData = data; // keep this line so variable exists
+localStorage.setItem("userData", JSON.stringify(userData));
+setApiUserData(userData);
+
 
 
         localStorage.setItem("userData", JSON.stringify(userData));
