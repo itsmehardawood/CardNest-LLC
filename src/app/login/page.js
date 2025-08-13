@@ -170,23 +170,10 @@ export default function LoginPage() {
           throw new Error(data.message || "Login failed. Please check your credentials.");
         }
 
-        // Step 2: Store user data in localStorage immediately after successful API call
-        const userData = {
-          user: {
-            id: data.user?.id || data.user_id,
-            merchant_id: data.user?.merchant_id,
-            email: data.user?.email || data.email,
-            phone: data.user?.phone_no || data.phone_no,
-            country_code: data.user?.country_code || formData.countryCode,
-            country_name: data.user?.country_name || formData.selectedCountry,
-            otp_verified: data.user?.otp_verified || false,
-            business_verified: data.user?.business_verified,
-            verification_reason: data.user?.verification_reason,
-            role: data.user?.role,
-            created_at: data.user?.created_at,
-            updated_at: data.user?.updated_at,
-          }
-        };
+      // Store full backend response in localStorage like simple login
+localStorage.setItem("userData", JSON.stringify(data));
+setApiUserData(data);
+
 
         localStorage.setItem("userData", JSON.stringify(userData));
         setApiUserData(userData);
@@ -266,17 +253,17 @@ export default function LoginPage() {
 
       // Update localStorage with Firebase UID
       if (apiUserData) {
-        const updatedUserData = {
-          ...apiUserData,
-          user: {
-            ...apiUserData.user,
-            firebaseUid: user.uid,
-            firebasePhone: user.phoneNumber,
-            otp_verified: true
-          }
-        };
+    const updatedUserData = {
+  ...apiUserData,
+  user: {
+    ...apiUserData.user,
+    firebaseUid: user.uid,
+    firebasePhone: user.phoneNumber,
+    otp_verified: true
+  }
+};
 
-        localStorage.setItem("userData", JSON.stringify(updatedUserData));
+localStorage.setItem("userData", JSON.stringify(updatedUserData));
         console.log("Updated user data with Firebase info:", updatedUserData);
       }
 
