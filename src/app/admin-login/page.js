@@ -1354,27 +1354,11 @@ export default function AdminLoginPage() {
         }
 
         // Step 2: Store user data in localStorage immediately after successful API call
-        const userData = {
-          user: {
-            id: data.user?.id || data.user_id,
-            merchant_id: data.user?.merchant_id,
-            email: data.user?.email || data.email,
-            phone: data.user?.phone_no || data.phone_no,
-            country_code: data.user?.country_code || formData.countryCode,
-            country_name: data.user?.country_name || formData.selectedCountry,
-            otp_verified: data.user?.otp_verified || false,
-            business_verified: data.user?.business_verified,
-            verification_reason: data.user?.verification_reason,
-            role: data.user?.role,
-            created_at: data.user?.created_at,
-            updated_at: data.user?.updated_at,
-          }
-        };
+     const userData = data; // store entire backend response (or replace with your desired structure)
+localStorage.setItem("userData", JSON.stringify(userData));
+setApiUserData(userData);
 
-        localStorage.setItem("userData", JSON.stringify(userData));
-        setApiUserData(userData);
-
-        console.log("Admin user data stored in localStorage:", userData);
+console.log("Admin user data stored in localStorage:", userData);
 
         // Step 3: Always send Firebase OTP using phone number from backend response
         const phoneFromBackend = data.user?.phone_no || data.phone_no;
@@ -1431,68 +1415,71 @@ export default function AdminLoginPage() {
     }
   };
 
-  const handleOtpVerification = async () => {
-    if (!confirmationResult) {
-      setOtpError("Verification session expired. Please try again.");
-      return;
+const handleOtpVerification = async () => {
+  if (!confirmationResult) {
+    setOtpError("Verification session expired. Please try again.");
+    return;
+  }
+
+  setLoading(true);
+  setOtpError("");
+
+  try {
+    // Verify OTP with Firebase
+    const result = await confirmationResult.confirm(otp);
+    const user = result.user;
+
+    console.log("Firebase OTP verified successfully:", user);
+
+    // Update localStorage with Firebase UID
+    if (apiUserData) {
+      const userData = {
+        ...apiUserData,
+        user: {
+          ...apiUserData.user,
+          firebaseUid: user.uid,
+          firebasePhone: user.phoneNumber,
+          otp_verified: true
+        }
+      };
+
+      localStorage.setItem("userData", JSON.stringify(userData));
+      setApiUserData(userData);
+
+      console.log("Updated admin user data with Firebase info:", userData);
     }
 
-    setLoading(true);
-    setOtpError("");
+    setSuccess("Phone verified successfully! Checking admin access...");
 
-    try {
-      // Verify OTP with Firebase
-      const result = await confirmationResult.confirm(otp);
-      const user = result.user;
+    // Only SUPER_ADMIN is allowed for admin panel
+    const userRole = apiUserData?.user?.role;
 
-      console.log("Firebase OTP verified successfully:", user);
-
-      // Update localStorage with Firebase UID
-      if (apiUserData) {
-        const updatedUserData = {
-          ...apiUserData,
-          user: {
-            ...apiUserData.user,
-            firebaseUid: user.uid,
-            firebasePhone: user.phoneNumber,
-            otp_verified: true
-          }
-        };
-
-        localStorage.setItem("userData", JSON.stringify(updatedUserData));
-        console.log("Updated admin user data with Firebase info:", updatedUserData);
-      }
-
-      setSuccess("Phone verified successfully! Checking admin access...");
-      
-      // Only SUPER_ADMIN is allowed for admin panel
-      const userRole = apiUserData?.user?.role;
-      
-      if (userRole === "SUPER_ADMIN") {
-        setTimeout(() => {
-          router.push("/admin");
-        }, 1500);
-      } else {
-        setTimeout(() => {
-          setSuccess(""); // Clear success message
-          setOtpError("Invalid user. Only superadmin users are allowed to access the admin panel.");
-        }, 1500);
-      }
-
-    } catch (err) {
-      console.error("OTP verification error:", err);
-      
-      if (err.code === "auth/invalid-verification-code") {
-        setOtpError("Invalid verification code. Please check and try again.");
-      } else if (err.code === "auth/code-expired") {
-        setOtpError("Verification code has expired. Please request a new one.");
-      } else {
-        setOtpError("Verification failed. Please try again.");
-      }
-    } finally {
-      setLoading(false);
+    if (userRole === "SUPER_ADMIN") {
+      setTimeout(() => {
+        router.push("/admin");
+      }, 1500);
+    } else {
+      setTimeout(() => {
+        setSuccess(""); // Clear success message
+        setOtpError("Invalid user. Only superadmin users are allowed to access the admin panel.");
+      }, 1500);
     }
-  };
+
+  } catch (err) {
+    console.error("OTP verification error:", err);
+
+    if (err.code === "auth/invalid-verification-code") {
+      setOtpError("Invalid verification code. Please check and try again.");
+    } else if (err.code === "auth/code-expired") {
+      setOtpError("Verification code has expired. Please request a new one.");
+    } else {
+      setOtpError("Verification failed. Please try again.");
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleBack = () => {
     setIsOtpMode(false);
