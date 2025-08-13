@@ -289,8 +289,8 @@ if (loading) {
     <div className="min-h-screen bg-black py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-white mb-2">Card Design Studio</h1>
-          <p className="text-gray-300 max-w-lg mx-auto">Customize your card features with our intuitive designer</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Scan Confidence Settings</h1>
+          <p className="text-gray-300 max-w-lg mx-auto">Customize your card features you want to scan</p>
           <div className="mt-4 flex space-y-2 lg:space-y-0 md:space-y-0 items-center justify-center flex-col lg:flex-row md:flex-row space-x-4">
             <div className="bg-blue-900 text-blue-300 px-4 py-2 rounded-full text-sm font-medium inline-flex items-center">
               <Shield className="h-4 w-4 mr-2" />
@@ -347,9 +347,10 @@ if (loading) {
                     onClick={() => handleFeatureToggle(feature.key)}
                     className={`p-4 rounded-xl flex items-start cursor-pointer transition-all ${
                       selectedFeatures[feature.key] 
-                        ? 'bg-blue-900 border-2 border-blue-700 shadow-sm' 
+                        ? ' border-2 border-blue-700 shadow-sm'  
                         : 'hover:bg-gray-900 border-2 border-transparent hover:border-gray-700'
                     }`}
+                     style={{backgroundColor: '#e0aa3e'}}
                   >
                     <div className={`h-6 w-6 rounded-md border-2 flex items-center justify-center mr-4 mt-0.5 transition-colors ${
                       selectedFeatures[feature.key] 
@@ -365,7 +366,7 @@ if (loading) {
                         </div>
                         <div>
                           <h3 className="text-sm font-medium text-white">{feature.label}</h3>
-                          <p className="text-xs text-gray-400 mt-1">{feature.desc}</p>
+                          <p className="text-xs text-white mt-1">{feature.desc}</p>
                         </div>
                       </div>
                     </div>
@@ -407,9 +408,11 @@ if (loading) {
                     onClick={() => handleFeatureToggle(feature.key)}
                     className={`p-4 rounded-xl flex items-start cursor-pointer transition-all ${
                       selectedFeatures[feature.key] 
-                        ? 'bg-blue-900 border-2 border-blue-700 shadow-sm' 
+                        ? ' border-2 border-blue-700 shadow-sm' 
                         : 'hover:bg-gray-900 border-2 border-transparent hover:border-gray-700'
                     }`}
+                                         style={{backgroundColor: '#e0aa3e'}}
+
                   >
                     <div className={`h-6 w-6 rounded-md border-2 flex items-center justify-center mr-4 mt-0.5 transition-colors ${
                       selectedFeatures[feature.key] 
@@ -425,7 +428,7 @@ if (loading) {
                         </div>
                         <div>
                           <h3 className="text-sm font-medium text-white">{feature.label}</h3>
-                          <p className="text-xs text-gray-400 mt-1">{feature.desc}</p>
+                          <p className="text-xs text-white mt-1">{feature.desc}</p>
                         </div>
                       </div>
                     </div>

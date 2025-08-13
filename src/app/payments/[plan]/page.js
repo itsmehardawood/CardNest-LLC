@@ -1534,10 +1534,10 @@ export default function PaymentPage({ params }) {
                             <span>Subtotal:</span>
                             <span>${pricingCalculation.subtotal.toFixed(2)}</span>
                           </div>
-                          <div className="flex justify-between text-sm">
+                          {/* <div className="flex justify-between text-sm">
                             <span>{pricingCalculation.taxName} ({(pricingCalculation.taxRate * 100).toFixed(1)}%):</span>
                             <span>${pricingCalculation.tax.toFixed(2)}</span>
-                          </div>
+                          </div> */}
                           <div className="border-t pt-2">
                             <div className="flex justify-between font-semibold">
                               <span>Total:</span>

@@ -1,66 +1,646 @@
+// "use client";
+
+// import React, { useState } from "react";
+// import { Plus, X, Building2, Save, AlertCircle } from "lucide-react";
+
+// const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, isEditing = false }) => {
+//   const [formData, setFormData] = useState({
+//     sub_b_name: existingBusiness?.sub_b_name || "",
+//     sub_b_email: existingBusiness?.sub_b_email || "",
+//     sub_b_reg_no: existingBusiness?.sub_b_reg_no || "",
+//     sub_b_street: existingBusiness?.sub_b_street || "",
+//     sub_b_street_line2: existingBusiness?.sub_b_street_line2 || "",
+//     sub_b_city: existingBusiness?.sub_b_city || "",
+//     sub_b_state: existingBusiness?.sub_b_state || "",
+//     sub_b_zip_code: existingBusiness?.sub_b_zip_code || "",
+//     sub_b_country: existingBusiness?.sub_b_country || ""
+//   });
+
+//   const [submitting, setSubmitting] = useState(false);
+//   const [errors, setErrors] = useState({});
+
+//   const handleInputChange = (field, value) => {
+//     setFormData(prev => ({
+//       ...prev,
+//       [field]: value
+//     }));
+    
+//     // Clear error when user starts typing
+//     if (errors[field]) {
+//       setErrors(prev => ({
+//         ...prev,
+//         [field]: null
+//       }));
+//     }
+//   };
+
+//   const validateForm = () => {
+//     const newErrors = {};
+//     const requiredFields = [
+//       'sub_b_name', 'sub_b_email', 'sub_b_reg_no', 
+//       'sub_b_street', 'sub_b_city', 'sub_b_state', 
+//       'sub_b_zip_code', 'sub_b_country'
+//     ];
+
+//     requiredFields.forEach(field => {
+//       if (!formData[field].trim()) {
+//         newErrors[field] = 'This field is required';
+//       }
+//     });
+
+//     // Email validation
+//     if (formData.sub_b_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.sub_b_email)) {
+//       newErrors.sub_b_email = 'Please enter a valid email address';
+//     }
+
+//     setErrors(newErrors);
+//     return Object.keys(newErrors).length === 0;
+//   };
+
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+    
+//     if (!validateForm()) {
+//       return;
+//     }
+
+//     setSubmitting(true);
+
+//     try {
+//       // Get user data from localStorage
+//       const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+//       const merchantId = userData.merchant_id;
+
+//       if (!merchantId) {
+//         throw new Error("User data not found. Please login again.");
+//       }
+
+//       const apiData = {
+//         parent_id: merchantId,
+//         sub_businesses: [formData]
+//       };
+
+//       const response = await fetch('https://admin.cardnest.io/api/superadmin/sub-business-store', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify(apiData),
+//       });
+
+//       const result = await response.json();
+
+//       if (!response.ok) {
+//         throw new Error(result.message || 'Failed to save sub-business');
+//       }
+
+//       // Call the callback to update parent component
+//       onSubBusinessAdded({
+//         ...formData,
+//         id: result.data?.id || Date.now() // Use API response ID or fallback
+//       });
+
+//       // Show success message
+//       alert(isEditing ? "Sub-business updated successfully!" : "Sub-business added successfully!");
+      
+//       // Close the form
+//       onClose();
+
+//     } catch (err) {
+//       console.error("Error saving sub-business:", err);
+//       alert(err.message || "Failed to save sub-business. Please try again.");
+//     } finally {
+//       setSubmitting(false);
+//     }
+//   };
+
+//   const getFieldLabel = (field) => {
+//     const labels = {
+//       sub_b_name: "Business Name",
+//       sub_b_email: "Business Email",
+//       sub_b_reg_no: "Registration Number",
+//       sub_b_street: "Street Address",
+//       sub_b_street_line2: "Street Line 2",
+//       sub_b_city: "City",
+//       sub_b_state: "State/Province",
+//       sub_b_zip_code: "ZIP/Postal Code",
+//       sub_b_country: "Country"
+//     };
+//     return labels[field] || field;
+//   };
+
+//   const getFieldPlaceholder = (field) => {
+//     const placeholders = {
+//       sub_b_name: "Enter business name",
+//       sub_b_email: "Enter business email",
+//       sub_b_reg_no: "Enter registration number",
+//       sub_b_street: "Enter street address",
+//       sub_b_street_line2: "Apartment, suite, etc. (Optional)",
+//       sub_b_city: "Enter city",
+//       sub_b_state: "Enter state/province",
+//       sub_b_zip_code: "Enter ZIP/postal code",
+//       sub_b_country: "Enter country"
+//     };
+//     return placeholders[field] || "";
+//   };
+
+//   return (
+//     <div className="fixed inset-0 bg-black/20 bg-opacity-50 flex items-center justify-center z-50 p-4">
+//       <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+//         {/* Header */}
+//         <div className="bg-gradient-to-r from-slate-700 to-slate-900 p-6 text-white">
+//           <div className="flex items-center justify-between">
+//             <div className="flex items-center space-x-3">
+//               <div className="w-12 h-12 bg- bg-opacity-20 rounded-full flex items-center justify-center">
+//                 <Building2 className="w-6 h-6" />
+//               </div>
+//               <div>
+//                 <h2 className="text-2xl font-bold">
+//                   {isEditing ? "Edit Sub-Business" : "Add New Sub-Business"}
+//                 </h2>
+//                 <p className="text-indigo-100">
+//                   {isEditing ? "Update business information" : "Fill in the details below to add a new sub-business"}
+//                 </p>
+//               </div>
+//             </div>
+//             <button
+//               onClick={onClose}
+//               className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-all duration-200"
+//               disabled={submitting}
+//             >
+//               <X className="w-6 h-6" />
+//             </button>
+//           </div>
+//         </div>
+
+//         {/* Form Content */}
+//         <div className="p-6 max-h-[calc(90vh-120px)] overflow-y-auto">
+//           <form onSubmit={handleSubmit} className="space-y-6">
+//             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+//               {/* Business Name */}
+//               <div className="lg:col-span-2">
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">
+//                   {getFieldLabel('sub_b_name')} *
+//                 </label>
+//                 <input
+//                   type="text"
+//                   value={formData.sub_b_name}
+//                   onChange={(e) => handleInputChange('sub_b_name', e.target.value)}
+//                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
+//                     errors.sub_b_name ? 'border-red-500' : 'border-gray-300'
+//                   }`}
+//                   placeholder={getFieldPlaceholder('sub_b_name')}
+//                   disabled={submitting}
+//                 />
+//                 {errors.sub_b_name && (
+//                   <p className="mt-1 text-sm text-red-600 flex items-center">
+//                     <AlertCircle className="w-4 h-4 mr-1" />
+//                     {errors.sub_b_name}
+//                   </p>
+//                 )}
+//               </div>
+
+//               {/* Email */}
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">
+//                   {getFieldLabel('sub_b_email')} *
+//                 </label>
+//                 <input
+//                   type="email"
+//                   value={formData.sub_b_email}
+//                   onChange={(e) => handleInputChange('sub_b_email', e.target.value)}
+//                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
+//                     errors.sub_b_email ? 'border-red-500' : 'border-gray-300'
+//                   }`}
+//                   placeholder={getFieldPlaceholder('sub_b_email')}
+//                   disabled={submitting}
+//                 />
+//                 {errors.sub_b_email && (
+//                   <p className="mt-1 text-sm text-red-600 flex items-center">
+//                     <AlertCircle className="w-4 h-4 mr-1" />
+//                     {errors.sub_b_email}
+//                   </p>
+//                 )}
+//               </div>
+
+//               {/* Registration Number */}
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">
+//                   {getFieldLabel('sub_b_reg_no')} *
+//                 </label>
+//                 <input
+//                   type="text"
+//                   value={formData.sub_b_reg_no}
+//                   onChange={(e) => handleInputChange('sub_b_reg_no', e.target.value)}
+//                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
+//                     errors.sub_b_reg_no ? 'border-red-500' : 'border-gray-300'
+//                   }`}
+//                   placeholder={getFieldPlaceholder('sub_b_reg_no')}
+//                   disabled={submitting}
+//                 />
+//                 {errors.sub_b_reg_no && (
+//                   <p className="mt-1 text-sm text-red-600 flex items-center">
+//                     <AlertCircle className="w-4 h-4 mr-1" />
+//                     {errors.sub_b_reg_no}
+//                   </p>
+//                 )}
+//               </div>
+
+//               {/* Street Address */}
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">
+//                   {getFieldLabel('sub_b_street')} *
+//                 </label>
+//                 <input
+//                   type="text"
+//                   value={formData.sub_b_street}
+//                   onChange={(e) => handleInputChange('sub_b_street', e.target.value)}
+//                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
+//                     errors.sub_b_street ? 'border-red-500' : 'border-gray-300'
+//                   }`}
+//                   placeholder={getFieldPlaceholder('sub_b_street')}
+//                   disabled={submitting}
+//                 />
+//                 {errors.sub_b_street && (
+//                   <p className="mt-1 text-sm text-red-600 flex items-center">
+//                     <AlertCircle className="w-4 h-4 mr-1" />
+//                     {errors.sub_b_street}
+//                   </p>
+//                 )}
+//               </div>
+
+//               {/* Street Line 2 */}
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">
+//                   {getFieldLabel('sub_b_street_line2')}
+//                 </label>
+//                 <input
+//                   type="text"
+//                   value={formData.sub_b_street_line2}
+//                   onChange={(e) => handleInputChange('sub_b_street_line2', e.target.value)}
+//                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900"
+//                   placeholder={getFieldPlaceholder('sub_b_street_line2')}
+//                   disabled={submitting}
+//                 />
+//               </div>
+
+//               {/* City */}
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">
+//                   {getFieldLabel('sub_b_city')} *
+//                 </label>
+//                 <input
+//                   type="text"
+//                   value={formData.sub_b_city}
+//                   onChange={(e) => handleInputChange('sub_b_city', e.target.value)}
+//                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
+//                     errors.sub_b_city ? 'border-red-500' : 'border-gray-300'
+//                   }`}
+//                   placeholder={getFieldPlaceholder('sub_b_city')}
+//                   disabled={submitting}
+//                 />
+//                 {errors.sub_b_city && (
+//                   <p className="mt-1 text-sm text-red-600 flex items-center">
+//                     <AlertCircle className="w-4 h-4 mr-1" />
+//                     {errors.sub_b_city}
+//                   </p>
+//                 )}
+//               </div>
+
+//               {/* State */}
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">
+//                   {getFieldLabel('sub_b_state')} *
+//                 </label>
+//                 <input
+//                   type="text"
+//                   value={formData.sub_b_state}
+//                   onChange={(e) => handleInputChange('sub_b_state', e.target.value)}
+//                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
+//                     errors.sub_b_state ? 'border-red-500' : 'border-gray-300'
+//                   }`}
+//                   placeholder={getFieldPlaceholder('sub_b_state')}
+//                   disabled={submitting}
+//                 />
+//                 {errors.sub_b_state && (
+//                   <p className="mt-1 text-sm text-red-600 flex items-center">
+//                     <AlertCircle className="w-4 h-4 mr-1" />
+//                     {errors.sub_b_state}
+//                   </p>
+//                 )}
+//               </div>
+
+//               {/* ZIP Code */}
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">
+//                   {getFieldLabel('sub_b_zip_code')} *
+//                 </label>
+//                 <input
+//                   type="text"
+//                   value={formData.sub_b_zip_code}
+//                   onChange={(e) => handleInputChange('sub_b_zip_code', e.target.value)}
+//                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
+//                     errors.sub_b_zip_code ? 'border-red-500' : 'border-gray-300'
+//                   }`}
+//                   placeholder={getFieldPlaceholder('sub_b_zip_code')}
+//                   disabled={submitting}
+//                 />
+//                 {errors.sub_b_zip_code && (
+//                   <p className="mt-1 text-sm text-red-600 flex items-center">
+//                     <AlertCircle className="w-4 h-4 mr-1" />
+//                     {errors.sub_b_zip_code}
+//                   </p>
+//                 )}
+//               </div>
+
+//               {/* Country */}
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-2">
+//                   {getFieldLabel('sub_b_country')} *
+//                 </label>
+//                 <input
+//                   type="text"
+//                   value={formData.sub_b_country}
+//                   onChange={(e) => handleInputChange('sub_b_country', e.target.value)}
+//                   className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
+//                     errors.sub_b_country ? 'border-red-500' : 'border-gray-300'
+//                   }`}
+//                   placeholder={getFieldPlaceholder('sub_b_country')}
+//                   disabled={submitting}
+//                 />
+//                 {errors.sub_b_country && (
+//                   <p className="mt-1 text-sm text-red-600 flex items-center">
+//                     <AlertCircle className="w-4 h-4 mr-1" />
+//                     {errors.sub_b_country}
+//                   </p>
+//                 )}
+//               </div>
+//             </div>
+
+//             {/* Action Buttons */}
+//             <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6 border-t border-gray-200">
+//               <button
+//                 type="button"
+//                 onClick={onClose}
+//                 className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-all duration-200 disabled:opacity-50"
+//                 disabled={submitting}
+//               >
+//                 Cancel
+//               </button>
+//               <button
+//                 type="submit"
+//                 disabled={submitting}
+//                 className="bg-slate-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 min-w-[140px]"
+//               >
+//                 {submitting ? (
+//                   <>
+//                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+//                     <span>Saving...</span>
+//                   </>
+//                 ) : (
+//                   <>
+//                     <Save className="w-5 h-5" />
+//                     <span>{isEditing ? "Update" : "Add"} Business</span>
+//                   </>
+//                 )}
+//               </button>
+//             </div>
+//           </form>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default AddSubBusiness;
+
+
+
+
 "use client";
 
 import React, { useState } from "react";
-import { Plus, X, Building2, Save, AlertCircle } from "lucide-react";
+import { Plus, X, Building2, Save, AlertCircle, User, Upload, FileText, Trash2, Copy } from "lucide-react";
 
 const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, isEditing = false }) => {
-  const [formData, setFormData] = useState({
-    sub_b_name: existingBusiness?.sub_b_name || "",
-    sub_b_email: existingBusiness?.sub_b_email || "",
-    sub_b_reg_no: existingBusiness?.sub_b_reg_no || "",
-    sub_b_street: existingBusiness?.sub_b_street || "",
-    sub_b_street_line2: existingBusiness?.sub_b_street_line2 || "",
-    sub_b_city: existingBusiness?.sub_b_city || "",
-    sub_b_state: existingBusiness?.sub_b_state || "",
-    sub_b_zip_code: existingBusiness?.sub_b_zip_code || "",
-    sub_b_country: existingBusiness?.sub_b_country || ""
-  });
+  const [subBusinesses, setSubBusinesses] = useState([
+    {
+      id: 1,
+      formData: {
+        // Business Information
+        sub_b_name: existingBusiness?.sub_b_name || "",
+        sub_b_email: existingBusiness?.sub_b_email || "",
+        sub_b_reg_no: existingBusiness?.sub_b_reg_no || "",
+        sub_b_street: existingBusiness?.sub_b_street || "",
+        sub_b_street_line2: existingBusiness?.sub_b_street_line2 || "",
+        sub_b_city: existingBusiness?.sub_b_city || "",
+        sub_b_state: existingBusiness?.sub_b_state || "",
+        sub_b_zip_code: existingBusiness?.sub_b_zip_code || "",
+        sub_b_country: existingBusiness?.sub_b_country || "",
+        
+        // Account Holder Information
+        account_holder_first_name: existingBusiness?.account_holder_first_name || "",
+        account_holder_email: existingBusiness?.account_holder_email || "",
+        account_holder_date_of_birth: existingBusiness?.account_holder_date_of_birth || "",
+        account_holder_street: existingBusiness?.account_holder_street || "",
+        account_holder_city: existingBusiness?.account_holder_city || "",
+        account_holder_state: existingBusiness?.account_holder_state || "",
+        account_holder_zip_code: existingBusiness?.account_holder_zip_code || "",
+        account_holder_country: existingBusiness?.account_holder_country || "",
+        account_holder_id_type: existingBusiness?.account_holder_id_type || "",
+        account_holder_id_number: existingBusiness?.account_holder_id_number || "",
+      },
+      files: {
+        registration_document: null,
+        account_holder_id_document: null
+      },
+      errors: {}
+    }
+  ]);
 
+  const [activeBusinessIndex, setActiveBusinessIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState('business'); // 'business' or 'account'
   const [submitting, setSubmitting] = useState(false);
-  const [errors, setErrors] = useState({});
 
-  const handleInputChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+  const addNewSubBusiness = () => {
+    const newId = Math.max(...subBusinesses.map(sb => sb.id)) + 1;
+    const newSubBusiness = {
+      id: newId,
+      formData: {
+        sub_b_name: "",
+        sub_b_email: "",
+        sub_b_reg_no: "",
+        sub_b_street: "",
+        sub_b_street_line2: "",
+        sub_b_city: "",
+        sub_b_state: "",
+        sub_b_zip_code: "",
+        sub_b_country: "",
+        account_holder_first_name: "",
+        account_holder_email: "",
+        account_holder_date_of_birth: "",
+        account_holder_street: "",
+        account_holder_city: "",
+        account_holder_state: "",
+        account_holder_zip_code: "",
+        account_holder_country: "",
+        account_holder_id_type: "",
+        account_holder_id_number: "",
+      },
+      files: {
+        registration_document: null,
+        account_holder_id_document: null
+      },
+      errors: {}
+    };
+
+    setSubBusinesses(prev => [...prev, newSubBusiness]);
+    setActiveBusinessIndex(subBusinesses.length);
+  };
+
+  const removeSubBusiness = (index) => {
+    if (subBusinesses.length === 1) {
+      alert("You must have at least one sub-business.");
+      return;
+    }
+
+    setSubBusinesses(prev => prev.filter((_, i) => i !== index));
     
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({
-        ...prev,
-        [field]: null
-      }));
+    // Adjust active index if necessary
+    if (activeBusinessIndex >= subBusinesses.length - 1) {
+      setActiveBusinessIndex(Math.max(0, subBusinesses.length - 2));
     }
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    const requiredFields = [
-      'sub_b_name', 'sub_b_email', 'sub_b_reg_no', 
-      'sub_b_street', 'sub_b_city', 'sub_b_state', 
-      'sub_b_zip_code', 'sub_b_country'
-    ];
+  const duplicateSubBusiness = (index) => {
+    const businessToDuplicate = subBusinesses[index];
+    const newId = Math.max(...subBusinesses.map(sb => sb.id)) + 1;
+    
+    const duplicatedBusiness = {
+      id: newId,
+      formData: { ...businessToDuplicate.formData },
+      files: {
+        registration_document: null,
+        account_holder_id_document: null
+      },
+      errors: {}
+    };
 
-    requiredFields.forEach(field => {
-      if (!formData[field].trim()) {
-        newErrors[field] = 'This field is required';
+    setSubBusinesses(prev => [...prev, duplicatedBusiness]);
+    setActiveBusinessIndex(subBusinesses.length);
+  };
+
+  const handleInputChange = (businessIndex, field, value) => {
+    setSubBusinesses(prev => prev.map((business, index) => {
+      if (index === businessIndex) {
+        return {
+          ...business,
+          formData: {
+            ...business.formData,
+            [field]: value
+          },
+          errors: {
+            ...business.errors,
+            [field]: null // Clear error when user starts typing
+          }
+        };
       }
+      return business;
+    }));
+  };
+
+  const handleFileChange = (businessIndex, field, file) => {
+    setSubBusinesses(prev => prev.map((business, index) => {
+      if (index === businessIndex) {
+        return {
+          ...business,
+          files: {
+            ...business.files,
+            [field]: file
+          },
+          errors: {
+            ...business.errors,
+            [field]: null // Clear error when user selects file
+          }
+        };
+      }
+      return business;
+    }));
+  };
+
+  const validateAllForms = () => {
+    let allValid = true;
+    const updatedBusinesses = subBusinesses.map((business, businessIndex) => {
+      const newErrors = {};
+      
+      // Required business fields
+      const requiredBusinessFields = [
+        'sub_b_name', 'sub_b_email', 'sub_b_reg_no', 
+        'sub_b_street', 'sub_b_city', 'sub_b_state', 
+        'sub_b_zip_code', 'sub_b_country'
+      ];
+
+      // Required account holder fields
+      const requiredAccountFields = [
+        'account_holder_first_name', 'account_holder_email', 'account_holder_date_of_birth',
+        'account_holder_street', 'account_holder_city', 'account_holder_state',
+        'account_holder_zip_code', 'account_holder_country', 'account_holder_id_type',
+        'account_holder_id_number'
+      ];
+
+      // Validate business fields
+      requiredBusinessFields.forEach(field => {
+        if (!business.formData[field].trim()) {
+          newErrors[field] = 'This field is required';
+          allValid = false;
+        }
+      });
+
+      // Validate account holder fields
+      requiredAccountFields.forEach(field => {
+        if (!business.formData[field].trim()) {
+          newErrors[field] = 'This field is required';
+          allValid = false;
+        }
+      });
+
+      // Email validation
+      if (business.formData.sub_b_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(business.formData.sub_b_email)) {
+        newErrors.sub_b_email = 'Please enter a valid email address';
+        allValid = false;
+      }
+
+      if (business.formData.account_holder_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(business.formData.account_holder_email)) {
+        newErrors.account_holder_email = 'Please enter a valid email address';
+        allValid = false;
+      }
+
+      // File validation
+      if (!business.files.registration_document && !isEditing) {
+        newErrors.registration_document = 'Registration document is required';
+        allValid = false;
+      }
+
+      if (!business.files.account_holder_id_document && !isEditing) {
+        newErrors.account_holder_id_document = 'Account holder ID document is required';
+        allValid = false;
+      }
+
+      return {
+        ...business,
+        errors: newErrors
+      };
     });
 
-    // Email validation
-    if (formData.sub_b_email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.sub_b_email)) {
-      newErrors.sub_b_email = 'Please enter a valid email address';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setSubBusinesses(updatedBusinesses);
+    return allValid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!validateForm()) {
+    if (!validateAllForms()) {
+      alert("Please fix all validation errors before submitting.");
       return;
     }
 
@@ -75,40 +655,55 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
         throw new Error("User data not found. Please login again.");
       }
 
-      const apiData = {
-        parent_id: merchantId,
-        sub_businesses: [formData]
-      };
+      // Create FormData
+      const apiFormData = new FormData();
+      
+      // Add parent_id
+      apiFormData.append('parent_id', merchantId);
+      
+      // Add all sub-businesses with proper indexing
+      subBusinesses.forEach((business, index) => {
+        // Add all form fields with the sub_businesses[index][] format
+        Object.keys(business.formData).forEach(key => {
+          apiFormData.append(`sub_businesses[${index}][${key}]`, business.formData[key]);
+        });
+        
+        // Add files
+        if (business.files.registration_document) {
+          apiFormData.append(`sub_businesses[${index}][registration_document]`, business.files.registration_document);
+        }
+        
+        if (business.files.account_holder_id_document) {
+          apiFormData.append(`sub_businesses[${index}][account_holder_id_document]`, business.files.account_holder_id_document);
+        }
+      });
 
       const response = await fetch('https://admin.cardnest.io/api/superadmin/sub-business-store', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(apiData),
+        body: apiFormData, // Send FormData directly
       });
 
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || 'Failed to save sub-business');
+        throw new Error(result.message || 'Failed to save sub-businesses');
       }
 
       // Call the callback to update parent component
-      onSubBusinessAdded({
-        ...formData,
-        id: result.data?.id || Date.now() // Use API response ID or fallback
-      });
+      onSubBusinessAdded(subBusinesses.map(business => ({
+        ...business.formData,
+        id: result.data?.id || Date.now()
+      })));
 
       // Show success message
-      alert(isEditing ? "Sub-business updated successfully!" : "Sub-business added successfully!");
+      alert(`${subBusinesses.length} sub-business${subBusinesses.length > 1 ? 'es' : ''} ${isEditing ? 'updated' : 'added'} successfully!`);
       
       // Close the form
       onClose();
 
     } catch (err) {
-      console.error("Error saving sub-business:", err);
-      alert(err.message || "Failed to save sub-business. Please try again.");
+      console.error("Error saving sub-businesses:", err);
+      alert(err.message || "Failed to save sub-businesses. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -116,6 +711,7 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
 
   const getFieldLabel = (field) => {
     const labels = {
+      // Business fields
       sub_b_name: "Business Name",
       sub_b_email: "Business Email",
       sub_b_reg_no: "Registration Number",
@@ -124,13 +720,30 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
       sub_b_city: "City",
       sub_b_state: "State/Province",
       sub_b_zip_code: "ZIP/Postal Code",
-      sub_b_country: "Country"
+      sub_b_country: "Country",
+      
+      // Account holder fields
+      account_holder_first_name: "Account Holder Name",
+      account_holder_email: "Account Holder Email",
+      account_holder_date_of_birth: "Date of Birth",
+      account_holder_street: "Street Address",
+      account_holder_city: "City",
+      account_holder_state: "State/Province",
+      account_holder_zip_code: "ZIP/Postal Code",
+      account_holder_country: "Country",
+      account_holder_id_type: "ID Type",
+      account_holder_id_number: "ID Number",
+      
+      // File fields
+      registration_document: "Registration Document",
+      account_holder_id_document: "Account Holder ID Document"
     };
     return labels[field] || field;
   };
 
   const getFieldPlaceholder = (field) => {
     const placeholders = {
+      // Business fields
       sub_b_name: "Enter business name",
       sub_b_email: "Enter business email",
       sub_b_reg_no: "Enter registration number",
@@ -139,14 +752,164 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
       sub_b_city: "Enter city",
       sub_b_state: "Enter state/province",
       sub_b_zip_code: "Enter ZIP/postal code",
-      sub_b_country: "Enter country"
+      sub_b_country: "Enter country",
+      
+      // Account holder fields
+      account_holder_first_name: "Enter account holder name",
+      account_holder_email: "Enter account holder email",
+      account_holder_date_of_birth: "YYYY-MM-DD",
+      account_holder_street: "Enter street address",
+      account_holder_city: "Enter city",
+      account_holder_state: "Enter state/province",
+      account_holder_zip_code: "Enter ZIP/postal code",
+      account_holder_country: "Enter country",
+      account_holder_id_type: "e.g., Passport, Driver's License",
+      account_holder_id_number: "Enter ID number"
     };
     return placeholders[field] || "";
   };
 
+  const currentBusiness = subBusinesses[activeBusinessIndex];
+
+  const renderFormField = (field, type = "text", isRequired = true, isSelectField = false, selectOptions = []) => {
+    const fieldValue = currentBusiness.formData[field];
+    const fieldError = currentBusiness.errors[field];
+
+    return (
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          {getFieldLabel(field)} {isRequired && "*"}
+        </label>
+        {isSelectField ? (
+          <select
+            value={fieldValue}
+            onChange={(e) => handleInputChange(activeBusinessIndex, field, e.target.value)}
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
+              fieldError ? 'border-red-500' : 'border-gray-300'
+            }`}
+            disabled={submitting}
+          >
+            <option value="">Select {getFieldLabel(field)}</option>
+            {selectOptions.map(option => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+        ) : (
+          <input
+            type={type}
+            value={fieldValue}
+            onChange={(e) => handleInputChange(activeBusinessIndex, field, e.target.value)}
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
+              fieldError ? 'border-red-500' : 'border-gray-300'
+            }`}
+            placeholder={getFieldPlaceholder(field)}
+            disabled={submitting}
+          />
+        )}
+        {fieldError && (
+          <p className="mt-1 text-sm text-red-600 flex items-center">
+            <AlertCircle className="w-4 h-4 mr-1" />
+            {fieldError}
+          </p>
+        )}
+      </div>
+    );
+  };
+
+  const renderFileField = (field, isRequired = true) => {
+    const fieldFile = currentBusiness.files[field];
+    const fieldError = currentBusiness.errors[field];
+
+    return (
+      <div className="lg:col-span-2">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          {getFieldLabel(field)} {isRequired && "*"}
+        </label>
+        <div className={`w-full px-4 py-3 border-2 border-dashed rounded-lg transition-all duration-200 ${
+          fieldError ? 'border-red-500' : 'border-gray-300'
+        } hover:border-indigo-400`}>
+          <input
+            type="file"
+            onChange={(e) => handleFileChange(activeBusinessIndex, field, e.target.files[0])}
+            className="w-full"
+            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+            disabled={submitting}
+          />
+          <div className="flex items-center justify-center mt-2">
+            <Upload className="w-5 h-5 text-gray-400 mr-2" />
+            <span className="text-sm text-gray-500">
+              {fieldFile ? fieldFile.name : `Upload ${getFieldLabel(field).toLowerCase()}`}
+            </span>
+          </div>
+        </div>
+        {fieldError && (
+          <p className="mt-1 text-sm text-red-600 flex items-center">
+            <AlertCircle className="w-4 h-4 mr-1" />
+            {fieldError}
+          </p>
+        )}
+      </div>
+    );
+  };
+
+  const renderBusinessFields = () => (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Business Name */}
+      <div className="lg:col-span-2">
+        {renderFormField('sub_b_name')}
+      </div>
+
+      {/* Email & Registration Number */}
+      {renderFormField('sub_b_email', 'email')}
+      {renderFormField('sub_b_reg_no')}
+
+      {/* Address Fields */}
+      {renderFormField('sub_b_street')}
+      <div>{renderFormField('sub_b_street_line2', 'text', false)}</div>
+      {renderFormField('sub_b_city')}
+      {renderFormField('sub_b_state')}
+      {renderFormField('sub_b_zip_code')}
+      {renderFormField('sub_b_country')}
+
+      {/* Registration Document */}
+      {renderFileField('registration_document')}
+    </div>
+  );
+
+  const idTypeOptions = [
+    { value: "passport", label: "Passport" },
+    { value: "drivers_license", label: "Driver's License" },
+    { value: "national_id", label: "National ID" },
+    { value: "other", label: "Other" }
+  ];
+
+  const renderAccountHolderFields = () => (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Account Holder Info */}
+      {renderFormField('account_holder_first_name')}
+      {renderFormField('account_holder_email', 'email')}
+      {renderFormField('account_holder_date_of_birth', 'date')}
+      {renderFormField('account_holder_id_type', 'text', true, true, idTypeOptions)}
+      {renderFormField('account_holder_id_number')}
+
+      {/* Account Holder Address */}
+      <div className="lg:col-span-2">
+        <h4 className="text-lg font-medium text-gray-900 mb-4">Account Holder Address</h4>
+      </div>
+      {renderFormField('account_holder_street')}
+      {renderFormField('account_holder_city')}
+      {renderFormField('account_holder_state')}
+      {renderFormField('account_holder_zip_code')}
+      {renderFormField('account_holder_country')}
+
+      {/* ID Document */}
+      {renderFileField('account_holder_id_document')}
+    </div>
+  );
+
   return (
     <div className="fixed inset-0 bg-black/20 bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-slate-700 to-slate-900 p-6 text-white">
           <div className="flex items-center justify-between">
@@ -156,254 +919,175 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
               </div>
               <div>
                 <h2 className="text-2xl font-bold">
-                  {isEditing ? "Edit Sub-Business" : "Add New Sub-Business"}
+                  {isEditing ? "Edit Sub-Business" : "Add Sub-Businesses"}
                 </h2>
                 <p className="text-indigo-100">
-                  {isEditing ? "Update business information" : "Fill in the details below to add a new sub-business"}
+                  {isEditing ? "Update business information" : `Managing ${subBusinesses.length} sub-business${subBusinesses.length > 1 ? 'es' : ''}`}
                 </p>
               </div>
             </div>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={addNewSubBusiness}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2"
+                disabled={submitting}
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Business</span>
+              </button>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-all duration-200"
+                disabled={submitting}
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Sub-Business Tabs */}
+        <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium text-gray-900">Sub-Businesses</h3>
+            <span className="text-sm text-gray-500">Total: {subBusinesses.length}</span>
+          </div>
+          <div className="flex space-x-2 overflow-x-auto pb-2">
+            {subBusinesses.map((business, index) => (
+              <div key={business.id} className="flex items-center space-x-1">
+                <button
+                  type="button"
+                  onClick={() => setActiveBusinessIndex(index)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2 whitespace-nowrap ${
+                    activeBusinessIndex === index
+                      ? 'bg-indigo-600 text-white shadow-md'
+                      : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+                  }`}
+                >
+                  <Building2 className="w-4 h-4" />
+                  <span>Business {index + 1}</span>
+                  {business.formData.sub_b_name && (
+                    <span className="text-xs opacity-75">
+                      ({business.formData.sub_b_name.substring(0, 10)}...)
+                    </span>
+                  )}
+                </button>
+                <div className="flex space-x-1">
+                  <button
+                    type="button"
+                    onClick={() => duplicateSubBusiness(index)}
+                    className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                    title="Duplicate this business"
+                    disabled={submitting}
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                  {subBusinesses.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeSubBusiness(index)}
+                      className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                      title="Remove this business"
+                      disabled={submitting}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Content Tabs */}
+        <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
+          <div className="flex space-x-4">
             <button
-              onClick={onClose}
-              className="p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-all duration-200"
-              disabled={submitting}
+              type="button"
+              onClick={() => setActiveTab('business')}
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2 ${
+                activeTab === 'business'
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-200'
+              }`}
             >
-              <X className="w-6 h-6" />
+              <Building2 className="w-4 h-4" />
+              <span>Business Information</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('account')}
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center space-x-2 ${
+                activeTab === 'account'
+                  ? 'bg-indigo-600 text-white shadow-md'
+                  : 'text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <User className="w-4 h-4" />
+              <span>Account Holder</span>
             </button>
           </div>
         </div>
 
         {/* Form Content */}
-        <div className="p-6 max-h-[calc(90vh-120px)] overflow-y-auto">
+        <div className="p-6 max-h-[calc(95vh-300px)] overflow-y-auto">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Business Name */}
-              <div className="lg:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {getFieldLabel('sub_b_name')} *
-                </label>
-                <input
-                  type="text"
-                  value={formData.sub_b_name}
-                  onChange={(e) => handleInputChange('sub_b_name', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
-                    errors.sub_b_name ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder={getFieldPlaceholder('sub_b_name')}
-                  disabled={submitting}
-                />
-                {errors.sub_b_name && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.sub_b_name}
-                  </p>
-                )}
-              </div>
-
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {getFieldLabel('sub_b_email')} *
-                </label>
-                <input
-                  type="email"
-                  value={formData.sub_b_email}
-                  onChange={(e) => handleInputChange('sub_b_email', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
-                    errors.sub_b_email ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder={getFieldPlaceholder('sub_b_email')}
-                  disabled={submitting}
-                />
-                {errors.sub_b_email && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.sub_b_email}
-                  </p>
-                )}
-              </div>
-
-              {/* Registration Number */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {getFieldLabel('sub_b_reg_no')} *
-                </label>
-                <input
-                  type="text"
-                  value={formData.sub_b_reg_no}
-                  onChange={(e) => handleInputChange('sub_b_reg_no', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
-                    errors.sub_b_reg_no ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder={getFieldPlaceholder('sub_b_reg_no')}
-                  disabled={submitting}
-                />
-                {errors.sub_b_reg_no && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.sub_b_reg_no}
-                  </p>
-                )}
-              </div>
-
-              {/* Street Address */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {getFieldLabel('sub_b_street')} *
-                </label>
-                <input
-                  type="text"
-                  value={formData.sub_b_street}
-                  onChange={(e) => handleInputChange('sub_b_street', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
-                    errors.sub_b_street ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder={getFieldPlaceholder('sub_b_street')}
-                  disabled={submitting}
-                />
-                {errors.sub_b_street && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.sub_b_street}
-                  </p>
-                )}
-              </div>
-
-              {/* Street Line 2 */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {getFieldLabel('sub_b_street_line2')}
-                </label>
-                <input
-                  type="text"
-                  value={formData.sub_b_street_line2}
-                  onChange={(e) => handleInputChange('sub_b_street_line2', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900"
-                  placeholder={getFieldPlaceholder('sub_b_street_line2')}
-                  disabled={submitting}
-                />
-              </div>
-
-              {/* City */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {getFieldLabel('sub_b_city')} *
-                </label>
-                <input
-                  type="text"
-                  value={formData.sub_b_city}
-                  onChange={(e) => handleInputChange('sub_b_city', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
-                    errors.sub_b_city ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder={getFieldPlaceholder('sub_b_city')}
-                  disabled={submitting}
-                />
-                {errors.sub_b_city && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.sub_b_city}
-                  </p>
-                )}
-              </div>
-
-              {/* State */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {getFieldLabel('sub_b_state')} *
-                </label>
-                <input
-                  type="text"
-                  value={formData.sub_b_state}
-                  onChange={(e) => handleInputChange('sub_b_state', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
-                    errors.sub_b_state ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder={getFieldPlaceholder('sub_b_state')}
-                  disabled={submitting}
-                />
-                {errors.sub_b_state && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.sub_b_state}
-                  </p>
-                )}
-              </div>
-
-              {/* ZIP Code */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {getFieldLabel('sub_b_zip_code')} *
-                </label>
-                <input
-                  type="text"
-                  value={formData.sub_b_zip_code}
-                  onChange={(e) => handleInputChange('sub_b_zip_code', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
-                    errors.sub_b_zip_code ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder={getFieldPlaceholder('sub_b_zip_code')}
-                  disabled={submitting}
-                />
-                {errors.sub_b_zip_code && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.sub_b_zip_code}
-                  </p>
-                )}
-              </div>
-
-              {/* Country */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {getFieldLabel('sub_b_country')} *
-                </label>
-                <input
-                  type="text"
-                  value={formData.sub_b_country}
-                  onChange={(e) => handleInputChange('sub_b_country', e.target.value)}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200 bg-white text-gray-900 ${
-                    errors.sub_b_country ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder={getFieldPlaceholder('sub_b_country')}
-                  disabled={submitting}
-                />
-                {errors.sub_b_country && (
-                  <p className="mt-1 text-sm text-red-600 flex items-center">
-                    <AlertCircle className="w-4 h-4 mr-1" />
-                    {errors.sub_b_country}
-                  </p>
-                )}
-              </div>
-            </div>
+            {activeTab === 'business' ? renderBusinessFields() : renderAccountHolderFields()}
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6 border-t border-gray-200">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-all duration-200 disabled:opacity-50"
-                disabled={submitting}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="bg-slate-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 min-w-[140px]"
-              >
-                {submitting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                    <span>Saving...</span>
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-5 h-5" />
-                    <span>{isEditing ? "Update" : "Add"} Business</span>
-                  </>
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-gray-200">
+              <div className="flex space-x-4">
+                {activeTab === 'business' && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('account')}
+                    className="px-6 py-3 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 font-medium transition-all duration-200"
+                    disabled={submitting}
+                  >
+                    Next: Account Holder →
+                  </button>
                 )}
-              </button>
+                {activeTab === 'account' && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('business')}
+                    className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium transition-all duration-200"
+                    disabled={submitting}
+                  >
+                    ← Back: Business Info
+                  </button>
+                )}
+              </div>
+
+              <div className="flex space-x-4">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-all duration-200 disabled:opacity-50"
+                  disabled={submitting}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="bg-slate-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 min-w-[140px]"
+                >
+                  {submitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-5 h-5" />
+                      <span>
+                        {isEditing ? "Update" : "Save All"} ({subBusinesses.length})
+                      </span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </form>
         </div>
