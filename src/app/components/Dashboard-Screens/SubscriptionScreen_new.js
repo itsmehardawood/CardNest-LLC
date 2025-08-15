@@ -49,10 +49,23 @@ function SubscriptionsScreen() {
                     subscriptionFound = true;
                   }
                   break;
+                } else if (response.status === 404) {
+                  // No subscription found - this is expected for new users
+                  console.log('No subscription found for user - this is normal for new users');
+                  setHasActiveSubscription(false);
+                  setSubscriptionData(null);
+                  subscriptionFound = true;
+                  break;
                 }
               } catch (error) {
                 console.error(`Error with ${param}:`, error);
               }
+            }
+            
+            // If no subscription was found after trying all parameters
+            if (!subscriptionFound) {
+              setHasActiveSubscription(false);
+              setSubscriptionData(null);
             }
           }
         }
@@ -82,10 +95,12 @@ function SubscriptionsScreen() {
 
   // Helper functions for package data based on package_id
   const getMonthlyLimit = () => {
+    if (!subscriptionData) return 0;
     return subscriptionData.package_id === 3 ? subscriptionData.custom_api_count : subscriptionData.package.monthly_limit;
   };
 
   const getUsedCalls = () => {
+    if (!subscriptionData) return 0;
     return subscriptionData.package_id === 3 ? subscriptionData.custom_calls_used : subscriptionData.api_calls_used;
   };
 
@@ -94,18 +109,23 @@ function SubscriptionsScreen() {
   };
 
   const getUsagePercentage = () => {
-    return Math.round((getUsedCalls() / getMonthlyLimit()) * 100);
+    const limit = getMonthlyLimit();
+    if (limit === 0) return 0;
+    return Math.round((getUsedCalls() / limit) * 100);
   };
 
   const getPlanName = () => {
+    if (!subscriptionData) return 'No Plan';
     return subscriptionData.package_id === 3 ? 'Custom Enterprise Plan' : `${subscriptionData.package.package_name} Plan`;
   };
 
   const getPlanPrice = () => {
+    if (!subscriptionData) return 0;
     return subscriptionData.package_id === 3 ? subscriptionData.custom_price : subscriptionData.package.package_price;
   };
 
   const isCustomPackage = () => {
+    if (!subscriptionData) return false;
     return subscriptionData.package_id === 3;
   };
 
@@ -288,26 +308,53 @@ if (loading) {
               <p className="text-gray-300 max-w-md mx-auto mb-6">
                 You do not have an active subscription. Choose a plan that fits your needs to unlock all features.
               </p>
-              {/* <button
-                onClick={handleBrowsePlans}
-                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200"
-              >
-                Browse Plans
-                <svg className="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </button> */}
+       
             </div>
           )}
 
-          {/* Plans Section - Always shown */}
-          <div className="bg-slate-900 rounded-xl shadow-sm border border-gray-800 p-6">
-            <div className="mb-8 text-center">
-              <h2 className="text-2xl font-bold text-white mb-2">Available Plans</h2>
-              <p className="text-gray-300">Choose the perfect plan for your business needs</p>
+          {/* Plans Section - Conditional based on package type */}
+          {hasActiveSubscription && subscriptionData ? (
+            isCustomPackage() ? (
+              <div className="bg-slate-900 rounded-xl shadow-sm border border-gray-800 p-6">
+                <div className="text-center">
+                  <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-blue-900 mb-4">
+                    <svg className="h-8 w-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-2xl font-bold text-white mb-2">Custom Enterprise Plan</h2>
+                  <p className="text-gray-300 max-w-md mx-auto mb-6">
+                    You are currently on a custom enterprise plan. If you would like to downgrade your package or make any changes, please contact our customer support team.
+                  </p>
+                  <div className="bg-blue-900 p-4 rounded-lg border border-blue-800">
+                    <div className="flex items-center justify-center space-x-2">
+                      <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                      </svg>
+                      <span className="text-blue-300 font-medium">Contact Customer Support</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-slate-900 rounded-xl shadow-sm border border-gray-800 p-6">
+                <div className="mb-8 text-center">
+                  <h2 className="text-2xl font-bold text-white mb-2">Available Plans</h2>
+                  <p className="text-gray-300">Choose the perfect plan for your business needs</p>
+                </div>
+                <PricingSection  isDark={true} />
+              </div>
+            )
+          ) : (
+            <div className="bg-slate-900 rounded-xl shadow-sm border border-gray-800 p-6">
+              <div className="mb-8 text-center">
+                <h2 className="text-2xl font-bold text-white mb-2">Available Plans</h2>
+                <p className="text-gray-300">Choose the perfect plan for your business needs</p>
+              </div>
+              <PricingSection  isDark={true} />
             </div>
-            <PricingSection  isDark={true} />
-          </div>
+          )}
         </div>
       </div>
     </div>

@@ -1216,11 +1216,11 @@ function DashboardContent() {
         // Extract business name from the API response
         const fetchedBusinessName = result.data?.business_profile?.business_name;
         
-        console.log("Business verification API response:", result);
-        console.log("Business verified status:", businessVerified);
-        console.log("Verification reason:", verificationReason);
-        console.log("Verification status message:", verificationStatus);
-        console.log("Business name:", fetchedBusinessName);
+        // console.log("Business verification API response:", result);
+        // console.log("Business verified status:", businessVerified);
+        // console.log("Verification reason:", verificationReason);
+        // console.log("Verification status message:", verificationStatus);
+        // console.log("Business name:", fetchedBusinessName);
 
         // Update business name state
         if (fetchedBusinessName) {

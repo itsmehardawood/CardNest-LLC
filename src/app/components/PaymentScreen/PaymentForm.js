@@ -614,7 +614,7 @@ export default function PaymentForm({
                 
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">
-                    Tax (3%):
+                    Tax:
                   </span>
                   <span className="font-medium">{formatCurrency(pricingCalculation.tax)}</span>
                 </div>

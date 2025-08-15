@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { FiAlertCircle, FiCheckCircle, FiClock, FiEdit2, FiMail, FiZap, FiDollarSign, FiFileText } from 'react-icons/fi';
+import GraphData from './GraphData';
 
 function HomeScreen({ status, setActiveTab }) {
   const [verificationReason, setVerificationReason] = useState('');
@@ -113,7 +114,7 @@ function HomeScreen({ status, setActiveTab }) {
             {/* Status Card */}
             <div className={`${statusStyling.bgColor} ${statusStyling.borderColor} p-5 rounded-lg border transition-all hover:shadow-md`}>
               <div className="flex items-center mb-3">
-                <div className="p-2 rounded-full bg-black shadow-sm mr-3">
+                <div className="p-2 rounded-full mr-3">
                   {statusStyling.icon}
                 </div>
                 <h3 className={`font-semibold ${statusStyling.titleColor}`}>Account Status</h3>
@@ -165,7 +166,7 @@ function HomeScreen({ status, setActiveTab }) {
             {/* Quick Actions Card */}
             <div className="bg-gray-900 p-5 rounded-lg border border-gray-700 transition-all hover:shadow-md">
               <div className="flex items-center mb-3">
-                <div className="p-2 rounded-full bg-black shadow-sm mr-3">
+                <div className="p-2 rounded-full mr-3">
                   <FiZap className="text-green-500 text-xl" />
                 </div>
                 <h3 className="font-semibold text-white">Quick Actions</h3>
@@ -198,7 +199,7 @@ function HomeScreen({ status, setActiveTab }) {
             {/* Support Card - Simplified */}
             <div className="bg-gray-900 p-5 rounded-lg border border-gray-700 transition-all hover:shadow-md">
               <div className="flex items-center mb-3">
-                <div className="p-2 rounded-full bg-black shadow-sm mr-3">
+                <div className="p-2 rounded-full mr-3">
                   <FiMail className="text-purple-500 text-xl" />
                 </div>
                 <h3 className="font-semibold text-white">Need Help?</h3>
@@ -287,6 +288,13 @@ function HomeScreen({ status, setActiveTab }) {
         Congratulations! Your account has been approved. If you have not subscribed yet, you can now choose a subscription plan and start using our services.
               </p>
               
+            </div>
+          )}
+
+          {/* Scan Analytics - Only show for approved users */}
+          {status === 'approved' && (
+            <div className="mt-8">
+              <GraphData />
             </div>
           )}
         </div>

@@ -789,12 +789,7 @@ export default TempDisplaySettings;
 //             </button>
 //           </div>
 
-//           {/* Debug Info */}
-//           {debugInfo && (
-//             <div className="mt-4 p-3 bg-gray-800 rounded border border-gray-600">
-//               <p className="text-xs text-gray-400">Debug: {debugInfo}</p>
-//             </div>
-//           )}
+      
 //         </div>
 //       ) : (
 //         /* Settings View */

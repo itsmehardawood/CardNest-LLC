@@ -35,7 +35,7 @@ function MainBusinessScreen({
 
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
-        console.log("User data found in localStorage:", parsedUser);
+        // console.log("User data found in localStorage:", parsedUser);
 
         // Handle nested user object structure
         const userObj = parsedUser.user || parsedUser;
@@ -49,7 +49,7 @@ function MainBusinessScreen({
       
           if (response.ok) {
             const data = await response.json();
-            console.log("Business verification data:", data);
+            // console.log("Business verification data:", data);
             setVerificationData(data);
             setApiError(null); // Clear any previous errors
           } else {

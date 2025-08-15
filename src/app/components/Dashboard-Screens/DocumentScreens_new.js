@@ -699,19 +699,7 @@ const renderCredentialsSection = () => {
               >
                 <FiFileText /> Go to Business Profile
               </button>
-              {handleFileUpload && (
-                <label className="px-4 py-2 border border-blue-600 text-blue-400 rounded-lg hover:bg-blue-900 text-sm cursor-pointer transition-colors flex items-center justify-center gap-2">
-                  <FiUpload /> Quick Upload Here
-                  <input
-                    type="file"
-                    multiple
-                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                    onChange={handleDirectUpload}
-                    className="hidden"
-                    aria-label="Quick upload documents"
-                  />
-                </label>
-              )}
+          
             </div>
           </div>
         )}

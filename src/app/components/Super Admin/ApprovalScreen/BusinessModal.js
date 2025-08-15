@@ -859,28 +859,32 @@ const BusinessModal = ({
             {activeTab === "pending" && (
               <div className="space-y-6">
                 {/* Registration Document */}
-                <DocumentPreview
-                  documentPath={selectedBusiness.registration_document_path}
-                  documentName={selectedBusiness.registration_document_path.split('/').pop()}
-                  documentType="registration"
-                  onDownload={() => handleDownloadDocument(
-                    selectedBusiness.registration_document_path,
-                    `${selectedBusiness.business_name}_registration_document.${selectedBusiness.registration_document_path.split('.').pop()}`
-                  )}
-                  downloadLoading={downloadLoading}
-                />
+                {selectedBusiness.registration_document_path && (
+                  <DocumentPreview
+                    documentPath={selectedBusiness.registration_document_path}
+                    documentName={(selectedBusiness.registration_document_path || '').split('/').pop()}
+                    documentType="registration"
+                    onDownload={() => handleDownloadDocument(
+                      selectedBusiness.registration_document_path,
+                      `${selectedBusiness.business_name}_registration_document.${(selectedBusiness.registration_document_path || '').split('.').pop()}`
+                    )}
+                    downloadLoading={downloadLoading}
+                  />
+                )}
 
                 {/* ID Document */}
-                <DocumentPreview
-                  documentPath={selectedBusiness.account_holder_id_document_path}
-                  documentName={selectedBusiness.account_holder_id_document_path.split('/').pop()}
-                  documentType="id"
-                  onDownload={() => handleDownloadDocument(
-                    selectedBusiness.account_holder_id_document_path,
-                    `${selectedBusiness.account_holder_first_name}_${selectedBusiness.account_holder_last_name}_id_document.${selectedBusiness.account_holder_id_document_path.split('.').pop()}`
-                  )}
-                  downloadLoading={downloadLoading}
-                />
+                {selectedBusiness.account_holder_id_document_path && (
+                  <DocumentPreview
+                    documentPath={selectedBusiness.account_holder_id_document_path}
+                    documentName={(selectedBusiness.account_holder_id_document_path || '').split('/').pop()}
+                    documentType="id"
+                    onDownload={() => handleDownloadDocument(
+                      selectedBusiness.account_holder_id_document_path,
+                      `${selectedBusiness.account_holder_first_name}_${selectedBusiness.account_holder_last_name}_id_document.${(selectedBusiness.account_holder_id_document_path || '').split('.').pop()}`
+                    )}
+                    downloadLoading={downloadLoading}
+                  />
+                )}
               </div>
             )}
 

@@ -92,9 +92,9 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
           const userObj = parsedUserData.user || parsedUserData;
           const merchantIdValue = userObj.merchant_id || userObj.merchantId;
           
-          console.log('Parsed userData:', parsedUserData);
-          console.log('User object:', userObj);
-          console.log('Merchant ID found:', merchantIdValue);
+          // console.log('Parsed userData:', parsedUserData);
+          // console.log('User object:', userObj);
+          // console.log('Merchant ID found:', merchantIdValue);
           
           setMerchantId(merchantIdValue);
           
