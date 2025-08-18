@@ -222,7 +222,7 @@ if (loading) {
                         <svg className="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
-                        {isCustomPackage() && subscriptionData.custom_status === 'inactive' ? 'Pending Activation' : 'Approved'}
+                        {isCustomPackage() && subscriptionData.custom_status === 'inactive' ? 'Activated' : 'Approved'}
                       </div>
                     </div>
                   </div>
@@ -267,7 +267,7 @@ if (loading) {
                     )}
 
                     {/* Placeholder for Package ID 3 */}
-                    {subscriptionData.package_id === 3 && (
+                    {/* {subscriptionData.package_id === 3 && (
                       <div className="mb-8 bg-blue-900 p-6 rounded-lg border border-blue-800">
                         <div className="text-center">
                           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-800 mb-4">
@@ -282,7 +282,7 @@ if (loading) {
                           </p>
                         </div>
                       </div>
-                    )}
+                    )} */}
 
                     {/* Progress Bar - Hidden for package ID 3 due to backend issues */}
                     {subscriptionData.package_id !== 3 && (

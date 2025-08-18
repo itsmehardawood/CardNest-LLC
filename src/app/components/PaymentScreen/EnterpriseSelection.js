@@ -356,7 +356,7 @@ export default function EnterpriseSelection() {
                           Monthly API Count *
                         </label>
                         <input
-                          type="number"
+                          type="text"
                           value={apiCount}
                           onChange={(e) => {
                             setApiCount(e.target.value);
@@ -379,34 +379,16 @@ export default function EnterpriseSelection() {
                       </div>
 
                       {/* Real-time Price Calculation */}
-                      {apiCount && parseInt(apiCount) > 0 && (
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                          <div className="text-center">
-                            <p className="text-sm text-blue-700 mb-2">Estimated Pricing</p>
-                            <div className="space-y-1">
-                              <p className="text-xs text-blue-600">
-                                {parseInt(apiCount).toLocaleString()} APIs × ${perApiPrice} per API
-                              </p>
-                              <p className="text-2xl font-bold text-blue-800">
-                                ${calculateEstimatedPrice()}
-                                <span className="text-sm font-normal text-blue-600 ml-1">/month</span>
-                              </p>
-                              {isLoadingPrice && (
-                                <p className="text-xs text-blue-500">Updating price...</p>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      )}
+                   
 
                       <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6">
                         <h4 className="font-semibold text-emerald-900 mb-3">
                           Information
                         </h4>
                         <div className="space-y-2 text-sm text-emerald-800">
-                          <p>
+                          {/* <p>
                             • Per API price: ${perApiPrice}
-                          </p>
+                          </p> */}
                           <p>
                             • Custom pricing calculated in real-time
                           </p>

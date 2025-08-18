@@ -27,12 +27,17 @@ const handleLogin = async () => {
     });
 
     const data = await response.json();
+
     if (data.status === true) {
       const userRole = data?.user?.role;
       const allowedRoles = ["BUSINESS_USER", "ENTERPRISE_USER"];
 
       if (allowedRoles.includes(userRole)) {
-        localStorage.setItem('userData', JSON.stringify(data));
+        // ✅ Add expiry for 30 minutes (testing)
+        const expiryTime = new Date().getTime() + 30 * 60 * 60 * 1000; // 30 minutes in ms
+        const userDataWithExpiry = { ...data, expiry: expiryTime };
+
+        localStorage.setItem('userData', JSON.stringify(userDataWithExpiry));
         router.push('/dashboard');
       } else {
         setError("Invalid user. Only business and enterprise users are allowed to access this platform.");
@@ -47,6 +52,7 @@ const handleLogin = async () => {
     setLoading(false);
   }
 };
+
 
 
   return (

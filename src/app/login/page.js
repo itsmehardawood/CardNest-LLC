@@ -134,108 +134,198 @@ export default function LoginPage() {
     if (error) setError("");
   };
 
-  const handleSignIn = async (e) => {
-    e.preventDefault();
+//   const handleSignIn = async (e) => {
+//     e.preventDefault();
 
-    if (!isOtpMode) {
-      // Step 1: Call login API first
-      setLoading(true);
-      setError("");
-      setSuccess("");
+//     if (!isOtpMode) {
+//       // Step 1: Call login API first
+//       setLoading(true);
+//       setError("");
+//       setSuccess("");
 
-      try {
-        const requestBody = {
-          country_code: formData.countryCode,
-          login_input: emailOrPhone,
-        };
-
-        console.log("Sending login request:", JSON.stringify(requestBody, null, 2));
-
-        const response = await apiFetch(
-          "/login",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            body: JSON.stringify(requestBody),
-          }
-        );
-
-        const data = await response.json();
-        console.log("Login API response:", data);
-
-        if (!response.ok || !data.status) {
-          throw new Error(data.message || "Login failed. Please check your credentials.");
-        }
-
-      // Store full backend response in localStorage like simple login
-const userData = data; // keep this line so variable exists
-localStorage.setItem("userData", JSON.stringify(userData));
-setApiUserData(userData);
+//       try {
+//         const requestBody = {
+//           country_code: formData.countryCode,
+//           login_input: emailOrPhone,
+//         };
 
 
+//         const response = await apiFetch(
+//           "/login",
+//           {
+//             method: "POST",
+//             headers: {
+//               "Content-Type": "application/json",
+//               Accept: "application/json",
+//             },
+//             body: JSON.stringify(requestBody),
+//           }
+//         );
 
-        localStorage.setItem("userData", JSON.stringify(userData));
-        setApiUserData(userData);
+//         const data = await response.json();
+//         // console.log("Login API response:", data);
 
-        console.log("User data stored in localStorage:", userData);
+//         if (!response.ok || !data.status) {
+//           throw new Error(data.message || "Login failed. Please check your credentials.");
+//         }
 
-        // Step 3: Always send Firebase OTP using phone number from backend response
-        const phoneFromBackend = data.user?.phone_no || data.phone_no;
+//       // Store full backend response in localStorage like simple login
+// const userData = data; // keep this line so variable exists
+// localStorage.setItem("userData", JSON.stringify(userData));
+// setApiUserData(userData);
+
+
+
+//         localStorage.setItem("userData", JSON.stringify(userData));
+//         setApiUserData(userData);
+
+//         console.log("User data stored in localStorage:", userData);
+
+//         // Step 3: Always send Firebase OTP using phone number from backend response
+//         const phoneFromBackend = data.user?.phone_no || data.phone_no;
         
-        if (!phoneFromBackend) {
-          throw new Error("No phone number received from backend for OTP verification.");
-        }
+//         if (!phoneFromBackend) {
+//           throw new Error("No phone number received from backend for OTP verification.");
+//         }
 
-        // Store the phone number from backend for display and resend functionality
-        setBackendPhoneNumber(phoneFromBackend);
+//         // Store the phone number from backend for display and resend functionality
+//         setBackendPhoneNumber(phoneFromBackend);
 
-        // Always send Firebase OTP to the phone number from backend
-        const fullPhoneNumber = `${formData.countryCode}${phoneFromBackend}`;
-        console.log("Sending Firebase OTP to:", fullPhoneNumber);
+//         // Always send Firebase OTP to the phone number from backend
+//         const fullPhoneNumber = `${formData.countryCode}${phoneFromBackend}`;
+//         console.log("Sending Firebase OTP to:", fullPhoneNumber);
 
-        // Validate phone number format
-        const phoneRegex = /^\+[1-9]\d{1,14}$/;
-        if (!phoneRegex.test(fullPhoneNumber)) {
-          throw new Error(`Invalid phone number format: ${fullPhoneNumber}`);
-        }
+//         // Validate phone number format
+//         const phoneRegex = /^\+[1-9]\d{1,14}$/;
+//         if (!phoneRegex.test(fullPhoneNumber)) {
+//           throw new Error(`Invalid phone number format: ${fullPhoneNumber}`);
+//         }
 
-        // Ensure reCAPTCHA is ready
-        if (!window.recaptchaVerifier) {
-          throw new Error("reCAPTCHA verifier not initialized");
-        }
+//         // Ensure reCAPTCHA is ready
+//         if (!window.recaptchaVerifier) {
+//           throw new Error("reCAPTCHA verifier not initialized");
+//         }
 
-        const appVerifier = window.recaptchaVerifier;
-        const confirmation = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
+//         const appVerifier = window.recaptchaVerifier;
+//         const confirmation = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
         
-        setConfirmationResult(confirmation);
-        setIsOtpMode(true);
-        setSuccess("Verification code sent to your phone.");
-        console.log("Firebase OTP sent successfully");
+//         setConfirmationResult(confirmation);
+//         setIsOtpMode(true);
+//         setSuccess("Verification code sent to your phone.");
+//         console.log("Firebase OTP sent successfully");
 
-      } catch (err) {
-        console.error("Error in login process:", err);
+//       } catch (err) {
+//         console.error("Error in login process:", err);
         
-        // Handle Firebase-specific errors
-        if (err.code === "auth/invalid-phone-number") {
-          setError("Invalid phone number format. Please check your number.");
-        } else if (err.code === "auth/too-many-requests") {
-          setError("Too many requests. Please try again later.");
-        } else if (err.code === "auth/quota-exceeded") {
-          setError("SMS quota exceeded. Please try again later.");
-        } else {
-          setError(err.message || "Login failed. Please try again.");
-        }
-      } finally {
-        setLoading(false);
+//         // Handle Firebase-specific errors
+//         if (err.code === "auth/invalid-phone-number") {
+//           setError("Invalid phone number format. Please check your number.");
+//         } else if (err.code === "auth/too-many-requests") {
+//           setError("Too many requests. Please try again later.");
+//         } else if (err.code === "auth/quota-exceeded") {
+//           setError("SMS quota exceeded. Please try again later.");
+//         } else {
+//           setError(err.message || "Login failed. Please try again.");
+//         }
+//       } finally {
+//         setLoading(false);
+//       }
+//     } else {
+//       // Step 4: Verify Firebase OTP
+//       handleOtpVerification();
+//     }
+//   };
+
+
+const handleSignIn = async (e) => {
+  e.preventDefault();
+
+  if (!isOtpMode) {
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const requestBody = {
+        country_code: formData.countryCode,
+        login_input: emailOrPhone,
+      };
+
+      const response = await apiFetch("/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.status) {
+        throw new Error(data.message || "Login failed. Please check your credentials.");
       }
-    } else {
-      // Step 4: Verify Firebase OTP
-      handleOtpVerification();
+
+      // ✅ Store user data with expiry (3 hours from now)
+      const expiryTime = new Date().getTime() + 3 * 60 * 60 * 1000; // 3 hours in ms
+    //  const expiryTime = new Date().getTime() + 30 * 1000; // 30 seconds in ms
+
+      const userDataWithExpiry = { ...data, expiry: expiryTime };
+
+      localStorage.setItem("userData", JSON.stringify(userDataWithExpiry));
+      setApiUserData(userDataWithExpiry);
+
+      console.log("User data stored in localStorage with expiry:", userDataWithExpiry);
+
+      // Step 3: Send Firebase OTP
+      const phoneFromBackend = data.user?.phone_no || data.phone_no;
+
+      if (!phoneFromBackend) {
+        throw new Error("No phone number received from backend for OTP verification.");
+      }
+
+      setBackendPhoneNumber(phoneFromBackend);
+      const fullPhoneNumber = `${formData.countryCode}${phoneFromBackend}`;
+
+      const phoneRegex = /^\+[1-9]\d{1,14}$/;
+      if (!phoneRegex.test(fullPhoneNumber)) {
+        throw new Error(`Invalid phone number format: ${fullPhoneNumber}`);
+      }
+
+      if (!window.recaptchaVerifier) {
+        throw new Error("reCAPTCHA verifier not initialized");
+      }
+
+      const appVerifier = window.recaptchaVerifier;
+      const confirmation = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
+
+      setConfirmationResult(confirmation);
+      setIsOtpMode(true);
+      setSuccess("Verification code sent to your phone.");
+      console.log("Firebase OTP sent successfully");
+
+    } catch (err) {
+      console.error("Error in login process:", err);
+
+      if (err.code === "auth/invalid-phone-number") {
+        setError("Invalid phone number format. Please check your number.");
+      } else if (err.code === "auth/too-many-requests") {
+        setError("Too many requests. Please try again later.");
+      } else if (err.code === "auth/quota-exceeded") {
+        setError("SMS quota exceeded. Please try again later.");
+      } else {
+        setError(err.message || "Login failed. Please try again.");
+      }
+    } finally {
+      setLoading(false);
     }
-  };
+  } else {
+    // Step 4: Verify Firebase OTP
+    handleOtpVerification();
+  }
+};
+
+
 
   const handleOtpVerification = async () => {
     if (!confirmationResult) {

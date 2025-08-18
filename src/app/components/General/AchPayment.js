@@ -20,8 +20,11 @@ const ACHPaymentForm = ({
   const achRef = useRef(null);
   const paymentsRef = useRef(null);
 
-  const appId = "sq0idp-nxaY-afaaeWBXySlmIAEaA";
+  
+
+   const appId = "sq0idp-nxaY-afaaeWBXySlmIAEaA";
   const locationId = "LNRMQ2T1MH3BA";
+
 
   const initializeACH = async (payments) => {
     const ach = await payments.ach();
