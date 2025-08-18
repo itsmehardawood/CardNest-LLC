@@ -1,7 +1,83 @@
 "use client";
 
 import React, { useState } from "react";
-import { Plus, X, Building2, Save, AlertCircle, User, Upload, FileText, Trash2, Copy } from "lucide-react";
+import { Plus, X, Building2, Save, AlertCircle, User, Upload, FileText, Trash2, Copy, CheckCircle, XCircle } from "lucide-react";
+
+// Custom Alert Component
+const CustomAlert = ({ isOpen, onClose, type = 'info', title, message }) => {
+  if (!isOpen) return null;
+
+  const getAlertStyles = () => {
+    switch (type) {
+      case 'success':
+        return {
+          bg: 'bg-green-50',
+          border: 'border-green-200',
+          icon: <CheckCircle className="w-6 h-6 text-green-600" />,
+          titleColor: 'text-green-800',
+          messageColor: 'text-green-700',
+          buttonBg: 'bg-green-600 hover:bg-green-700'
+        };
+      case 'error':
+        return {
+          bg: 'bg-red-50',
+          border: 'border-red-200',
+          icon: <XCircle className="w-6 h-6 text-red-600" />,
+          titleColor: 'text-red-800',
+          messageColor: 'text-red-700',
+          buttonBg: 'bg-red-600 hover:bg-red-700'
+        };
+      case 'warning':
+        return {
+          bg: 'bg-yellow-50',
+          border: 'border-yellow-200',
+          icon: <AlertCircle className="w-6 h-6 text-yellow-600" />,
+          titleColor: 'text-yellow-800',
+          messageColor: 'text-yellow-700',
+          buttonBg: 'bg-yellow-600 hover:bg-yellow-700'
+        };
+      default:
+        return {
+          bg: 'bg-blue-50',
+          border: 'border-blue-200',
+          icon: <AlertCircle className="w-6 h-6 text-blue-600" />,
+          titleColor: 'text-blue-800',
+          messageColor: 'text-blue-700',
+          buttonBg: 'bg-blue-600 hover:bg-blue-700'
+        };
+    }
+  };
+
+  const styles = getAlertStyles();
+
+  return (
+    <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-[60] p-4">
+      <div className={`${styles.bg} ${styles.border} border rounded-lg shadow-lg max-w-md w-full p-6 transform transition-all duration-200 scale-100`}>
+        <div className="flex items-start space-x-4">
+          <div className="flex-shrink-0">
+            {styles.icon}
+          </div>
+          <div className="flex-1">
+            <h3 className={`text-lg font-medium ${styles.titleColor} mb-2`}>
+              {title}
+            </h3>
+            <p className={`text-sm ${styles.messageColor} mb-4`}>
+              {message}
+            </p>
+            <div className="flex justify-end">
+              <button
+                onClick={onClose}
+                className={`px-4 py-2 ${styles.buttonBg} text-white rounded-lg font-medium transition-colors duration-200`}
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, isEditing = false }) => {
   const [subBusinesses, setSubBusinesses] = useState([
@@ -43,6 +119,28 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
   const [activeBusinessIndex, setActiveBusinessIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('business'); // 'business' or 'account'
   const [submitting, setSubmitting] = useState(false);
+  
+  // Custom Alert State
+  const [alert, setAlert] = useState({
+    isOpen: false,
+    type: 'info',
+    title: '',
+    message: ''
+  });
+
+  // Helper function to show alerts
+  const showAlert = (type, title, message) => {
+    setAlert({
+      isOpen: true,
+      type,
+      title,
+      message
+    });
+  };
+
+  const closeAlert = () => {
+    setAlert(prev => ({ ...prev, isOpen: false }));
+  };
 
   const addNewSubBusiness = () => {
     const newId = Math.max(...subBusinesses.map(sb => sb.id)) + 1;
@@ -83,7 +181,7 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
 
   const removeSubBusiness = (index) => {
     if (subBusinesses.length === 1) {
-      alert("You must have at least one sub-business.");
+      showAlert('warning', 'Cannot Remove Business', 'You must have at least one sub-business.');
       return;
     }
 
@@ -223,7 +321,7 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
     e.preventDefault();
     
     if (!validateAllForms()) {
-      alert("Please fix all validation errors before submitting.");
+      showAlert('error', 'Validation Error', 'Please fix all validation errors before submitting.');
       return;
     }
 
@@ -235,7 +333,9 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
       const merchantId = userData.merchant_id;
 
       if (!merchantId) {
-        throw new Error("User data not found. Please login again.");
+        showAlert('error', 'Authentication Error', 'User data not found. Please login again.');
+        setSubmitting(false);
+        return;
       }
 
       // Create FormData
@@ -279,14 +379,16 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
       })));
 
       // Show success message
-      alert(`${subBusinesses.length} sub-business${subBusinesses.length > 1 ? 'es' : ''} ${isEditing ? 'updated' : 'added'} successfully!`);
+      showAlert('success', 'Success!', `${subBusinesses.length} sub-business${subBusinesses.length > 1 ? 'es' : ''} ${isEditing ? 'updated' : 'added'} successfully!`);
       
-      // Close the form
-      onClose();
+      // Close the form after a short delay
+      setTimeout(() => {
+        onClose();
+      }, 2000);
 
     } catch (err) {
       console.error("Error saving sub-businesses:", err);
-      alert(err.message || "Failed to save sub-businesses. Please try again.");
+      showAlert('error', 'Error', err.message || "Failed to save sub-businesses. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -494,8 +596,18 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
   );
 
   return (
-    <div className="fixed inset-0 bg-black/20 bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-hidden">
+    <>
+      {/* Custom Alert */}
+      <CustomAlert
+        isOpen={alert.isOpen}
+        onClose={closeAlert}
+        type={alert.type}
+        title={alert.title}
+        message={alert.message}
+      />
+      
+      <div className="fixed inset-0 bg-black/20 bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-slate-700 to-slate-900 p-6 text-white">
           <div className="flex items-center justify-between">
@@ -678,7 +790,8 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
           </form>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 

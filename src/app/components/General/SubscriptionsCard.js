@@ -799,3 +799,4 @@ const PricingSection = ({ isDark = false }) => {
 };
 
 export default PricingSection;
+

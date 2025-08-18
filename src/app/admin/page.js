@@ -15,6 +15,7 @@ import TempDisplaySettings from '../components/Super Admin/General/TempDisplaySe
 import NavigationSidebar from '../components/Super Admin/General/AdminNav';
 import DashboardFooter from '../components/Super Admin/General/AdminFooter';
 import PageHeader from '../components/Super Admin/General/AdminHeader';
+import EnterpriseUsers from '../components/Super Admin/EnterpriseScreen/EnterpriseUsers';
 
 
 const AdminDashboard = () => {
@@ -128,6 +129,8 @@ const AdminDashboard = () => {
         return <BillingLogsSection/>
          case 'Display Settings':
         return <TempDisplaySettings/>
+        case 'Enterprise Users':
+          return <EnterpriseUsers />;
       default:
         return (
           <div className="bg-black rounded-lg shadow-sm border border-gray-800 p-6">
