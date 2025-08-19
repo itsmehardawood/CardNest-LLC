@@ -376,12 +376,18 @@ export default function PaymentPage({ params }) {
             custom_api_count: plan.customPricing.apiCount,
             custom_price: plan.customPricing.customPrice,
           }),
+          // For package ID 3, ensure custom_api_count is included
+          ...(plan.id === 3 && plan.customPricing && {
+            custom_api_count: plan.customPricing.apiCount,
+          }),
           ...(paymentResult && {
             payment_result: paymentResult,
           }),
         };
 
         console.log("Submitting payment details:", paymentData);
+        console.log("Payment - Plan ID:", plan.id);
+        console.log("Payment - Custom API Count (for package 3):", plan.id === 3 ? plan.customPricing?.apiCount : 'N/A');
 
         const paymentResponse = await apiFetch(
           "/payment/storeDetails",
@@ -416,12 +422,18 @@ export default function PaymentPage({ params }) {
           scan_id: scanData.scanID,
         }),
         ...(plan.customPricing && {
-          custom_api_count: plan.customPricing.apiCount,
           custom_monthly_price: plan.customPricing.customPrice,
+        }),
+        // For package ID 3, include custom_api_count
+        ...(plan.id === 3 && plan.customPricing && {
+          custom_api_count: plan.customPricing.apiCount,
         }),
       };
 
       console.log("Submitting subscription:", subscriptionData);
+      console.log("Plan ID:", plan.id);
+      console.log("Custom API Count (for package 3):", plan.id === 3 ? plan.customPricing?.apiCount : 'N/A');
+      console.log("Custom Pricing Data:", plan.customPricing);
 
       const response = await apiFetch(
         "/Subscriptions",
@@ -548,6 +560,8 @@ export default function PaymentPage({ params }) {
           const parsedCustomPricing = JSON.parse(customPricingData);
           setCustomApiPricing(parsedCustomPricing);
           console.log("Custom API pricing found:", parsedCustomPricing);
+          console.log("Custom API Count from localStorage:", parsedCustomPricing.apiCount);
+          console.log("Custom Price from localStorage:", parsedCustomPricing.customPrice);
         }
 
         const storedUser = localStorage.getItem("userData");
@@ -585,6 +599,16 @@ export default function PaymentPage({ params }) {
         const customPricing = customPricingData ? JSON.parse(customPricingData) : null;
         const mappedPlan = mapApiDataToPlan(foundPlan, customPricing);
         setPlan(mappedPlan);
+
+        console.log("Plan ID:", foundPlan.id);
+        console.log("Found Plan:", foundPlan);
+        console.log("Custom Pricing Data:", customPricing);
+        console.log("Mapped Plan:", mappedPlan);
+        
+        if (foundPlan.id === 3 && customPricing) {
+          console.log("Package ID 3 - Custom API Count:", customPricing.apiCount);
+          console.log("Package ID 3 - Custom Price:", customPricing.customPrice);
+        }
 
         // Only generate scan token for card payments on non-enterprise plans
         if (mappedPlan.price !== "SALES" && (mappedPlan.name.toLowerCase() !== "enterprise" || mappedPlan.customPricing)) {

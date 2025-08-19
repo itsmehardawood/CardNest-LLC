@@ -86,11 +86,11 @@ export default function EnterpriseSelection() {
   };
 
   const handleSubBusinessAdded = (subBusinessData) => {
-    // Handle successful submission from AddSubBusiness component
-    console.log("Sub-businesses added:", subBusinessData);
-    alert(
-      "Enterprise package details submitted successfully! Our sales team will contact you soon."
-    );
+    // // Handle successful submission from AddSubBusiness component
+    // console.log("Sub-businesses added:", subBusinessData);
+    // alert(
+    //   "Enterprise package details submitted successfully! Our sales team will contact you soon."
+    // );
     router.push("/dashboard");
   };
 

@@ -68,7 +68,7 @@ function getStatusFromBusinessVerified(businessVerified) {
 function DashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-   useAutoLogout(); // activate auto logout
+   useAutoLogout(); 
 
 
   const [userData, setUserData] = useState(null);

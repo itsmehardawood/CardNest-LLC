@@ -512,23 +512,29 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
         <label className="block text-sm font-medium text-gray-700 mb-2">
           {getFieldLabel(field)} {isRequired && "*"}
         </label>
-        <div className={`w-full px-4 py-3 border-2 border-dashed rounded-lg transition-all duration-200 ${
-          fieldError ? 'border-red-500' : 'border-gray-300'
-        } hover:border-indigo-400`}>
-          <input
-            type="file"
-            onChange={(e) => handleFileChange(activeBusinessIndex, field, e.target.files[0])}
-            className="w-full"
-            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-            disabled={submitting}
-          />
-          <div className="flex items-center justify-center mt-2">
-            <Upload className="w-5 h-5 text-gray-400 mr-2" />
-            <span className="text-sm text-gray-500">
-              {fieldFile ? fieldFile.name : `Upload ${getFieldLabel(field).toLowerCase()}`}
-            </span>
-          </div>
-        </div>
+        <button
+          type="button"
+          className={`w-full flex items-center justify-center px-4 py-4 border-2 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+            fieldError ? 'border-red-500 bg-red-50' : 'border-indigo-400 bg-indigo-50 hover:bg-indigo-100'
+          }`}
+          onClick={() => {
+            document.getElementById(`file-input-${field}`).click();
+          }}
+          disabled={submitting}
+        >
+          <Upload className="w-6 h-6 text-indigo-600 mr-3" />
+          <span className="text-base text-indigo-800 font-medium">
+            {fieldFile ? fieldFile.name : `Click to upload ${getFieldLabel(field).toLowerCase()}`}
+          </span>
+        </button>
+        <input
+          id={`file-input-${field}`}
+          type="file"
+          style={{ display: 'none' }}
+          onChange={(e) => handleFileChange(activeBusinessIndex, field, e.target.files[0])}
+          accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+          disabled={submitting}
+        />
         {fieldError && (
           <p className="mt-1 text-sm text-red-600 flex items-center">
             <AlertCircle className="w-4 h-4 mr-1" />
