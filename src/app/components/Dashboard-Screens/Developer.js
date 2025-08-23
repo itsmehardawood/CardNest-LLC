@@ -160,15 +160,16 @@ function DevelopersScreen() {
         </div>
 
         {/* Quick Links */}
-        <div className="bg-blue-900 rounded-lg border border-blue-700 p-4">
-          <h4 className="text-sm font-medium text-blue-300 mb-3">Quick Links & Resources:</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-            <a href="#" className="text-blue-200 hover:text-blue-100 transition-colors">• API Reference</a>
-            <a href="#" className="text-blue-200 hover:text-blue-100 transition-colors">• Integration Guide</a>
-            <a href="#" className="text-blue-200 hover:text-blue-100 transition-colors">• Code Examples</a>
-            <a href="#" className="text-blue-200 hover:text-blue-100 transition-colors">• Support Forum</a>
-          </div>
-        </div>
+<div className="bg-blue-900 rounded-lg border border-blue-700 p-4">
+  <h4 className="text-sm font-medium text-blue-300 mb-3">Resources</h4>
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+    <p className="text-blue-200 transition-colors">• API Reference</p>
+    <p className="text-blue-200 transition-colors">• Integration Guide</p>
+    <p className="text-blue-200 transition-colors">• Code Examples</p>
+    <p className="text-blue-200 transition-colors">• Support Forum</p>
+  </div>
+</div>
+
       </div>
     </div>
   );

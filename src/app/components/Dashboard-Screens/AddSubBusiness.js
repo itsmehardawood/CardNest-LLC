@@ -451,7 +451,7 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
       account_holder_zip_code: "Enter ZIP/postal code",
       account_holder_country: "Enter country",
       account_holder_id_type: "e.g., Passport, Driver's License",
-      account_holder_id_number: "Enter ID number"
+      account_holder_id_number: "Enter ID number without dashes and spaces"
     };
     return placeholders[field] || "";
   };

@@ -19,7 +19,8 @@ const EnterpriseUserDisplay = ({ onNavigateToSubBusinesses }) => {
             <p className="text-purple-400 font-medium">
               Premium Business Management
             </p>
-          </div>
+          </div> 
+    
         </div>
         <div className="hidden md:flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded-full shadow-md border border-gray-600">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>

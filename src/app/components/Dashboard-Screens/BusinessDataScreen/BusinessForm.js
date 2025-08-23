@@ -399,7 +399,7 @@ const BusinessForm = ({
                   type="text"
                   name="account_holder_id_number"
                   value={businessInfo.account_holder_id_number}
-                  placeholder="A12345678 or DL123456789"
+                  placeholder="e.g A12345678 write without spaces and dashes"
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-700 bg-black text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   required

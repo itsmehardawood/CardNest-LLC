@@ -10,11 +10,11 @@ export default function PlanDetails({ plan, userData }) {
         <p className="text-gray-600">
           You are subscribing to the {plan.name} plan
         </p>
-        {userData && (
+        {/* {userData && (
           <p className="text-sm text-gray-500 mt-2">
             Merchant ID: {(userData.user || userData).merchant_id}
           </p>
-        )}
+        )} */}
       </div>
 
       {/* Plan Card */}

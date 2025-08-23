@@ -1,14 +1,22 @@
-
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Building2, Calculator, ArrowRight } from "lucide-react";
 import AddSubBusiness from "../Dashboard-Screens/AddSubBusiness";
-import { apiFetch } from "@/app/lib/api.js";
 
 export default function EnterpriseSelection() {
-  const router = useRouter();
+
+    const router = useRouter();
+
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+    if (!userData || !userData.merchant_id) {
+      router.push("/login"); // Redirect to login if userData is not found
+    }
+  }, []);
+
+
   const [businessTypeAnswer, setBusinessTypeAnswer] = useState(null); // null, 'yes', 'no'
   const [apiCount, setApiCount] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -20,7 +28,7 @@ export default function EnterpriseSelection() {
   // Function to fetch per API price
   const fetchPerApiPrice = async () => {
     if (isLoadingPrice) return;
-    
+
     setIsLoadingPrice(true);
     try {
       // Get user data from localStorage
@@ -70,11 +78,6 @@ export default function EnterpriseSelection() {
     return (parseFloat(perApiPrice) * parseInt(apiCount)).toFixed(2);
   };
 
-
-
- 
-
-
   const handleBusinessTypeSelection = (answer) => {
     setBusinessTypeAnswer(answer);
     setError(null);
@@ -101,14 +104,14 @@ export default function EnterpriseSelection() {
   };
 
   const handleApiCountSubmit = async () => {
-
-  
     setSubmitting(true);
     setError(null);
 
     try {
       if (!apiCount || parseInt(apiCount) <= 500) {
-        throw new Error("Please enter a minimum of 500 APIs for the custom package");
+        throw new Error(
+          "Please enter a minimum of 501 APIs for the custom package"
+        );
       }
 
       // Get user data from localStorage
@@ -163,8 +166,8 @@ export default function EnterpriseSelection() {
           calculationDetails: {
             perApiPrice: perApiPrice,
             totalApis: apiCountNum,
-            totalAmount: parseFloat(customPrice)
-          }
+            totalAmount: parseFloat(customPrice),
+          },
         })
       );
 
@@ -351,7 +354,7 @@ export default function EnterpriseSelection() {
 
                   <div className="max-w-md mx-auto">
                     <div className="space-y-4">
-                       <div>
+                      <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Monthly API Count *
                         </label>
@@ -361,7 +364,11 @@ export default function EnterpriseSelection() {
                           onChange={(e) => {
                             setApiCount(e.target.value);
                             // Fetch per API price when user starts entering
-                            if (e.target.value && !isLoadingPrice && perApiPrice === 0.25) {
+                            if (
+                              e.target.value &&
+                              !isLoadingPrice &&
+                              perApiPrice === 0.25
+                            ) {
                               fetchPerApiPrice();
                             }
                           }}
@@ -379,7 +386,6 @@ export default function EnterpriseSelection() {
                       </div>
 
                       {/* Real-time Price Calculation */}
-                   
 
                       <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-6">
                         <h4 className="font-semibold text-emerald-900 mb-3">
@@ -389,10 +395,10 @@ export default function EnterpriseSelection() {
                           {/* <p>
                             • Per API price: ${perApiPrice}
                           </p> */}
+                          <p>• Custom pricing calculated in real-time</p>
                           <p>
-                            • Custom pricing calculated in real-time
+                            • Final price will be confirmed on the next page
                           </p>
-                          <p>• Final price will be confirmed on the next page</p>
                           <p>• No commitment required - cancel anytime</p>
                         </div>
                       </div>
@@ -427,9 +433,12 @@ export default function EnterpriseSelection() {
           <div className="mt-8 text-center">
             <p className="text-gray-500 text-sm">
               Need help choosing? Contact our sales team at{" "}
-              <span className="text-indigo-600 font-medium">
+              <a
+                href="mailto:support@cardnest.io"
+                className="text-indigo-600 font-medium hover:underline"
+              >
                 support@cardnest.io
-              </span>
+              </a>
             </p>
           </div>
         </div>

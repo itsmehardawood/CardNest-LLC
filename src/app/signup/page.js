@@ -296,6 +296,8 @@ useEffect(() => {
       }
 
       // Step 3: Store user data in localStorage with both API and Firebase info
+      const expiryTime = new Date().getTime() + 3 * 60 * 60 * 1000; // 3 hours from now
+      
       const userData = {
         user: {
           id: data.user.id,
@@ -313,6 +315,8 @@ useEffect(() => {
           firebaseUid: user.uid,
           firebasePhone: user.phoneNumber,
         },
+        expiry: expiryTime,
+        status: data.status
       };
 
       localStorage.setItem("userData", JSON.stringify(userData));

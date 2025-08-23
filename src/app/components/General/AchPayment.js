@@ -168,23 +168,71 @@ const paymentResponse = await apiFetch("/payment/storeDetails", {
   };
 
 
-  const handlePaymentSubmission = async (event) => {
+  // const handlePaymentSubmission = async (event) => {
+  //   event.preventDefault();
+
+  //   if (!formData.contactName) {
+  //     onPaymentError(
+  //       "Please provide a contact name for the bank account holder"
+  //     );
+  //     return;
+  //   }
+
+  //   if (!formData.email || !formData.billingAddress || !formData.city || 
+  //       !formData.zipCode || !formData.country) {
+  //     onPaymentError(
+  //       "Please fill in all required billing information"
+  //     );
+  //     return;
+  //   }
+
+  //   if (!achRef.current) {
+  //     console.error("ACH not initialized");
+  //     onPaymentError("Bank payment system not ready. Please try again.");
+  //     return;
+  //   }
+
+  //   try {
+  //     setIsLoading(true);
+  //     setPaymentStatus("");
+
+  //     const achOptions = getACHOptions();
+  //     const result = await tokenize(achRef.current, achOptions);
+  //     setPaymentStatus("SUCCESS");
+  //     onPaymentSuccess(result);
+  //   } catch (error) {
+  //     setPaymentStatus("FAILURE");
+  //     console.error("ACH Payment Error:", error.message);
+  //     onPaymentError(error.message);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+
+
+
+const handlePaymentSubmission = async (event) => {
     event.preventDefault();
 
-    if (!formData.contactName) {
-      onPaymentError(
-        "Please provide a contact name for the bank account holder"
-      );
+    // Only require essential fields - Square ACH will handle bank account details
+    if (!formData.email) {
+      onPaymentError("Please provide an email address");
       return;
     }
 
-    if (!formData.email || !formData.billingAddress || !formData.city || 
-        !formData.zipCode || !formData.country) {
-      onPaymentError(
-        "Please fill in all required billing information"
-      );
-      return;
-    }
+    // Make contactName required but provide a fallback
+    const accountHolderName = formData.contactName || 'Account Holder';
+
+    // Make other fields optional for initial payment processing
+    const billingData = {
+      email: formData.email,
+      billingAddress: formData.billingAddress || '',
+      city: formData.city || '',
+      zipCode: formData.zipCode || '',
+      country: formData.country || 'US',
+      contactName: accountHolderName
+    };
 
     if (!achRef.current) {
       console.error("ACH not initialized");
@@ -306,6 +354,57 @@ const paymentResponse = await apiFetch("/payment/storeDetails", {
     return null;
   };
 
+
+// Add this useEffect in your ACHPaymentForm component to debug:
+// useEffect(() => {
+//   const buttonDisabled = disabled || isLoading || !squareLoaded;
+  
+//   console.log("=== ACH BUTTON STATE DEBUG ===");
+//   console.log("Button Disabled:", buttonDisabled);
+//   console.log("Breakdown:");
+//   console.log("  - disabled prop:", disabled);
+//   console.log("  - isLoading:", isLoading);
+//   console.log("  - squareLoaded:", squareLoaded);
+//   console.log("  - !squareLoaded:", !squareLoaded);
+//   console.log("  - window.Square exists:", !!window.Square);
+//   console.log("================================");
+// }, [disabled, isLoading, squareLoaded]);
+
+// // Also add this to track Square.js loading:
+// useEffect(() => {
+//   console.log("Square.js Script Loading Status:");
+//   console.log("  - squareLoaded state:", squareLoaded);
+//   console.log("  - window.Square exists:", !!window.Square);
+  
+//   if (squareLoaded && window.Square) {
+//     console.log("✅ Square.js is ready");
+//   } else if (squareLoaded && !window.Square) {
+//     console.log("⚠️ squareLoaded=true but window.Square is missing");
+//   } else if (!squareLoaded && window.Square) {
+//     console.log("⚠️ window.Square exists but squareLoaded=false");
+//   } else {
+//     console.log("❌ Square.js not ready yet");
+//   }
+// }, [squareLoaded]);
+
+// // Track when Square.js script actually loads:
+// <Script
+//   src="https://web.squarecdn.com/v1/square.js"
+//   onLoad={() => {
+//     console.log("🎉 Square.js onLoad fired");
+//     console.log("window.Square available:", !!window.Square);
+//     setSquareLoaded(true);
+//   }}
+//   onError={(e) => {
+//     console.error("❌ Square.js failed to load:", e);
+//   }}
+// />
+
+
+
+
+
+
   return (
     <>
     {/* old */}
@@ -315,11 +414,10 @@ const paymentResponse = await apiFetch("/payment/storeDetails", {
         onLoad={() => setSquareLoaded(true)}
       /> */}
 
-<Script
-  src="https://web.squarecdn.com/v1/square.js"
-  onLoad={() => setSquareLoaded(true)}
-/>
-
+      <Script
+        src="https://web.squarecdn.com/v1/square.js"
+        onLoad={() => setSquareLoaded(true)}
+      />
 
       <div className="space-y-4">
         <button
