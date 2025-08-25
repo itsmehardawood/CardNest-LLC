@@ -1,6 +1,5 @@
 'use client'
-import React, { useState } from 'react'
-import { Check, X } from 'lucide-react';
+import React, { useEffect } from 'react'
 import Link from 'next/link';
 import PricingSection from '../components/General/SubscriptionsCard';
 import { useRouter } from 'next/navigation';
