@@ -145,7 +145,7 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
         `Are you sure you want to permanently delete ${docName}? This action cannot be undone.`
       )
     ) {
-      console.log("Delete document:", docName);
+      // console.log("Delete document:", docName);
       // Implement actual delete functionality here
     }
   };

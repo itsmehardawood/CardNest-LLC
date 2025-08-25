@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Building2, Calculator, ArrowRight } from "lucide-react";
 import AddSubBusiness from "../Dashboard-Screens/AddSubBusiness";
+import Link from "next/link";
 
 export default function EnterpriseSelection() {
 
@@ -196,6 +197,7 @@ export default function EnterpriseSelection() {
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-20">
+          <Link href="/">
             <video autoPlay loop muted playsInline width="70">
               <source
                 src="https://dw1u598x1c0uz.cloudfront.net/CardNest%20Logo%20WebM%20version.webm"
@@ -203,6 +205,7 @@ export default function EnterpriseSelection() {
               />
               Your browser does not support the video tag.
             </video>
+            </Link>
           </div>
         </div>
       </nav>

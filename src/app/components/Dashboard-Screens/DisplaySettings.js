@@ -27,7 +27,7 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
       }
     });
 
-    console.log('GET API Response status:', response.status);
+    // console.log('GET API Response status:', response.status);
     
     let result;
     const contentType = response.headers.get('content-type');
@@ -36,7 +36,7 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
       result = await response.json();
     } else {
       const textResult = await response.text();
-      console.log('Non-JSON response:', textResult);
+      // console.log('Non-JSON response:', textResult);
       
       try {
         result = JSON.parse(textResult);
@@ -45,7 +45,7 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
       }
     }
 
-    console.log('GET API Response result:', result);
+    // console.log('GET API Response result:', result);
 
     if (response.ok && (result.status === true || result.success === true)) {
       // Pre-populate form with existing data
@@ -69,7 +69,7 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
         setDebugInfo('No existing data found');
       }
     } else {
-      console.log('No existing data or API error:', result.message || 'Unknown error');
+      // console.log('No existing data or API error:', result.message || 'Unknown error');
       setDebugInfo('No existing data found or API error');
     }
   } catch (error) {
@@ -176,10 +176,10 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
   };
 
   const handleSubmit = async () => {
-    console.log('=== DISPLAY SETTINGS SUBMISSION ===');
-    console.log('Merchant ID:', merchantId);
-    console.log('Display Name:', formData.displayName);
-    console.log('Logo file:', formData.logo?.name);
+    // console.log('=== DISPLAY SETTINGS SUBMISSION ===');
+    // console.log('Merchant ID:', merchantId);
+    // console.log('Display Name:', formData.displayName);
+    // console.log('Logo file:', formData.logo?.name);
     
     if (!merchantId) {
       setSubmitError('Merchant ID not found. Please log in again.');
@@ -204,14 +204,14 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
       
       // Only append logo if one is selected
       if (formData.logo) {
-        console.log('Adding logo to FormData...');
+        // console.log('Adding logo to FormData...');
         setDebugInfo('Adding logo to FormData...');
         formDataPayload.append('display_logo', formData.logo);
       }
 
-      console.log('FormData entries:');
+      // console.log('FormData entries:');
       for (let [key, value] of formDataPayload.entries()) {
-        console.log(key, value instanceof File ? `File: ${value.name}` : value);
+        // console.log(key, value instanceof File ? `File: ${value.name}` : value);
       }
       setDebugInfo('Sending FormData to API...');
 
@@ -226,8 +226,8 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
         body: formDataPayload // Send FormData instead of JSON
       });
 
-      console.log('API Response status:', response.status);
-      console.log('API Response ok:', response.ok);
+      // console.log('API Response status:', response.status);
+      // console.log('API Response ok:', response.ok);
       setDebugInfo(`API responded with status: ${response.status}`);
 
       // Handle different response types and show detailed error info
@@ -238,7 +238,7 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
         result = await response.json();
       } else {
         const textResult = await response.text();
-        console.log('Non-JSON response:', textResult);
+        // console.log('Non-JSON response:', textResult);
         
         // Try to parse as JSON anyway (some APIs return JSON with wrong content-type)
         try {
@@ -248,7 +248,7 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
         }
       }
 
-      console.log('API Response result:', result);
+      // console.log('API Response result:', result);
       
       if (!response.ok) {
         // Handle detailed validation errors
@@ -262,7 +262,7 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
       }
       
       if (result.status === true || result.success === true || response.ok) {
-        console.log('✅ Update successful');
+        // console.log('✅ Update successful');
         setSubmitSuccess(true);
         setDebugInfo('Update successful!');
         

@@ -5,7 +5,7 @@ import { FiMail, FiMapPin, FiCalendar, FiHome, FiRefreshCw, FiAlertCircle, FiEye
 import { apiFetch } from '@/app/lib/api.js';
 import SubBusinessModal from './SubBusinessModal';
 
-const SubBusinessList = () => {
+const SubBusinessList = ({ searchTerm = '' }) => {
   const [subBusinesses, setSubBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -96,6 +96,26 @@ const SubBusinessList = () => {
     return parts.length > 0 ? parts.join(', ') : 'No address available';
   };
 
+  // Filter sub-businesses based on search term
+  const filteredSubBusinesses = subBusinesses.filter((subBusiness) => {
+    if (!searchTerm) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    const businessName = subBusiness.business_profile?.business_name?.toLowerCase() || '';
+    const email = subBusiness.email?.toLowerCase() || '';
+    const merchantId = subBusiness.merchant_id?.toString().toLowerCase() || '';
+    const regNumber = subBusiness.business_profile?.business_registration_number?.toLowerCase() || '';
+    const address = formatAddress(subBusiness.business_profile).toLowerCase();
+    
+    return (
+      businessName.includes(searchLower) ||
+      email.includes(searchLower) ||
+      merchantId.includes(searchLower) ||
+      regNumber.includes(searchLower) ||
+      address.includes(searchLower)
+    );
+  });
+
   if (loading) {
     return (
       <div className="bg-black rounded-lg shadow-sm border border-gray-800 p-6">
@@ -137,7 +157,18 @@ const SubBusinessList = () => {
             <div>
               <h2 className="text-xl font-semibold text-white">Sub-Businesses</h2>
               <p className="text-gray-300 text-sm mt-1">
-                Total sub-businesses: {subBusinesses.length}
+                {searchTerm ? (
+                  <>
+                    Showing {filteredSubBusinesses.length} of {subBusinesses.length} sub-businesses
+                    {searchTerm && (
+                      <span className="text-blue-400 ml-1">
+                        for {searchTerm}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <>Total sub-businesses: {subBusinesses.length}</>
+                )}
               </p>
             </div>
             <button
@@ -159,9 +190,20 @@ const SubBusinessList = () => {
                 You have not created any sub-businesses yet.
               </p>
             </div>
+          ) : filteredSubBusinesses.length === 0 ? (
+            <div className="text-center py-8">
+              <FiHome className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-white mb-2">No Results Found</h3>
+              <p className="text-gray-300 text-sm">
+                No sub-businesses match your search for {searchTerm}.
+              </p>
+              <p className="text-gray-400 text-xs mt-2">
+                Try searching by business name, email, ID, registration number, or address.
+              </p>
+            </div>
           ) : (
             <div className="space-y-4">
-              {subBusinesses.map((subBusiness) => (
+              {filteredSubBusinesses.map((subBusiness) => (
                 <div
                   key={subBusiness.merchant_id}
                   className="border border-gray-700 rounded-lg p-4 hover:shadow-md hover:border-gray-600 transition-all"

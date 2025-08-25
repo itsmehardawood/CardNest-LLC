@@ -43,10 +43,10 @@ export default function AdminLoginPage() {
           {
             size: "invisible",
             callback: (response) => {
-              console.log("reCAPTCHA solved", response);
+              // console.log("reCAPTCHA solved", response);
             },
             "expired-callback": () => {
-              console.log("reCAPTCHA expired");
+              // console.log("reCAPTCHA expired");
               // Reset reCAPTCHA on expiry
               if (window.recaptchaVerifier) {
                 window.recaptchaVerifier.clear();
@@ -61,7 +61,7 @@ export default function AdminLoginPage() {
 
         window.recaptchaVerifier.render().then((widgetId) => {
           window.recaptchaWidgetId = widgetId;
-          console.log("reCAPTCHA widget rendered:", widgetId);
+          // console.log("reCAPTCHA widget rendered:", widgetId);
         }).catch((error) => {
           console.error("reCAPTCHA render error:", error);
         });
@@ -124,7 +124,7 @@ export default function AdminLoginPage() {
           login_input: emailOrPhone,
         };
 
-        console.log("Sending admin login request:", JSON.stringify(requestBody, null, 2));
+        // console.log("Sending admin login request:", JSON.stringify(requestBody, null, 2));
 
         const response = await apiFetch(
           "/login",
@@ -139,7 +139,7 @@ export default function AdminLoginPage() {
         );
 
         const data = await response.json();
-        console.log("Admin login API response:", data);
+        // console.log("Admin login API response:", data);
 
         if (!response.ok || !data.status) {
           throw new Error(data.message || "Login failed. Please check your credentials.");
@@ -150,7 +150,7 @@ export default function AdminLoginPage() {
 localStorage.setItem("userData", JSON.stringify(userData));
 setApiUserData(userData);
 
-console.log("Admin user data stored in localStorage:", userData);
+// console.log("Admin user data stored in localStorage:", userData);
 
         // Step 3: Always send Firebase OTP using phone number from backend response
         const phoneFromBackend = data.user?.phone_no || data.phone_no;
@@ -164,7 +164,7 @@ console.log("Admin user data stored in localStorage:", userData);
 
         // Always send Firebase OTP to the phone number from backend
         const fullPhoneNumber = `${formData.countryCode}${phoneFromBackend}`;
-        console.log("Sending Firebase OTP to:", fullPhoneNumber);
+        // console.log("Sending Firebase OTP to:", fullPhoneNumber);
 
         // Validate phone number format
         const phoneRegex = /^\+[1-9]\d{1,14}$/;
@@ -183,7 +183,7 @@ console.log("Admin user data stored in localStorage:", userData);
         setConfirmationResult(confirmation);
         setIsOtpMode(true);
         setSuccess("Verification code sent to your phone.");
-        console.log("Firebase OTP sent successfully");
+        // console.log("Firebase OTP sent successfully");
 
       } catch (err) {
         console.error("Error in admin login process:", err);
@@ -221,7 +221,7 @@ const handleOtpVerification = async () => {
     const result = await confirmationResult.confirm(otp);
     const user = result.user;
 
-    console.log("Firebase OTP verified successfully:", user);
+    // console.log("Firebase OTP verified successfully:", user);
 
     // Update localStorage with Firebase UID
     if (apiUserData) {
@@ -238,7 +238,7 @@ const handleOtpVerification = async () => {
       localStorage.setItem("userData", JSON.stringify(userData));
       setApiUserData(userData);
 
-      console.log("Updated admin user data with Firebase info:", userData);
+      // console.log("Updated admin user data with Firebase info:", userData);
     }
 
     setSuccess("Phone verified successfully! Checking admin access...");
@@ -290,7 +290,7 @@ const handleOtpVerification = async () => {
     try {
       // Use the phone number from backend response
       const fullPhoneNumber = `${formData.countryCode}${backendPhoneNumber}`;
-      console.log("Resending Firebase OTP to:", fullPhoneNumber);
+      // console.log("Resending Firebase OTP to:", fullPhoneNumber);
 
       // Validate phone number format
       const phoneRegex = /^\+[1-9]\d{1,14}$/;
@@ -309,7 +309,7 @@ const handleOtpVerification = async () => {
       setConfirmationResult(confirmation);
       setSuccess("Verification code resent successfully!");
       
-      console.log("Firebase OTP resent successfully");
+      // console.log("Firebase OTP resent successfully");
     } catch (err) {
       console.error("Resend OTP error:", err);
       setOtpError("Failed to resend verification code. Please try again.");

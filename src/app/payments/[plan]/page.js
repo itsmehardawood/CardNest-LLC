@@ -16,6 +16,7 @@ export default function PaymentPage({ params }) {
   const router = useRouter();
   const resolvedParams = use(params);
 
+
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("userData") || "{}");
     if (!userData || !userData.merchant_id) {
@@ -37,7 +38,7 @@ export default function PaymentPage({ params }) {
   const [scanError, setScanError] = useState(null);
   const [encryptedData, setEncryptedData] = useState(null);
   const [customApiPricing, setCustomApiPricing] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState("ach"); // Always default to 'ach' now that card is disabled
+  const [paymentMethod, setPaymentMethod] = useState('ach'); // Always default to 'ach' now that card is disabled
   const [achPaymentResult, setAchPaymentResult] = useState(null);
   const pollingRef = useRef(null);
 
@@ -60,18 +61,20 @@ export default function PaymentPage({ params }) {
     CVV: "",
   });
 
-  // Add this helper function to your PaymentPage component
-  const isACHFormValid = () => {
-    return (
-      formData.email &&
-      formData.email.trim() !== "" &&
-      // Make contactName optional but recommended
-      formData.city &&
-      formData.city.trim() !== "" &&
-      formData.zipCode &&
-      formData.zipCode.trim() !== ""
-    );
-  };
+
+  
+// Add this helper function to your PaymentPage component
+const isACHFormValid = () => {
+  return (
+    formData.email && 
+    formData.email.trim() !== '' &&
+    // Make contactName optional but recommended
+    formData.city && 
+    formData.city.trim() !== '' &&
+    formData.zipCode && 
+    formData.zipCode.trim() !== ''
+  );
+};
   // Helper functions
   const isMobileDevice = () => {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -81,13 +84,16 @@ export default function PaymentPage({ params }) {
 
   const pollEncryptedData = async (scanId) => {
     try {
-      const response = await apiFetch("/scan/getEncryptedData", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ scanId }),
-      });
+      const response = await apiFetch(
+        "/scan/getEncryptedData",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ scanId }),
+        }
+      );
 
       const result = await response.json();
 
@@ -132,13 +138,16 @@ export default function PaymentPage({ params }) {
         isMobile: isMobileDevice() ? "true" : "false",
       };
 
-      const response = await apiFetch("/merchantscan/generateToken", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
-      });
+      const response = await apiFetch(
+        "/merchantscan/generateToken",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestData),
+        }
+      );
 
       const data = await response.json();
 
@@ -186,7 +195,7 @@ export default function PaymentPage({ params }) {
       }
 
       const decryptedData = decryptWithAES128(encryptedData, encryptionKey);
-      // console.log("Decrypted card data:", decryptedData);
+      console.log("Decrypted card data:", decryptedData);
 
       if (!decryptedData.complete_scan) {
         throw new Error("Card scan was not completed successfully");
@@ -273,11 +282,11 @@ export default function PaymentPage({ params }) {
     ];
 
     const features = [...staticFeatures];
-
+    
     if (customPricing && customPricing.isCustomPlan && apiPlan.id === 3) {
-      features.push({
-        text: `${customPricing.apiCount.toLocaleString()} Custom API Scans`,
-        included: true,
+      features.push({ 
+        text: `${customPricing.apiCount.toLocaleString()} Custom API Scans`, 
+        included: true 
       });
     } else if (isEnterprise) {
       features.push({ text: "Custom pricing/options", included: true });
@@ -290,9 +299,7 @@ export default function PaymentPage({ params }) {
 
     let planPrice = isEnterprise ? "SALES" : `${apiPlan.package_price}`;
     let planSubtitle = isEnterprise ? "CONTACT SUPPORT" : "FOR BUSINESS";
-    let apiScans = isEnterprise
-      ? "UNLIMITED*"
-      : `${apiPlan.monthly_limit} API SCANS`;
+    let apiScans = isEnterprise ? "UNLIMITED*" : `${apiPlan.monthly_limit} API SCANS`;
 
     if (customPricing && customPricing.isCustomPlan && apiPlan.id === 3) {
       planPrice = `${customPricing.customPrice.toFixed(2)}`;
@@ -302,10 +309,7 @@ export default function PaymentPage({ params }) {
 
     return {
       id: apiPlan.id,
-      name:
-        customPricing?.isCustomPlan && apiPlan.id === 3
-          ? "CUSTOM ENTERPRISE"
-          : apiPlan.package_name.toUpperCase(),
+      name: (customPricing?.isCustomPlan && apiPlan.id === 3) ? "CUSTOM ENTERPRISE" : apiPlan.package_name.toUpperCase(),
       subtitle: planSubtitle,
       price: planPrice,
       period: apiPlan.package_period.toUpperCase(),
@@ -348,12 +352,50 @@ export default function PaymentPage({ params }) {
 
   // ACH Payment handlers
   const handleACHPaymentSuccess = async (result) => {
-    // console.log("ACH Payment successful:", result);
+    console.log("ACH Payment successful:", result);
     setAchPaymentResult(result);
     setNotification("Bank payment completed successfully!");
+    
+    try {
+      // Store ACH payment details in the new endpoint
+      const userObj = userData;
+      if (userObj?.merchant_id) {
+        const achPaymentData = {
+          merchant_id: userObj.merchant_id,
+          ach_string: JSON.stringify(result) // Convert ACH response to JSON string
+        };
 
+        console.log("Storing ACH payment details:", achPaymentData);
+
+        const achResponse = await apiFetch("/Subscriptions/storeAchPayment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(achPaymentData),
+        });
+
+        if (!achResponse.ok) {
+          const achError = await achResponse.json();
+          console.error("Failed to store ACH payment details:", achError);
+          console.error("ACH Response status:", achResponse.status);
+          console.error("ACH Response statusText:", achResponse.statusText);
+          if (achError.errors) {
+            console.error("Validation errors:", achError.errors);
+          }
+          // Don't throw error here, just log it - continue with subscription
+        } else {
+          const achResult = await achResponse.json();
+          console.log("ACH payment details stored successfully:", achResult);
+        }
+      }
+    } catch (error) {
+      console.error("Error storing ACH payment details:", error);
+      // Don't throw error here, just log it - continue with subscription
+    }
+    
     // Proceed with subscription creation
-    await handleFinalSubscription("ach", result);
+    await handleFinalSubscription('ach', result);
   };
 
   const handleACHPaymentError = (errorMessage) => {
@@ -395,29 +437,28 @@ export default function PaymentPage({ params }) {
             custom_price: plan.customPricing.customPrice,
           }),
           // For package ID 3, ensure custom_api_count is included
-          ...(plan.id === 3 &&
-            plan.customPricing && {
-              custom_api_count: plan.customPricing.apiCount,
-            }),
+          ...(plan.id === 3 && plan.customPricing && {
+            custom_api_count: plan.customPricing.apiCount,
+          }),
           ...(paymentResult && {
             payment_result: paymentResult,
           }),
         };
 
-        // console.log("Submitting payment details:", paymentData);
-        // console.log("Payment - Plan ID:", plan.id);
-        // console.log(
-        //   "Payment - Custom API Count (for package 3):",
-        //   plan.id === 3 ? plan.customPricing?.apiCount : "N/A"
-        // );
+        console.log("Submitting payment details:", paymentData);
+        console.log("Payment - Plan ID:", plan.id);
+        console.log("Payment - Custom API Count (for package 3):", plan.id === 3 ? plan.customPricing?.apiCount : 'N/A');
 
-        const paymentResponse = await apiFetch("/payment/storeDetails", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(paymentData),
-        });
+        const paymentResponse = await apiFetch(
+          "/payment/storeDetails",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(paymentData),
+          }
+        );
 
         const paymentResultResponse = await paymentResponse.json();
 
@@ -428,10 +469,7 @@ export default function PaymentPage({ params }) {
           );
         }
 
-        // console.log(
-        //   "Payment details stored successfully:",
-        //   paymentResultResponse
-        // );
+        console.log("Payment details stored successfully:", paymentResultResponse);
       }
 
       // Create subscription
@@ -440,18 +478,16 @@ export default function PaymentPage({ params }) {
         package_id: plan.id,
         subscription_date: new Date().toISOString().split("T")[0],
         payment_method: paymentType,
-        ...(paymentType === "card" &&
-          scanData?.scanID && {
-            scan_id: scanData.scanID,
-          }),
+        ...(paymentType === 'card' && scanData?.scanID && {
+          scan_id: scanData.scanID,
+        }),
         ...(plan.customPricing && {
           custom_monthly_price: plan.customPricing.customPrice,
         }),
-        // For package ID 3, include custom_api_count
-        ...(plan.id === 3 &&
-          plan.customPricing && {
-            custom_api_count: plan.customPricing.apiCount,
-          }),
+        //  For package ID 3, include custom_api_count
+        ...(plan.id === 3 && plan.customPricing && {
+          custom_api_count: plan.customPricing.apiCount,
+        }),
       };
 
       // console.log("Submitting subscription:", subscriptionData);
@@ -459,13 +495,16 @@ export default function PaymentPage({ params }) {
       // console.log("Custom API Count (for package 3):", plan.id === 3 ? plan.customPricing?.apiCount : 'N/A');
       // console.log("Custom Pricing Data:", plan.customPricing);
 
-      const response = await apiFetch("/Subscriptions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(subscriptionData),
-      });
+      const response = await apiFetch(
+        "/Subscriptions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(subscriptionData),
+        }
+      );
 
       const result = await response.json();
 
@@ -476,7 +515,7 @@ export default function PaymentPage({ params }) {
       }
 
       if (result.status) {
-        // console.log("Subscription created successfully:", result);
+        console.log("Subscription created successfully:", result);
 
         if (pollingRef.current) {
           clearInterval(pollingRef.current);
@@ -485,7 +524,7 @@ export default function PaymentPage({ params }) {
 
         localStorage.removeItem("customApiPricing");
         setNotification("Subscription created successfully!");
-
+        
         setTimeout(() => {
           router.push("/dashboard");
         }, 2000);
@@ -518,33 +557,26 @@ export default function PaymentPage({ params }) {
     }
 
     // Handle enterprise plans that require contact
-    if (
-      plan.price === "SALES" ||
-      (plan.name.toLowerCase().includes("enterprise") && !plan.customPricing)
-    ) {
-      // console.log("Contact form submitted:", {
-      //   ...formData,
-      //   plan_id: plan.id,
-      //   merchant_id: userObj.merchant_id,
-      // });
+    if (plan.price === "SALES" || (plan.name.toLowerCase().includes("enterprise") && !plan.customPricing)) {
+      console.log("Contact form submitted:", {
+        ...formData,
+        plan_id: plan.id,
+        merchant_id: userObj.merchant_id,
+      });
 
-      alert(
-        "Your message has been sent! Our sales team will contact you soon."
-      );
+      alert("Your message has been sent! Our sales team will contact you soon.");
       router.push("/dashboard");
       return;
     }
 
     // For regular plans, validate payment method requirements
-    if (paymentMethod === "card") {
+    if (paymentMethod === 'card') {
       if (!scanData) {
         setError("Please complete the card scan process first.");
         return;
       }
       if (!encryptedData) {
-        setError(
-          "Please complete the card scan process and ensure your card information is captured."
-        );
+        setError("Please complete the card scan process and ensure your card information is captured.");
         return;
       }
     }
@@ -553,16 +585,13 @@ export default function PaymentPage({ params }) {
 
     try {
       // For card payments, proceed with existing card logic
-      if (paymentMethod === "card") {
-        await handleFinalSubscription("card");
+      if (paymentMethod === 'card') {
+        await handleFinalSubscription('card');
       }
       // For ACH payments, the flow is handled by the ACH component
     } catch (err) {
       console.error("Payment/Subscription error:", err);
-      setError(
-        err.message ||
-          "An error occurred while processing your payment/subscription"
-      );
+      setError(err.message || "An error occurred while processing your payment/subscription");
     }
   };
 
@@ -578,7 +607,7 @@ export default function PaymentPage({ params }) {
       if (pollingRef.current) {
         clearInterval(pollingRef.current);
       }
-    };
+    }; 
   }, []);
 
   useEffect(() => {
@@ -590,10 +619,10 @@ export default function PaymentPage({ params }) {
         if (customPricingData) {
           const parsedCustomPricing = JSON.parse(customPricingData);
           setCustomApiPricing(parsedCustomPricing);
-          //   console.log("Custom API pricing found:", parsedCustomPricing);
-          //   console.log("Custom API Count from localStorage:", parsedCustomPricing.apiCount);
-          //   console.log("Custom Price from localStorage:", parsedCustomPricing.customPrice);
-        }
+        //   console.log("Custom API pricing found:", parsedCustomPricing);
+        //   console.log("Custom API Count from localStorage:", parsedCustomPricing.apiCount);
+        //   console.log("Custom Price from localStorage:", parsedCustomPricing.customPrice);
+         }
 
         const storedUser = localStorage.getItem("userData");
         if (!storedUser) {
@@ -608,6 +637,13 @@ export default function PaymentPage({ params }) {
         if (userObj.email) {
           setFormData((prev) => ({ ...prev, email: userObj.email }));
         }
+
+
+
+
+
+
+
 
         const response = await apiFetch("/Packages");
         if (!response.ok) {
@@ -627,9 +663,7 @@ export default function PaymentPage({ params }) {
           return;
         }
 
-        const customPricing = customPricingData
-          ? JSON.parse(customPricingData)
-          : null;
+        const customPricing = customPricingData ? JSON.parse(customPricingData) : null;
         const mappedPlan = mapApiDataToPlan(foundPlan, customPricing);
         setPlan(mappedPlan);
 
@@ -637,18 +671,14 @@ export default function PaymentPage({ params }) {
         // console.log("Found Plan:", foundPlan);
         // console.log("Custom Pricing Data:", customPricing);
         // console.log("Mapped Plan:", mappedPlan);
-
+        
         if (foundPlan.id === 3 && customPricing) {
-          // console.log("Package ID 3 - Custom API Count:", customPricing.apiCount);
-          // console.log("Package ID 3 - Custom Price:", customPricing.customPrice);
-        }
+        //   console.log("Package ID 3 - Custom API Count:", customPricing.apiCount);
+        //   console.log("Package ID 3 - Custom Price:", customPricing.customPrice);
+         }
 
         // Only generate scan token for card payments on non-enterprise plans
-        if (
-          mappedPlan.price !== "SALES" &&
-          (mappedPlan.name.toLowerCase() !== "enterprise" ||
-            mappedPlan.customPricing)
-        ) {
+        if (mappedPlan.price !== "SALES" && (mappedPlan.name.toLowerCase() !== "enterprise" || mappedPlan.customPricing)) {
           await generateScanToken(userObj);
         }
       } catch (err) {
@@ -704,9 +734,7 @@ export default function PaymentPage({ params }) {
     return notFound();
   }
 
-  const isEnterprisePlan =
-    plan.price === "SALES" ||
-    (plan.name.toLowerCase().includes("enterprise") && !plan.customPricing);
+  const isEnterprisePlan = plan.price === "SALES" || (plan.name.toLowerCase().includes("enterprise") && !plan.customPricing);
 
   return (
     <div className="min-h-screen text-black bg-white">
@@ -741,30 +769,20 @@ export default function PaymentPage({ params }) {
                 <div className="space-y-6">
                   {/* Payment Method Selection */}
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Choose Payment Method
-                    </h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Choose Payment Method</h3>
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         type="button"
-                        onClick={() => setPaymentMethod("ach")}
+                        onClick={() => setPaymentMethod('ach')}
                         className={`p-3 rounded-lg border-2 transition-all ${
-                          paymentMethod === "ach"
-                            ? "border-green-500 bg-green-50 text-green-700"
-                            : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
+                          paymentMethod === 'ach'
+                            ? 'border-green-500 bg-green-50 text-green-700'
+                            : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
                         }`}
                       >
                         <div className="flex items-center justify-center gap-2">
-                          <svg
-                            className="w-5 h-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"
-                              fill="currentColor"
-                            />
+                          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" fill="currentColor"/>
                           </svg>
                           Bank Account
                         </div>
@@ -775,37 +793,18 @@ export default function PaymentPage({ params }) {
                         className="p-3 rounded-lg border-2 border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
                       >
                         <div className="flex items-center justify-center gap-2">
-                          <svg
-                            className="w-5 h-5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <rect
-                              x="2"
-                              y="6"
-                              width="20"
-                              height="12"
-                              rx="2"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            />
-                            <path
-                              d="M2 10h20"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                            />
+                          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" strokeWidth="2"/>
+                            <path d="M2 10h20" stroke="currentColor" strokeWidth="2"/>
                           </svg>
-                      
-                           <p> Card Payments</p>
-                                      
+                          Credit Card (Upcoming)
                         </div>
                       </button>
                     </div>
                   </div>
 
                   {/* Payment Form based on selected method */}
-                  {paymentMethod === "card" ? (
+                  {paymentMethod === 'card' ? (
                     <PaymentForm
                       plan={plan}
                       formData={formData}
@@ -828,10 +827,7 @@ export default function PaymentPage({ params }) {
                       {/* Basic form fields for ACH */}
                       <div className="grid grid-cols-1 gap-4">
                         <div>
-                          <label
-                            htmlFor="email"
-                            className="block text-sm font-medium text-gray-700 mb-2"
-                          >
+                          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                             Email Address *
                           </label>
                           <input
@@ -845,12 +841,9 @@ export default function PaymentPage({ params }) {
                             placeholder="your@email.com"
                           />
                         </div>
-
+                        
                         <div>
-                          <label
-                            htmlFor="contactName"
-                            className="block text-sm font-medium text-gray-700 mb-2"
-                          >
+                          <label htmlFor="contactName" className="block text-sm font-medium text-gray-700 mb-2">
                             Account Holder Name *
                           </label>
                           <input
@@ -864,12 +857,9 @@ export default function PaymentPage({ params }) {
                             placeholder="Full Name on Bank Account"
                           />
                         </div>
-
+                        
                         <div>
-                          <label
-                            htmlFor="billingAddress"
-                            className="block text-sm font-medium text-gray-700 mb-2"
-                          >
+                          <label htmlFor="billingAddress" className="block text-sm font-medium text-gray-700 mb-2">
                             Billing Address
                           </label>
                           <input
@@ -882,13 +872,10 @@ export default function PaymentPage({ params }) {
                             placeholder="Street Address"
                           />
                         </div>
-
+                        
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label
-                              htmlFor="city"
-                              className="block text-sm font-medium text-gray-700 mb-2"
-                            >
+                            <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
                               City *
                             </label>
                             <input
@@ -903,10 +890,7 @@ export default function PaymentPage({ params }) {
                             />
                           </div>
                           <div>
-                            <label
-                              htmlFor="zipCode"
-                              className="block text-sm font-medium text-gray-700 mb-2"
-                            >
+                            <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700 mb-2">
                               ZIP Code *
                             </label>
                             <input
@@ -928,9 +912,7 @@ export default function PaymentPage({ params }) {
                         <div className="bg-gray-50 rounded-lg p-4 space-y-2">
                           <div className="flex justify-between text-sm">
                             <span>Subtotal:</span>
-                            <span>
-                              ${pricingCalculation.subtotal.toFixed(2)}
-                            </span>
+                            <span>${pricingCalculation.subtotal.toFixed(2)}</span>
                           </div>
                           <div className="flex justify-between text-sm">
                             <span>Tax:</span>
@@ -939,9 +921,7 @@ export default function PaymentPage({ params }) {
                           <div className="border-t pt-2">
                             <div className="flex justify-between font-semibold">
                               <span>Total:</span>
-                              <span>
-                                ${pricingCalculation.total.toFixed(2)}
-                              </span>
+                              <span>${pricingCalculation.total.toFixed(2)}</span>
                             </div>
                           </div>
                         </div>
@@ -953,9 +933,11 @@ export default function PaymentPage({ params }) {
                         onPaymentError={handleACHPaymentError}
                         formData={formData}
                         disabled={submitting}
-                        plan={plan} // Already passed
+                          plan={plan} // Already passed
+
                         amount={pricingCalculation.total.toFixed(2)}
-                        apiFetch={apiFetch} // Add this line
+                          apiFetch={apiFetch} // Add this line
+
                       />
                     </div>
                   )}

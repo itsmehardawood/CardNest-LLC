@@ -20,7 +20,12 @@ const ACHPaymentForm = ({
   const achRef = useRef(null);
   const paymentsRef = useRef(null);
 
-  
+  // Testing
+  //  const appId = 'sandbox-sq0idb-4MDwFnJR1In5fQFf44NiSA';
+  //     const locationId = 'LP4A2N8WD6386';
+
+
+// prod
 
    const appId = "sq0idp-nxaY-afaaeWBXySlmIAEaA";
   const locationId = "LNRMQ2T1MH3BA";
@@ -355,54 +360,6 @@ const handlePaymentSubmission = async (event) => {
   };
 
 
-// Add this useEffect in your ACHPaymentForm component to debug:
-// useEffect(() => {
-//   const buttonDisabled = disabled || isLoading || !squareLoaded;
-  
-//   console.log("=== ACH BUTTON STATE DEBUG ===");
-//   console.log("Button Disabled:", buttonDisabled);
-//   console.log("Breakdown:");
-//   console.log("  - disabled prop:", disabled);
-//   console.log("  - isLoading:", isLoading);
-//   console.log("  - squareLoaded:", squareLoaded);
-//   console.log("  - !squareLoaded:", !squareLoaded);
-//   console.log("  - window.Square exists:", !!window.Square);
-//   console.log("================================");
-// }, [disabled, isLoading, squareLoaded]);
-
-// // Also add this to track Square.js loading:
-// useEffect(() => {
-//   console.log("Square.js Script Loading Status:");
-//   console.log("  - squareLoaded state:", squareLoaded);
-//   console.log("  - window.Square exists:", !!window.Square);
-  
-//   if (squareLoaded && window.Square) {
-//     console.log("✅ Square.js is ready");
-//   } else if (squareLoaded && !window.Square) {
-//     console.log("⚠️ squareLoaded=true but window.Square is missing");
-//   } else if (!squareLoaded && window.Square) {
-//     console.log("⚠️ window.Square exists but squareLoaded=false");
-//   } else {
-//     console.log("❌ Square.js not ready yet");
-//   }
-// }, [squareLoaded]);
-
-// // Track when Square.js script actually loads:
-// <Script
-//   src="https://web.squarecdn.com/v1/square.js"
-//   onLoad={() => {
-//     console.log("🎉 Square.js onLoad fired");
-//     console.log("window.Square available:", !!window.Square);
-//     setSquareLoaded(true);
-//   }}
-//   onError={(e) => {
-//     console.error("❌ Square.js failed to load:", e);
-//   }}
-// />
-
-
-
-
 
 
   return (
@@ -414,6 +371,7 @@ const handlePaymentSubmission = async (event) => {
         onLoad={() => setSquareLoaded(true)}
       /> */}
 
+{/* new */}
       <Script
         src="https://web.squarecdn.com/v1/square.js"
         onLoad={() => setSquareLoaded(true)}

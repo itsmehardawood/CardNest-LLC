@@ -10,7 +10,7 @@ function SupportScreen() {
       return;
     }
     // Send message logic here
-    console.log('Sending message:', { category: selectedCategory, message });
+    // console.log('Sending message:', { category: selectedCategory, message });
     setMessage('');
     setSelectedCategory('');
     alert('Message sent successfully!');
@@ -18,7 +18,7 @@ function SupportScreen() {
 
   const handleViewDocs = () => {
     // View documentation logic here
-    console.log('View documentation clicked');
+    // console.log('View documentation clicked');
   };
 
   return (

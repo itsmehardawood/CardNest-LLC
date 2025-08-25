@@ -41,7 +41,7 @@ function SubscriptionsScreen() {
                 
                 if (response.ok) {
                   const data = await response.json();
-                  console.log("Full subscription response:", data);
+                  // console.log("Full subscription response:", data);
                   
                   if (data.status === true && data.data) {
                     setHasActiveSubscription(true);
@@ -64,7 +64,7 @@ function SubscriptionsScreen() {
                   break;
                 } else if (response.status === 404) {
                   // No subscription found - this is expected for new users
-                  console.log('No subscription found for user - this is normal for new users');
+                  // console.log('No subscription found for user - this is normal for new users');
                   setHasActiveSubscription(false);
                   setSubscriptionData(null);
                   subscriptionFound = true;
