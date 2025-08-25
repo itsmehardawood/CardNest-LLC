@@ -92,7 +92,7 @@ export default function PaymentPage({ params }) {
       const result = await response.json();
 
       if (response.ok && result.data && result.data.encrypted_data) {
-        console.log("Encrypted data received:", result.data);
+        // console.log("Encrypted data received:", result.data);
         setEncryptedData(result.data.encrypted_data);
 
         if (pollingRef.current) {
@@ -174,7 +174,7 @@ export default function PaymentPage({ params }) {
   const decryptAndPopulateCardData = async () => {
     try {
       if (!authToken || !encryptedData) {
-        console.log("Missing authToken or encryptedData");
+        // console.log("Missing authToken or encryptedData");
         return;
       }
 
@@ -186,7 +186,7 @@ export default function PaymentPage({ params }) {
       }
 
       const decryptedData = decryptWithAES128(encryptedData, encryptionKey);
-      console.log("Decrypted card data:", decryptedData);
+      // console.log("Decrypted card data:", decryptedData);
 
       if (!decryptedData.complete_scan) {
         throw new Error("Card scan was not completed successfully");
@@ -348,7 +348,7 @@ export default function PaymentPage({ params }) {
 
   // ACH Payment handlers
   const handleACHPaymentSuccess = async (result) => {
-    console.log("ACH Payment successful:", result);
+    // console.log("ACH Payment successful:", result);
     setAchPaymentResult(result);
     setNotification("Bank payment completed successfully!");
 
@@ -404,12 +404,12 @@ export default function PaymentPage({ params }) {
           }),
         };
 
-        console.log("Submitting payment details:", paymentData);
-        console.log("Payment - Plan ID:", plan.id);
-        console.log(
-          "Payment - Custom API Count (for package 3):",
-          plan.id === 3 ? plan.customPricing?.apiCount : "N/A"
-        );
+        // console.log("Submitting payment details:", paymentData);
+        // console.log("Payment - Plan ID:", plan.id);
+        // console.log(
+        //   "Payment - Custom API Count (for package 3):",
+        //   plan.id === 3 ? plan.customPricing?.apiCount : "N/A"
+        // );
 
         const paymentResponse = await apiFetch("/payment/storeDetails", {
           method: "POST",
@@ -428,10 +428,10 @@ export default function PaymentPage({ params }) {
           );
         }
 
-        console.log(
-          "Payment details stored successfully:",
-          paymentResultResponse
-        );
+        // console.log(
+        //   "Payment details stored successfully:",
+        //   paymentResultResponse
+        // );
       }
 
       // Create subscription
@@ -476,7 +476,7 @@ export default function PaymentPage({ params }) {
       }
 
       if (result.status) {
-        console.log("Subscription created successfully:", result);
+        // console.log("Subscription created successfully:", result);
 
         if (pollingRef.current) {
           clearInterval(pollingRef.current);
@@ -522,11 +522,11 @@ export default function PaymentPage({ params }) {
       plan.price === "SALES" ||
       (plan.name.toLowerCase().includes("enterprise") && !plan.customPricing)
     ) {
-      console.log("Contact form submitted:", {
-        ...formData,
-        plan_id: plan.id,
-        merchant_id: userObj.merchant_id,
-      });
+      // console.log("Contact form submitted:", {
+      //   ...formData,
+      //   plan_id: plan.id,
+      //   merchant_id: userObj.merchant_id,
+      // });
 
       alert(
         "Your message has been sent! Our sales team will contact you soon."

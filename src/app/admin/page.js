@@ -55,7 +55,7 @@ const AdminDashboard = () => {
       
       if (!userData) {
         // No user data found or expired
-        console.log("No valid user data found, redirecting to admin login");
+        // console.log("No valid user data found, redirecting to admin login");
         router.push("/admin-login");
         return;
       }
@@ -65,13 +65,13 @@ const AdminDashboard = () => {
       
       if (userRole !== "SUPER_ADMIN") {
         // User is not a superadmin - redirect to admin login regardless of role
-        console.log("Access denied: User is not a superadmin");
+        // console.log("Access denied: User is not a superadmin");
         router.push("/admin-login");
         return;
       }
       
       // User is authenticated and is a superadmin
-      console.log("Access granted: User is a superadmin");
+      // console.log("Access granted: User is a superadmin");
       setIsAuthenticated(true);
     };
 

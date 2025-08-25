@@ -56,10 +56,10 @@ useEffect(() => {
       {
         size: "invisible",
         callback: (response) => {
-          console.log("reCAPTCHA solved");
+          // console.log("reCAPTCHA solved");
         },
         "expired-callback": () => {
-          console.log("reCAPTCHA expired");
+          // console.log("reCAPTCHA expired");
         },
       }
     );
@@ -184,7 +184,7 @@ useEffect(() => {
 
     try {
       // Step 1: Check if user already exists
-      console.log("Checking if user exists...");
+      // console.log("Checking if user exists...");
       const userExistsResult = await checkUserExists(formData.email, formData.phone);
       
       if (userExistsResult.exists) {
@@ -211,7 +211,7 @@ useEffect(() => {
       }
 
       // Step 2: If user doesn't exist, proceed with Firebase OTP
-      console.log("User doesn't exist, sending Firebase OTP...");
+      // console.log("User doesn't exist, sending Firebase OTP...");
       const fullPhoneNumber = `${formData.countryCode}${formData.phone}`;
       const appVerifier = window.recaptchaVerifier;
       const confirmation = await signInWithPhoneNumber(
@@ -227,7 +227,7 @@ useEffect(() => {
         "Verification code sent to your phone. Please verify to complete signup."
       );
 
-      console.log("Firebase OTP sent successfully");
+      // console.log("Firebase OTP sent successfully");
     } catch (err) {
       console.error("Error during signup process:", err);
 
@@ -264,7 +264,7 @@ useEffect(() => {
       const result = await confirmationResult.confirm(otp);
       const user = result.user;
 
-      console.log("Firebase OTP verified successfully:", user);
+      // console.log("Firebase OTP verified successfully:", user);
 
       // Step 2: Now create account via API since OTP is verified
       const apiData = {
@@ -320,7 +320,7 @@ useEffect(() => {
       };
 
       localStorage.setItem("userData", JSON.stringify(userData));
-      console.log("Account created and verified successfully:", userData);
+      // console.log("Account created and verified successfully:", userData);
 
       setSuccess(
         "Account created and verified successfully! Redirecting to dashboard..."
@@ -371,7 +371,7 @@ useEffect(() => {
       setConfirmationResult(confirmation);
       setSuccess("Verification code resent successfully!");
 
-      console.log("Firebase OTP resent successfully");
+      // console.log("Firebase OTP resent successfully");
     } catch (err) {
       console.error("Resend OTP error:", err);
       setOtpError("Failed to resend verification code. Please try again.");

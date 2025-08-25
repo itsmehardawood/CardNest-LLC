@@ -100,7 +100,7 @@ function DashboardContent() {
 
       if (!userData) {
         // No user data found or expired
-        console.log("No valid user data found, redirecting to login");
+        // console.log("No valid user data found, redirecting to login");
         router.push("/login");
         return;
       }
@@ -109,7 +109,7 @@ function DashboardContent() {
 
       if (userRole !== "BUSINESS_USER" && userRole !== "ENTERPRISE_USER") {
         // User is not a business user
-        console.log("Access denied: User is not a business user");
+        // console.log("Access denied: User is not a business user");
 
         // Redirect based on their actual role
         if (userRole === "SUPER_ADMIN") {
@@ -121,7 +121,7 @@ function DashboardContent() {
       }
 
       // User is authenticated and is a business user
-      console.log("Access granted: User is a business user");
+      // console.log("Access granted: User is a business user");
       setIsAuthenticated(true);
 
       // Set user data to state since access is granted
@@ -134,9 +134,9 @@ function DashboardContent() {
       );
       setStatus(businessVerifiedStatus);
 
-      console.log("User object:", userObj);
-      console.log("Business verified status:", userObj.business_verified);
-      console.log("Mapped status:", businessVerifiedStatus);
+      // console.log("User object:", userObj);
+      // console.log("Business verified status:", userObj.business_verified);
+      // console.log("Mapped status:", businessVerifiedStatus);
     };
 
     checkAuth();
@@ -146,7 +146,7 @@ function DashboardContent() {
   useEffect(() => {
     const verified = searchParams.get("verified");
     if (verified === "true") {
-      console.log("User verified via OTP");
+      // console.log("User verified via OTP");
     }
     setIsLoading(false);
   }, [searchParams]);
@@ -338,7 +338,7 @@ function DashboardContent() {
       });
       //Checking on console
       for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
+        // console.log(`${key}: ${value}`);
       }
       // Make API call
       const response = await fetch(
@@ -411,7 +411,7 @@ function DashboardContent() {
               checkBusinessVerificationStatus(userObj.id);
             }, 2000); // Check after 2 seconds to allow server processing
           }
-          console.log("Submission successful:", result);
+          // console.log("Submission successful:", result);
         } else {
           throw new Error(
             result.error || result.message || "Submission failed"
@@ -520,7 +520,7 @@ function DashboardContent() {
           const userObj = updatedUserData.user || updatedUserData;
           setUserData(userObj);
 
-          console.log("Updated user data in localStorage:", updatedUserData);
+          // console.log("Updated user data in localStorage:", updatedUserData);
         }
 
         return result.data;
@@ -539,7 +539,7 @@ function DashboardContent() {
           userData.business_verified
         );
         setStatus(fallbackStatus);
-        console.log("Using fallback status from localStorage:", fallbackStatus);
+        // console.log("Using fallback status from localStorage:", fallbackStatus);
       }
     }
   };

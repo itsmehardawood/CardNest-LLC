@@ -53,10 +53,10 @@ export default function LoginPage() {
         {
           size: "invisible",
           callback: (response) => {
-            console.log("reCAPTCHA solved", response);
+            // console.log("reCAPTCHA solved", response);
           },
           "expired-callback": () => {
-            console.log("reCAPTCHA expired");
+            // console.log("reCAPTCHA expired");
             if (window.recaptchaVerifier) {
               window.recaptchaVerifier.clear();
               window.recaptchaVerifier = null;
@@ -72,7 +72,7 @@ export default function LoginPage() {
         .render()
         .then((widgetId) => {
           window.recaptchaWidgetId = widgetId;
-          console.log("reCAPTCHA widget rendered:", widgetId);
+          // console.log("reCAPTCHA widget rendered:", widgetId);
         })
         .catch((error) => {
           console.error("reCAPTCHA render error:", error);
@@ -178,7 +178,7 @@ const handleSignIn = async (e) => {
       localStorage.setItem("userData", JSON.stringify(userDataWithExpiry));
       setApiUserData(userDataWithExpiry);
 
-      console.log("User data stored in localStorage with expiry:", userDataWithExpiry);
+      // console.log("User data stored in localStorage with expiry:", userDataWithExpiry);
 
       // Step 3: Send Firebase OTP
       const phoneFromBackend = data.user?.phone_no || data.phone_no;
@@ -205,7 +205,7 @@ const handleSignIn = async (e) => {
       setConfirmationResult(confirmation);
       setIsOtpMode(true);
       setSuccess("Verification code sent to your phone.");
-      console.log("Firebase OTP sent successfully");
+      // console.log("Firebase OTP sent successfully");
 
     } catch (err) {
       console.error("Error in login process:", err);
@@ -244,7 +244,7 @@ const handleSignIn = async (e) => {
       const result = await confirmationResult.confirm(otp);
       const user = result.user;
 
-      console.log("Firebase OTP verified successfully:", user);
+      // console.log("Firebase OTP verified successfully:", user);
 
       // Update localStorage with Firebase UID
       if (apiUserData) {
@@ -259,7 +259,7 @@ const handleSignIn = async (e) => {
 };
 
 localStorage.setItem("userData", JSON.stringify(updatedUserData));
-        console.log("Updated user data with Firebase info:", updatedUserData);
+        // console.log("Updated user data with Firebase info:", updatedUserData);
       }
 
       setSuccess("Phone verified successfully! Checking access permissions...");
@@ -310,7 +310,7 @@ if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {
     try {
       // Use the phone number from backend response
       const fullPhoneNumber = `${formData.countryCode}${backendPhoneNumber}`;
-      console.log("Resending Firebase OTP to:", fullPhoneNumber);
+      // console.log("Resending Firebase OTP to:", fullPhoneNumber);
 
       // Validate phone number format
       const phoneRegex = /^\+[1-9]\d{1,14}$/;
@@ -329,7 +329,7 @@ if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {
       setConfirmationResult(confirmation);
       setSuccess("Verification code resent successfully!");
       
-      console.log("Firebase OTP resent successfully");
+      // console.log("Firebase OTP resent successfully");
     } catch (err) {
       console.error("Resend OTP error:", err);
       setOtpError("Failed to resend verification code. Please try again.");

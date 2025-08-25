@@ -3,10 +3,19 @@ import React, { useState } from 'react'
 import { Check, X } from 'lucide-react';
 import Link from 'next/link';
 import PricingSection from '../components/General/SubscriptionsCard';
+import { useRouter } from 'next/navigation';
 
 
 const PlanPage = () => {
-const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const router = useRouter();
+  
+    useEffect(() => {
+      const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+      if (!userData || !userData.merchant_id) {
+        router.push("/login"); // Redirect to login if userData is not found
+      }
+    }, []);
 
 const plans = [
   {
