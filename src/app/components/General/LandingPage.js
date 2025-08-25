@@ -3,17 +3,6 @@ import React, { useEffect, useState } from "react";
 
 import DiagonalHeroSection from "./HeroSection";
 import ContactSection from "./ContactSection";
-
-import {
-  Menu,
-  X,
-  ArrowRight,
-  Check,
-  Star,
-  Users,
-  Shield,
-  Zap,
-} from "lucide-react";
 import Image from "next/image";
 import PricingSection from "./SubscriptionsCard";
 import FAQs from "./FAQs";

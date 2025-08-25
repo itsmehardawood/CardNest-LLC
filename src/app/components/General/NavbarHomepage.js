@@ -59,7 +59,7 @@ function NavbarHomepage() {
       return { href: "/admin", text: "Admin Panel" };
     }
     
-    if (userRole === "BUSINESS_USER") {
+    if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {
       return { href: "/dashboard", text: "Dashboard" };
     }
     
