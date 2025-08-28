@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Building2, Calculator, ArrowRight } from "lucide-react";
-import AddSubBusiness from "../Dashboard-Screens/AddSubBusiness";
 import Link from "next/link";
+import AddSubBusiness from "../AddSubBusiness";
 
 export default function EnterpriseSelection() {
 

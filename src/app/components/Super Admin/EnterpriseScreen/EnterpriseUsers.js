@@ -123,7 +123,7 @@ const EnterpriseUsers = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
           <p className="mt-4 text-gray-300">Loading enterprise data...</p>
@@ -134,7 +134,7 @@ const EnterpriseUsers = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center max-w-md mx-auto">
           <div className="bg-red-900/30 rounded-full p-3 w-16 h-16 mx-auto mb-4 border border-red-500/30">
             <AlertCircle className="h-10 w-10 text-red-400" />
@@ -153,7 +153,7 @@ const EnterpriseUsers = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 p-6">
+    <div className="min-h-screen bg-black p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">

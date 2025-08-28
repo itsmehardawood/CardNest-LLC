@@ -4,13 +4,13 @@ import React, { useState, use, useMemo, useEffect, useRef } from "react";
 import { notFound, useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { decryptWithAES128 } from "@/app/lib/decrypt";
-import ContactForm from "@/app/components/PaymentScreen/ContactForm";
-import PaymentHeader from "@/app/components/PaymentScreen/PaymentHeader";
-import PlanDetails from "@/app/components/PaymentScreen/PlanDetails";
-import PaymentForm from "@/app/components/PaymentScreen/PaymentForm";
 import Link from "next/link";
 import { apiFetch } from "@/app/lib/api.js";
 import ACHPaymentForm from "@/app/components/General/AchPayment";
+import ContactForm from "@/app/components/Dashboard-Screens/PaymentScreen/ContactForm";
+import PaymentForm from "@/app/components/Dashboard-Screens/PaymentScreen/PaymentForm";
+import PaymentHeader from "@/app/components/Dashboard-Screens/PaymentScreen/PaymentHeader";
+import PlanDetails from "@/app/components/Dashboard-Screens/PaymentScreen/PlanDetails";
 
 export default function PaymentPage({ params }) {
   const router = useRouter();
@@ -155,7 +155,7 @@ const isACHFormValid = () => {
         throw new Error(data.message || "Failed to generate scan token");
       }
 
-      // console.log("Scan token generated:", data);
+      console.log("Scan token generated:", data);
 
       if (data.authToken) {
         setAuthToken(data.authToken);
@@ -305,6 +305,25 @@ const isACHFormValid = () => {
       planPrice = `${customPricing.customPrice.toFixed(2)}`;
       planSubtitle = "CUSTOM PACKAGE";
       apiScans = `${customPricing.apiCount.toLocaleString()} API SCANS`;
+      
+      // Debug custom pricing (only in development)
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Custom Pricing Debug:", {
+          planId: apiPlan.id,
+          customPrice: customPricing.customPrice,
+          planPrice,
+          apiCount: customPricing.apiCount,
+        });
+      }
+    }
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log("Plan Mapping Debug:", {
+        apiPlanId: apiPlan.id,
+        hasCustomPricing: !!customPricing,
+        isCustomPlan: customPricing?.isCustomPlan,
+        finalPlanPrice: planPrice,
+      });
     }
 
     return {
@@ -340,6 +359,17 @@ const isACHFormValid = () => {
     const taxRate = 0.03;
     const tax = subtotal * taxRate;
     const total = subtotal + tax;
+
+    // Debug pricing calculation (only in development)
+    if (process.env.NODE_ENV === 'development') {
+      console.log("Pricing Debug:", {
+        planId: plan?.id,
+        planPrice: plan?.price,
+        subtotal,
+        total,
+        isCustomPackage: plan?.customPricing ? true : false,
+      });
+    }
 
     return {
       subtotal,
@@ -932,12 +962,10 @@ const isACHFormValid = () => {
                         onPaymentSuccess={handleACHPaymentSuccess}
                         onPaymentError={handleACHPaymentError}
                         formData={formData}
-                        disabled={submitting}
-                          plan={plan} // Already passed
-
-                        amount={pricingCalculation.total.toFixed(2)}
-                          apiFetch={apiFetch} // Add this line
-
+                        disabled={submitting || pricingCalculation.total <= 0}
+                        plan={plan}
+                        amount={pricingCalculation.total > 0 ? pricingCalculation.total.toFixed(2) : "1.00"}
+                        apiFetch={apiFetch}
                       />
                     </div>
                   )}

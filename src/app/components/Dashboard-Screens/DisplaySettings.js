@@ -1,4 +1,3 @@
-import { apiFetch } from '@/app/lib/api.js';
 import React, { useState, useEffect } from 'react';
 
 const DisplaySettings = () => {

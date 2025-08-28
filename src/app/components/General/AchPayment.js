@@ -21,14 +21,14 @@ const ACHPaymentForm = ({
   const paymentsRef = useRef(null);
 
   // Testing
-  //  const appId = 'sandbox-sq0idb-4MDwFnJR1In5fQFf44NiSA';
-  //     const locationId = 'LP4A2N8WD6386';
+   const appId = 'sandbox-sq0idb-4MDwFnJR1In5fQFf44NiSA';
+      const locationId = 'LP4A2N8WD6386';
 
 
 // prod
 
-   const appId = "sq0idp-nxaY-afaaeWBXySlmIAEaA";
-  const locationId = "LNRMQ2T1MH3BA";
+  //  const appId = "sq0idp-nxaY-afaaeWBXySlmIAEaA";
+  // const locationId = "LNRMQ2T1MH3BA";
 
 
   const initializeACH = async (payments) => {
@@ -164,10 +164,13 @@ const paymentResponse = await apiFetch("/payment/storeDetails", {
     const accountHolderName =
       `${billingContact.givenName} ${billingContact.familyName}`.trim();
 
+    // Ensure amount is valid and greater than 0
+    const validAmount = parseFloat(amount) > 0 ? amount : "1.00";
+
     return {
       accountHolderName: accountHolderName || "Account Holder",
       intent: "CHARGE",
-      amount: amount,
+      amount: validAmount,
       currency: "USD",
     };
   };
@@ -263,32 +266,86 @@ const handlePaymentSubmission = async (event) => {
   };
 
   const initializeSquare = async () => {
+    console.log("Initializing Square.js...");
+    
     if (!window.Square) {
-      throw new Error("Square.js failed to load properly");
+      console.error("Square.js not found in window object");
+      setCredentialsError(true);
+      return;
     }
+
+    console.log("Square.js found, creating payments instance...");
 
     let payments;
     try {
       payments = window.Square.payments(appId, locationId);
       paymentsRef.current = payments;
-    } catch {
+      console.log("Square payments instance created successfully");
+    } catch (error) {
+      console.error("Error creating Square payments instance:", error);
       setCredentialsError(true);
       return;
     }
 
     try {
+      console.log("Initializing ACH payment method...");
       const ach = await initializeACH(payments);
       achRef.current = ach;
+      console.log("ACH payment method initialized successfully");
     } catch (e) {
-      console.error("Initializing ACH failed", e);
+      console.error("Initializing ACH failed:", e);
+      setCredentialsError(true);
     }
   };
 
   useEffect(() => {
     if (squareLoaded) {
+      console.log("Square.js loaded, initializing ACH...");
       initializeSquare();
     }
   }, [squareLoaded]);
+
+  // Add timeout fallback for Square.js loading
+  useEffect(() => {
+    // Early check after 1 second
+    const earlyCheck = setTimeout(() => {
+      if (!squareLoaded && window.Square) {
+        console.log("Early Square.js detection successful");
+        setSquareLoaded(true);
+      }
+    }, 1000);
+
+    // Fallback check after 3 seconds
+    const timeout = setTimeout(() => {
+      if (!squareLoaded) {
+        console.warn("Square.js taking too long to load, checking if available...");
+        if (window.Square) {
+          console.log("Square.js found in window, setting as loaded");
+          setSquareLoaded(true);
+        } else {
+          console.error("Square.js not available after timeout");
+          setCredentialsError(true);
+        }
+      }
+    }, 3000); // Reduced to 3 seconds for better UX
+
+    return () => {
+      clearTimeout(earlyCheck);
+      clearTimeout(timeout);
+    };
+  }, [squareLoaded]);
+
+  // Add debugging for props (reduced logging)
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log("ACH Component State:", {
+        squareLoaded,
+        disabled,
+        amount,
+        hasEmail: !!formData?.email,
+      });
+    }
+  }, [squareLoaded, disabled]); // Only log when key states change
 
   const getStatusClasses = () => {
     let classes =
@@ -366,28 +423,64 @@ const handlePaymentSubmission = async (event) => {
     <>
     {/* old */}
 
-      {/* <Script
-        src="https://sandbox.web.squarecdn.com/v1/square.js"
-        onLoad={() => setSquareLoaded(true)}
-      /> */}
-
-{/* new */}
       <Script
-        src="https://web.squarecdn.com/v1/square.js"
+        src="https://sandbox.web.squarecdn.com/v1/square.js"
         onLoad={() => setSquareLoaded(true)}
       />
 
+{/* new */}
+      {/* <Script
+        src="https://web.squarecdn.com/v1/square.js"
+        onLoad={() => {
+          console.log("Square.js script loaded successfully");
+          setSquareLoaded(true);
+        }}
+        onError={(e) => {
+          console.error("Square.js failed to load:", e);
+          setCredentialsError(true);
+        }}
+        onReady={() => {
+          console.log("Square.js is ready");
+        }}
+      /> */}
+
       <div className="space-y-4">
+        {/* Debug info
+        {process.env.NODE_ENV === 'development' && (
+          <div className="text-xs text-gray-500 p-2 bg-gray-100 rounded">
+            Debug: Square Loaded: {squareLoaded ? 'Yes' : 'No'} | 
+            Amount: {amount} | 
+            Email: {formData?.email || 'None'} | 
+            Disabled: {disabled ? 'Yes' : 'No'}
+            {!squareLoaded && (
+              <button 
+                onClick={() => {
+                  console.log("Manual Square check - window.Square:", !!window.Square);
+                  if (window.Square) setSquareLoaded(true);
+                }}
+                className="ml-2 px-2 py-1 bg-blue-500 text-white text-xs rounded"
+              >
+                Force Check Square
+              </button>
+            )}
+          </div>
+        )} */}
+        
         <button
           type="button"
           onClick={handlePaymentSubmission}
-          disabled={disabled || isLoading || !squareLoaded}
-          className="w-full p-3 text-white bg-green-600 rounded-lg cursor-pointer border-none text-base font-medium leading-6 shadow hover:bg-green-700 active:bg-green-800 disabled:bg-black/5 disabled:text-black/30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          disabled={disabled || isLoading || !squareLoaded || !formData?.email}
+          className="w-full p-3 text-white bg-green-600 rounded-lg cursor-pointer border-none text-base font-medium leading-6 shadow hover:bg-green-700 active:bg-green-800 disabled:bg-gray-400 disabled:text-gray-600 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {isLoading ? (
             <>
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
               Processing Bank Payment...
+            </>
+          ) : !squareLoaded ? (
+            <>
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              Loading Payment System...
             </>
           ) : (
             <>
