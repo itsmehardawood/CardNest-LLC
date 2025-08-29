@@ -21,14 +21,14 @@ const ACHPaymentForm = ({
   const paymentsRef = useRef(null);
 
   // Testing
-   const appId = 'sandbox-sq0idb-4MDwFnJR1In5fQFf44NiSA';
-      const locationId = 'LP4A2N8WD6386';
+  //  const appId = 'sandbox-sq0idb-4MDwFnJR1In5fQFf44NiSA';
+  //     const locationId = 'LP4A2N8WD6386';
 
 
 // prod
 
-  //  const appId = "sq0idp-nxaY-afaaeWBXySlmIAEaA";
-  // const locationId = "LNRMQ2T1MH3BA";
+   const appId = "sq0idp-nxaY-afaaeWBXySlmIAEaA";
+  const locationId = "LNRMQ2T1MH3BA";
 
 
   const initializeACH = async (payments) => {
@@ -423,13 +423,13 @@ const handlePaymentSubmission = async (event) => {
     <>
     {/* old */}
 
-      <Script
+      {/* <Script
         src="https://sandbox.web.squarecdn.com/v1/square.js"
         onLoad={() => setSquareLoaded(true)}
-      />
+      /> */}
 
 {/* new */}
-      {/* <Script
+      <Script
         src="https://web.squarecdn.com/v1/square.js"
         onLoad={() => {
           console.log("Square.js script loaded successfully");
@@ -442,7 +442,7 @@ const handlePaymentSubmission = async (event) => {
         onReady={() => {
           console.log("Square.js is ready");
         }}
-      /> */}
+      />
 
       <div className="space-y-4">
         {/* Debug info

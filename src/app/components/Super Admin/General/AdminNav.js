@@ -42,7 +42,7 @@ const NavigationSidebar = ({
 
   const tabs = [
     { id: "home", label: "Home", icon: Home },
-    { id: "enterprise", label: "Enterprise Approval", icon: Building2 },
+    { id: "enterprise", label: "Business Approval", icon: Building2 },
     { id: "scanhistory", label: "Scan History", icon: History },
      { id: "EnterpriseUsers", label: "Enterprise Users", icon: Building2 },
     { id: "pricing", label: "Pricing", icon: DollarSign },

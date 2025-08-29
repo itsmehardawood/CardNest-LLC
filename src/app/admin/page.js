@@ -111,7 +111,7 @@ const AdminDashboard = () => {
     switch (activeTab) {
       case 'Home':
         return <HomePage/>
-      case 'Enterprise Approval':
+      case 'Business Approval':
         return <BusinessApprovalSectionUpdated />;
       case 'Pricing':
         return <PricingSectionAdmin />;
