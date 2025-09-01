@@ -413,22 +413,53 @@ const BusinessForm = ({
                 <input
                   type="file"
                   name="account_holder_id_document"
-                  accept=".jpg,.jpeg,.png,.pdf"
-                  onChange={(e) =>
+                  accept=".pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      // Validate file type
+                      if (file.type !== 'application/pdf') {
+                        alert('Please upload only PDF files for ID documents');
+                        e.target.value = ''; // Clear the input
+                        return;
+                      }
+                      // Validate file size (10MB = 10 * 1024 * 1024 bytes)
+                      if (file.size > 10 * 1024 * 1024) {
+                        alert('File size must be less than 10MB');
+                        e.target.value = ''; // Clear the input
+                        return;
+                      }
+                    }
                     setBusinessInfo((prev) => ({
                       ...prev,
-                      account_holder_id_document: e.target.files?.[0] || null,
-                    }))
-                  }
+                      account_holder_id_document: file || null,
+                    }));
+                  }}
                   className="w-full px-3 py-2 border border-gray-700 bg-black text-white rounded-md"
                   required
                 />
                 <p className="text-xs text-gray-400 mt-1">
-                  Upload a clear photo or scan of your ID (JPG, PNG, PDF - Max 10MB)
+                  Upload a clear PDF scan of your ID document (PDF only - Max 10MB)
                 </p>
                 {businessInfo.account_holder_id_document && (
-                  <div className="bg-gray-900 mt-2 p-2 rounded text-sm text-gray-300">
-                    📄 {businessInfo.account_holder_id_document.name}
+                  <div className="bg-gray-900 mt-2 p-3 rounded-md">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-300">
+                        📄 {businessInfo.account_holder_id_document.name}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setBusinessInfo((prev) => ({
+                            ...prev,
+                            account_holder_id_document: null,
+                          }))
+                        }
+                        className="text-red-400 hover:text-red-300 text-sm"
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>   
@@ -448,13 +479,30 @@ const BusinessForm = ({
               <input
                 type="file"
                 name="registration_document"
-                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                onChange={handleInputChange}
+                accept=".pdf"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    // Validate file type
+                    if (file.type !== 'application/pdf') {
+                      alert('Please upload only PDF files for business registration documents');
+                      e.target.value = ''; // Clear the input
+                      return;
+                    }
+                    // Validate file size (10MB = 10 * 1024 * 1024 bytes)
+                    if (file.size > 10 * 1024 * 1024) {
+                      alert('File size must be less than 10MB');
+                      e.target.value = ''; // Clear the input
+                      return;
+                    }
+                  }
+                  handleInputChange(e);
+                }}
                 className="w-full px-3 py-2 border border-gray-700 bg-black text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
               <p className="text-xs text-gray-400 mt-1">
-                Upload your business registration certificate, articles of incorporation, or business license (PDF, DOC, DOCX, JPG, JPEG, PNG - Max 10MB)
+                Upload your business registration certificate as PDF (PDF only - Max 10MB)
               </p>
             </div>
 
