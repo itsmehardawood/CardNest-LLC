@@ -38,15 +38,50 @@ function NavbarHomepage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      // Store current scroll position
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Restore scroll position
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflow = '';
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      }
     }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflow = '';
+    };
+  }, [isMenuOpen]);
+
+  const scrollToSection = (sectionId) => {
+    // First close the menu and restore scroll
     setIsMenuOpen(false);
+    
+    // Use setTimeout to ensure the body scroll is restored before scrolling
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }, 100); // Small delay to ensure body styles are restored
   };
 
   // Function to get the correct link and text based on user role
@@ -86,7 +121,7 @@ function NavbarHomepage() {
           </div>
 
           {/* Desktop Navigation - Only show on large screens */}
-          <div className="hidden lg:flex space-x-8">
+          <div className="hidden lg:flex space-x-8 ">
             <button
               onClick={() => scrollToSection("hero")}
               className={`hover:text-teal-600 transition-colors duration-200 font-medium ${
@@ -166,14 +201,7 @@ function NavbarHomepage() {
     >
       Terms & Agreement
     </a>
-    {/* <a
-      href="https://d2puivvgaibigt.cloudfront.net/CardNest%20API%20Integration%20(Web%20Version).pdf"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
-    >
-      Web API Integration
-    </a> */}
+
   </div>
 </div>
 
@@ -247,11 +275,17 @@ function NavbarHomepage() {
               onClick={() => setIsMenuOpen(false)}
             ></div>
 
-            {/* Sidebar */}
+            {/* Sidebar - Fixed with explicit dimensions */}
             <div
-              className={`absolute top-0 right-0 h-full w-80 max-w-[85vw] bg-gray-900 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${
+              className={`absolute top-0 right-0 bg-gray-900 shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col ${
                 isMenuOpen ? "translate-x-0" : "translate-x-full"
               }`}
+              style={{
+                width: 'min(320px, 85vw)',
+                height: '100vh',
+                minHeight: '100vh',
+                maxHeight: '100vh'
+              }}
             >
               {/* Sidebar Header - Fixed */}
               <div className="flex justify-between items-center p-6 border-b border-gray-700 bg-gray-900 flex-shrink-0">
@@ -277,7 +311,7 @@ function NavbarHomepage() {
               </div>
 
               {/* Sidebar Navigation - Scrollable */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-900">
+              <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-900 overscroll-contain">
                 <button
                   onClick={() => scrollToSection("hero")}
                   className="text-left text-white hover:text-teal-300 hover:bg-gray-800 transition-all duration-200 font-medium py-4 px-4 rounded-lg w-full"
@@ -335,14 +369,7 @@ function NavbarHomepage() {
                 >
                     Terms & Agreement
                 </a>
-                {/* <a
-                    href="https://d2puivvgaibigt.cloudfront.net/CardNest%20API%20Integration%20(Web%20Version).pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-left text-white hover:text-teal-300 hover:bg-gray-800 transition-all duration-200 font-medium py-3 px-4 rounded-lg w-full"
-                >
-                    Web API Integration
-                </a> */}
+        
                 </div>
 
                 {/* Sign In Link */}
