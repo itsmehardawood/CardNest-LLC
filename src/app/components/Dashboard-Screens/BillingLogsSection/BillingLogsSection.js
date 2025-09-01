@@ -221,7 +221,7 @@ const BillingLogsSection = () => {
               <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
                 {subscription.package_id === 3 
                   ? (subscription.custom_api_count?.toLocaleString()  || 'N/A')
-                  : subscription.custom_api_count?.toLocaleString() || 'N/A'
+                  : subscription.api_calls_limit?.toLocaleString() || 'N/A'
                 }
               </td>
               
@@ -269,15 +269,7 @@ const BillingLogsSection = () => {
                   }`}>
                     {getStatusText(subscription.is_blocked, subscription.renewal_date)}
                   </span>
-                  {/* {subscription.package_id === 3 && subscription.custom_status && (
-                    <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                      subscription.custom_status === 'active' 
-                        ? 'bg-green-900 text-green-300' 
-                        : 'bg-yellow-900 text-yellow-300'
-                    }`}>
-                      {subscription.custom_status === 'active' ? 'Custom Active' : 'Custom Pending'}
-                    </span>
-                  )} */}
+              
                 </div>
               </td>
             </tr>

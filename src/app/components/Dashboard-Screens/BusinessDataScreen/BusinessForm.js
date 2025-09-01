@@ -8,7 +8,8 @@ const BusinessForm = ({
   handleSubmitWithReload, 
   isSubmitting, 
   submitError, 
-  submitSuccess 
+  submitSuccess,
+  status 
 }) => {
   return (
   <main>
@@ -111,9 +112,19 @@ const BusinessForm = ({
                 placeholder="business@company.com"
                 value={businessInfo.email}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-700 bg-black text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={status === 'incomplete-profile'}
+                className={`w-full px-3 py-2 border border-gray-700 bg-black text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  status === 'incomplete-profile' 
+                    ? 'opacity-60 cursor-not-allowed bg-gray-800' 
+                    : ''
+                }`}
                 required 
               />
+              {status === 'incomplete-profile' && (
+                <p className="text-xs text-gray-400 mt-1">
+                  Email is auto-filled from your account and cannot be edited
+                </p>
+              )}
             </div>
           </div>
 
