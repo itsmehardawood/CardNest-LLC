@@ -231,6 +231,12 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
   };
 
   const handleFileChange = (businessIndex, field, file) => {
+    // Validate PDF file type
+    if (file && file.type !== 'application/pdf') {
+      showAlert('error', 'Invalid File Type', 'Please upload only PDF files.');
+      return;
+    }
+
     setSubBusinesses(prev => prev.map((business, index) => {
       if (index === businessIndex) {
         return {
@@ -346,12 +352,17 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
       
       // Add all sub-businesses with proper indexing
       subBusinesses.forEach((business, index) => {
-        // Add all form fields with the sub_businesses[index][] format
+        // Only add non-empty form fields to avoid validation issues
         Object.keys(business.formData).forEach(key => {
-          apiFormData.append(`sub_businesses[${index}][${key}]`, business.formData[key]);
+          const value = business.formData[key];
+          if (value && value.trim && value.trim() !== '') {
+            apiFormData.append(`sub_businesses[${index}][${key}]`, value.trim());
+          } else if (value) {
+            apiFormData.append(`sub_businesses[${index}][${key}]`, value);
+          }
         });
         
-        // Add files
+        // Add files only if they exist
         if (business.files.registration_document) {
           apiFormData.append(`sub_businesses[${index}][registration_document]`, business.files.registration_document);
         }
@@ -361,22 +372,61 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
         }
       });
 
+      // Debug: Log FormData contents (remove in production)
+      console.log('Submitting FormData:');
+      for (let pair of apiFormData.entries()) {
+        console.log(pair[0], pair[1]);
+      }
+
       const response = await fetch('https://admin.cardnest.io/api/superadmin/sub-business-store', {
         method: 'POST',
-        body: apiFormData, // Send FormData directly
+        body: apiFormData,
+        // Note: Don't set Content-Type header when using FormData - browser sets it automatically with boundary
       });
 
-      const result = await response.json();
+      let result;
+      try {
+        result = await response.json();
+      } catch (parseError) {
+        console.error('Failed to parse response as JSON:', parseError);
+        throw new Error('Invalid response from server');
+      }
 
       if (!response.ok) {
-        throw new Error(result.message || 'Failed to save sub-businesses');
+        // Enhanced error handling for 422 responses
+        if (response.status === 422) {
+          const errorMessage = result.message || 'Validation failed on server';
+          const validationErrors = result.errors || result.data || {};
+          
+          console.error('422 Validation Error Details:', {
+            message: errorMessage,
+            errors: validationErrors,
+            status: response.status
+          });
+          
+          // If there are specific field errors, show them
+          if (validationErrors && typeof validationErrors === 'object') {
+            const errorDetails = Object.entries(validationErrors)
+              .map(([field, errors]) => `${field}: ${Array.isArray(errors) ? errors.join(', ') : errors}`)
+              .join('\n');
+            
+            showAlert('error', 'Server Validation Error', `${errorMessage}\n\nDetails:\n${errorDetails}`);
+          } else {
+            showAlert('error', 'Server Validation Error', errorMessage);
+          }
+          return;
+        }
+        
+        throw new Error(result.message || `Server error: ${response.status}`);
       }
 
       // Call the callback to update parent component
-      onSubBusinessAdded(subBusinesses.map(business => ({
-        ...business.formData,
-        id: result.data?.id || Date.now()
-      })));
+      if (onSubBusinessAdded) {
+        onSubBusinessAdded(subBusinesses.map(business => ({
+          ...business.formData,
+          id: result.data?.id || Date.now()
+        })));
+      }
 
       // Show success message
       showAlert('success', 'Success!', `${subBusinesses.length} sub-business${subBusinesses.length > 1 ? 'es' : ''} ${isEditing ? 'updated' : 'added'} successfully!`);
@@ -421,8 +471,8 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
       account_holder_id_number: "ID Number",
       
       // File fields
-      registration_document: "Registration Document",
-      account_holder_id_document: "Account Holder ID Document"
+      registration_document: "Registration Document (PDF only)",
+      account_holder_id_document: "Account Holder ID Document (PDF only)"
     };
     return labels[field] || field;
   };
@@ -518,23 +568,24 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
             fieldError ? 'border-red-500 bg-red-50' : 'border-indigo-400 bg-indigo-50 hover:bg-indigo-100'
           }`}
           onClick={() => {
-            document.getElementById(`file-input-${field}`).click();
+            document.getElementById(`file-input-${field}-${activeBusinessIndex}`).click();
           }}
           disabled={submitting}
         >
-          <Upload className="w-6 h-6 text-indigo-600 mr-3" />
+          <FileText className="w-6 h-6 text-indigo-600 mr-3" />
           <span className="text-base text-indigo-800 font-medium">
-            {fieldFile ? fieldFile.name : `Click to upload ${getFieldLabel(field).toLowerCase()}`}
+            {fieldFile ? fieldFile.name : `Click to upload PDF ${getFieldLabel(field).toLowerCase()}`}
           </span>
         </button>
         <input
-          id={`file-input-${field}`}
+          id={`file-input-${field}-${activeBusinessIndex}`}
           type="file"
           style={{ display: 'none' }}
           onChange={(e) => handleFileChange(activeBusinessIndex, field, e.target.files[0])}
-          accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+          accept=".pdf"
           disabled={submitting}
         />
+        <p className="mt-1 text-xs text-gray-500">Only PDF files are accepted</p>
         {fieldError && (
           <p className="mt-1 text-sm text-red-600 flex items-center">
             <AlertCircle className="w-4 h-4 mr-1" />
@@ -618,14 +669,14 @@ const AddSubBusiness = ({ onSubBusinessAdded, onClose, existingBusiness = null, 
         <div className="bg-gradient-to-r from-slate-700 to-slate-900 p-6 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg- bg-opacity-20 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
                 <Building2 className="w-6 h-6" />
               </div>
               <div>
                 <h2 className="text-2xl font-bold">
                   {isEditing ? "Edit Sub-Business" : "Add Sub-Businesses"}
                 </h2>
-                <p className="text-indigo-100">
+                <p className="text-slate-100">
                   {isEditing ? "Update business information" : `Managing ${subBusinesses.length} sub-business${subBusinesses.length > 1 ? 'es' : ''}`}
                 </p>
               </div>
