@@ -21,12 +21,12 @@ const ACHPaymentForm = ({
   const paymentsRef = useRef(null);
 
   // Sandbox
-  const appId = "sandbox-sq0idb-MBvG49FH6Nz_mhhrBrclhg";
-  const locationId = "L0A7SN9FH9EMR";
+  // const appId = "sandbox-sq0idb-MBvG49FH6Nz_mhhrBrclhg";
+  // const locationId = "L0A7SN9FH9EMR";
 
   // prod
-  //  const appId = "sq0idp-nxaY-afaaeWBXySlmIAEaA";
-  //   const locationId = "LNRMQ2T1MH3BA";
+   const appId = "sq0idp-nxaY-afaaeWBXySlmIAEaA";
+    const locationId = "LNRMQ2T1MH3BA";
 
   const initializeACH = async (payments) => {
     const ach = await payments.ach();
@@ -328,22 +328,22 @@ const ACHPaymentForm = ({
     <>
       {/* old */}
 
-      <Script
+      {/* <Script
         src="https://sandbox.web.squarecdn.com/v1/square.js"
         onLoad={() => setSquareLoaded(true)}
-      />
+      /> */}
 
-      
-{/* <Script
+       
+ <Script
   src="https://web.squarecdn.com/v1/square.js"
   onLoad={() => setSquareLoaded(true)}
-/> */}
+/> 
 
       <div className="space-y-4">
         <button
           type="button"
           onClick={handlePaymentSubmission}
-          disabled={disabled || isLoading || !squareLoaded}
+          disabled={disabled || isLoading || !squareLoaded} 
           className="w-full p-3 text-white bg-green-600 rounded-lg cursor-pointer border-none text-base font-medium leading-6 shadow hover:bg-green-700 active:bg-green-800 disabled:bg-black/5 disabled:text-black/30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {isLoading ? (
