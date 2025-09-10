@@ -215,7 +215,6 @@ const MerchantList = ({ scanData, onMerchantClick, searchQuery }) => {
       if (!acc[merchantId]) {
         acc[merchantId] = {
           merchant_id: merchantId,
-          business_name: scan.business_name || 'N/A', // Add business name
           merchant_key: scan.merchant_key,
           total_scans: 0,
           unique_users: new Set(),
@@ -250,8 +249,7 @@ const MerchantList = ({ scanData, onMerchantClick, searchQuery }) => {
       }))
       .filter(merchant => 
         merchant.merchant_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        merchant.merchant_key.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (merchant.business_name && merchant.business_name.toLowerCase().includes(searchQuery.toLowerCase()))
+        merchant.merchant_key.toLowerCase().includes(searchQuery.toLowerCase())
       );
   }, [scanData, searchQuery]);
 
@@ -298,12 +296,9 @@ const MerchantList = ({ scanData, onMerchantClick, searchQuery }) => {
                       </div>
                       <div>
                         <h3 className="text-xl font-semibold text-gray-100 group-hover:text-blue-300 transition-colors">
-                          {merchant.business_name && merchant.business_name !== 'N/A' ? merchant.business_name : merchant.merchant_id}
+                          {merchant.merchant_id}
                         </h3>
-                        <p className="text-sm text-gray-400 mt-1">
-                          ID: {merchant.merchant_id}
-                        </p>
-                        <div className="flex items-center space-x-2 mt-1">
+                        <div className="flex items-center space-x-2">
                           <p className="text-sm text-gray-400 font-mono">
                             Key: {merchant.merchant_key.substring(0, 20)}...
                           </p>
@@ -530,7 +525,7 @@ const CardScanHistory = () => {
               type="text"
               value={searchQuery}
               onChange={handleSearchChange}
-              placeholder="Search by Business Name, Merchant ID or Key..."
+              placeholder="Search by Merchant ID or Key..."
               className="w-full bg-black/30 border border-gray-700/50 rounded-lg py-3 px-4 pl-10 text-gray-100 placeholder-gray-400 focus:outline-none focus:border-blue-500/50"
             />
             <svg className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

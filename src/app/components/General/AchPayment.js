@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import Script from "next/script";
 
 const ACHPaymentForm = ({
-  onPaymentSuccess, 
+  onPaymentSuccess,
   onPaymentError,
   formData,
   disabled,
@@ -20,16 +20,13 @@ const ACHPaymentForm = ({
   const achRef = useRef(null);
   const paymentsRef = useRef(null);
 
-  // Testing
-  //  const appId = 'sandbox-sq0idb-4MDwFnJR1In5fQFf44NiSA';
-  //     const locationId = 'LP4A2N8WD6386';
+  // Sandbox
+  const appId = "sandbox-sq0idb-MBvG49FH6Nz_mhhrBrclhg";
+  const locationId = "L0A7SN9FH9EMR";
 
-
-// prod
-
-   const appId = "sq0idp-nxaY-afaaeWBXySlmIAEaA";
-  const locationId = "LNRMQ2T1MH3BA";
-
+  // prod
+  //  const appId = "sq0idp-nxaY-afaaeWBXySlmIAEaA";
+  //   const locationId = "LNRMQ2T1MH3BA";
 
   const initializeACH = async (payments) => {
     const ach = await payments.ach();
@@ -39,7 +36,9 @@ const ACHPaymentForm = ({
   const createPayment = async (token) => {
     // Get user data from localStorage
     const storedUser = localStorage.getItem("userData");
-    
+    const amountCents = Math.round(parseFloat(amount) * 100);
+
+
     if (!storedUser) {
       throw new Error("User data not found. Please log in again.");
     }
@@ -48,8 +47,10 @@ const ACHPaymentForm = ({
     try {
       userData = JSON.parse(storedUser);
     } catch (error) {
-      console.error('Error parsing user data from localStorage:', error);
-      throw new Error("Failed to retrieve user information. Please log in again.");
+      console.error("Error parsing user data from localStorage:", error);
+      throw new Error(
+        "Failed to retrieve user information. Please log in again."
+      );
     }
 
     const userObj = userData.user || userData;
@@ -67,19 +68,23 @@ const ACHPaymentForm = ({
       zipcode: formData.zipCode,
       country: formData.country,
       payment_method: "ach",
-      
+
       // ACH-specific payment result data
       payment_result: {
         locationId,
         sourceId: token,
         idempotencyKey: window.crypto.randomUUID(),
         paymentType: "ach",
-        amount: amount,
+        amountMoney: {
+          amount: amountCents,
+          currency: "USD",
+          autocomplete: true,
+        },
       },
-      
+
       // Add contact name for ACH
       contact_name: formData.contactName,
-      
+
       // Include custom pricing if available
       ...(plan?.customPricing && {
         custom_api_count: plan.customPricing.apiCount,
@@ -91,7 +96,7 @@ const ACHPaymentForm = ({
 
     // const paymentResponse = await api("https:admin.cardnest.io/api/payment/storeDetails", {
 
-const paymentResponse = await apiFetch("/payment/storeDetails", {
+    const paymentResponse = await apiFetch("/payment/storeDetails", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -102,7 +107,7 @@ const paymentResponse = await apiFetch("/payment/storeDetails", {
     if (paymentResponse.ok) {
       const result = await paymentResponse.json();
       console.log("ACH payment stored successfully:", result);
-      
+
       // Return the payment result in the expected format
       return {
         ...paymentData.payment_result,
@@ -159,88 +164,45 @@ const paymentResponse = await apiFetch("/payment/storeDetails", {
     };
   };
 
+
+
   const getACHOptions = () => {
-    const billingContact = getBillingContact();
-    const accountHolderName =
-      `${billingContact.givenName} ${billingContact.familyName}`.trim();
+  const billingContact = getBillingContact();
+  const accountHolderName =
+    `${billingContact.givenName} ${billingContact.familyName}`.trim();
 
-    // Ensure amount is valid and greater than 0
-    const validAmount = parseFloat(amount) > 0 ? amount : "1.00";
+  // For the ACH popup, amount must be in **dollars** as string
+  const amountInDollars = parseFloat(amount).toFixed(2); // "30.90"
 
-    return {
-      accountHolderName: accountHolderName || "Account Holder",
-      intent: "CHARGE",
-      amount: validAmount,
-      currency: "USD",
-    };
+  return {
+    accountHolderName: accountHolderName || "Account Holder",
+    intent: "CHARGE",
+    amount: amountInDollars, // <-- dollars, not cents
+    currency: "USD",
   };
+};
 
 
-  // const handlePaymentSubmission = async (event) => {
-  //   event.preventDefault();
-
-  //   if (!formData.contactName) {
-  //     onPaymentError(
-  //       "Please provide a contact name for the bank account holder"
-  //     );
-  //     return;
-  //   }
-
-  //   if (!formData.email || !formData.billingAddress || !formData.city || 
-  //       !formData.zipCode || !formData.country) {
-  //     onPaymentError(
-  //       "Please fill in all required billing information"
-  //     );
-  //     return;
-  //   }
-
-  //   if (!achRef.current) {
-  //     console.error("ACH not initialized");
-  //     onPaymentError("Bank payment system not ready. Please try again.");
-  //     return;
-  //   }
-
-  //   try {
-  //     setIsLoading(true);
-  //     setPaymentStatus("");
-
-  //     const achOptions = getACHOptions();
-  //     const result = await tokenize(achRef.current, achOptions);
-  //     setPaymentStatus("SUCCESS");
-  //     onPaymentSuccess(result);
-  //   } catch (error) {
-  //     setPaymentStatus("FAILURE");
-  //     console.error("ACH Payment Error:", error.message);
-  //     onPaymentError(error.message);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
-
-
-
-const handlePaymentSubmission = async (event) => {
+  const handlePaymentSubmission = async (event) => {
     event.preventDefault();
 
-    // Only require essential fields - Square ACH will handle bank account details
-    if (!formData.email) {
-      onPaymentError("Please provide an email address");
+    if (!formData.contactName) {
+      onPaymentError(
+        "Please provide a contact name for the bank account holder"
+      );
       return;
     }
 
-    // Make contactName required but provide a fallback
-    const accountHolderName = formData.contactName || 'Account Holder';
-
-    // Make other fields optional for initial payment processing
-    const billingData = {
-      email: formData.email,
-      billingAddress: formData.billingAddress || '',
-      city: formData.city || '',
-      zipCode: formData.zipCode || '',
-      country: formData.country || 'US',
-      contactName: accountHolderName
-    };
+    if (
+      !formData.email ||
+      !formData.billingAddress ||
+      !formData.city ||
+      !formData.zipCode ||
+      !formData.country
+    ) {
+      onPaymentError("Please fill in all required billing information");
+      return;
+    }
 
     if (!achRef.current) {
       console.error("ACH not initialized");
@@ -266,86 +228,32 @@ const handlePaymentSubmission = async (event) => {
   };
 
   const initializeSquare = async () => {
-    console.log("Initializing Square.js...");
-    
     if (!window.Square) {
-      console.error("Square.js not found in window object");
-      setCredentialsError(true);
-      return;
+      throw new Error("Square.js failed to load properly");
     }
-
-    console.log("Square.js found, creating payments instance...");
 
     let payments;
     try {
       payments = window.Square.payments(appId, locationId);
       paymentsRef.current = payments;
-      console.log("Square payments instance created successfully");
-    } catch (error) {
-      console.error("Error creating Square payments instance:", error);
+    } catch {
       setCredentialsError(true);
       return;
     }
 
     try {
-      console.log("Initializing ACH payment method...");
       const ach = await initializeACH(payments);
       achRef.current = ach;
-      console.log("ACH payment method initialized successfully");
     } catch (e) {
-      console.error("Initializing ACH failed:", e);
-      setCredentialsError(true);
+      console.error("Initializing ACH failed", e);
     }
   };
 
   useEffect(() => {
     if (squareLoaded) {
-      console.log("Square.js loaded, initializing ACH...");
       initializeSquare();
     }
   }, [squareLoaded]);
-
-  // Add timeout fallback for Square.js loading
-  useEffect(() => {
-    // Early check after 1 second
-    const earlyCheck = setTimeout(() => {
-      if (!squareLoaded && window.Square) {
-        console.log("Early Square.js detection successful");
-        setSquareLoaded(true);
-      }
-    }, 1000);
-
-    // Fallback check after 3 seconds
-    const timeout = setTimeout(() => {
-      if (!squareLoaded) {
-        console.warn("Square.js taking too long to load, checking if available...");
-        if (window.Square) {
-          console.log("Square.js found in window, setting as loaded");
-          setSquareLoaded(true);
-        } else {
-          console.error("Square.js not available after timeout");
-          setCredentialsError(true);
-        }
-      }
-    }, 3000); // Reduced to 3 seconds for better UX
-
-    return () => {
-      clearTimeout(earlyCheck);
-      clearTimeout(timeout);
-    };
-  }, [squareLoaded]);
-
-  // Add debugging for props (reduced logging)
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.log("ACH Component State:", {
-        squareLoaded,
-        disabled,
-        amount,
-        hasEmail: !!formData?.email,
-      });
-    }
-  }, [squareLoaded, disabled]); // Only log when key states change
 
   const getStatusClasses = () => {
     let classes =
@@ -416,71 +324,32 @@ const handlePaymentSubmission = async (event) => {
     return null;
   };
 
-
-
-
   return (
     <>
-    {/* old */}
+      {/* old */}
 
-      {/* <Script
+      <Script
         src="https://sandbox.web.squarecdn.com/v1/square.js"
         onLoad={() => setSquareLoaded(true)}
-      /> */}
-
-{/* new */}
-      <Script
-        src="https://web.squarecdn.com/v1/square.js"
-        onLoad={() => {
-          console.log("Square.js script loaded successfully");
-          setSquareLoaded(true);
-        }}
-        onError={(e) => {
-          console.error("Square.js failed to load:", e);
-          setCredentialsError(true);
-        }}
-        onReady={() => {
-          console.log("Square.js is ready");
-        }}
       />
 
+      
+{/* <Script
+  src="https://web.squarecdn.com/v1/square.js"
+  onLoad={() => setSquareLoaded(true)}
+/> */}
+
       <div className="space-y-4">
-        {/* Debug info
-        {process.env.NODE_ENV === 'development' && (
-          <div className="text-xs text-gray-500 p-2 bg-gray-100 rounded">
-            Debug: Square Loaded: {squareLoaded ? 'Yes' : 'No'} | 
-            Amount: {amount} | 
-            Email: {formData?.email || 'None'} | 
-            Disabled: {disabled ? 'Yes' : 'No'}
-            {!squareLoaded && (
-              <button 
-                onClick={() => {
-                  console.log("Manual Square check - window.Square:", !!window.Square);
-                  if (window.Square) setSquareLoaded(true);
-                }}
-                className="ml-2 px-2 py-1 bg-blue-500 text-white text-xs rounded"
-              >
-                Force Check Square
-              </button>
-            )}
-          </div>
-        )} */}
-        
         <button
           type="button"
           onClick={handlePaymentSubmission}
-          disabled={disabled || isLoading || !squareLoaded || !formData?.email}
-          className="w-full p-3 text-white bg-green-600 rounded-lg cursor-pointer border-none text-base font-medium leading-6 shadow hover:bg-green-700 active:bg-green-800 disabled:bg-gray-400 disabled:text-gray-600 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          disabled={disabled || isLoading || !squareLoaded}
+          className="w-full p-3 text-white bg-green-600 rounded-lg cursor-pointer border-none text-base font-medium leading-6 shadow hover:bg-green-700 active:bg-green-800 disabled:bg-black/5 disabled:text-black/30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {isLoading ? (
             <>
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
               Processing Bank Payment...
-            </>
-          ) : !squareLoaded ? (
-            <>
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              Loading Payment System...
             </>
           ) : (
             <>
@@ -507,6 +376,3 @@ const handlePaymentSubmission = async (event) => {
 };
 
 export default ACHPaymentForm;
-
-
-

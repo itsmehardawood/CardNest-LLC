@@ -4,25 +4,21 @@ import React, { useState, use, useMemo, useEffect, useRef } from "react";
 import { notFound, useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { decryptWithAES128 } from "@/app/lib/decrypt";
+// import ContactForm from "@/app/components/PaymentScreen/ContactForm";
+// import PaymentHeader from "@/app/components/PaymentScreen/PaymentHeader";
+// import PlanDetails from "@/app/components/PaymentScreen/PlanDetails";
+// import PaymentForm from "@/app/components/PaymentScreen/PaymentForm";
 import Link from "next/link";
 import { apiFetch } from "@/app/lib/api.js";
 import ACHPaymentForm from "@/app/components/General/AchPayment";
+import PlanDetails from "@/app/components/Dashboard-Screens/PaymentScreen/PlanDetails";
+import PaymentHeader from "@/app/components/Dashboard-Screens/PaymentScreen/PaymentHeader";
 import ContactForm from "@/app/components/Dashboard-Screens/PaymentScreen/ContactForm";
 import PaymentForm from "@/app/components/Dashboard-Screens/PaymentScreen/PaymentForm";
-import PaymentHeader from "@/app/components/Dashboard-Screens/PaymentScreen/PaymentHeader";
-import PlanDetails from "@/app/components/Dashboard-Screens/PaymentScreen/PlanDetails";
 
 export default function PaymentPage({ params }) {
   const router = useRouter();
   const resolvedParams = use(params);
-
-
-  useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("userData") || "{}");
-    if (!userData || !userData.merchant_id) {
-      router.push("/login"); // Redirect to login if userData is not found
-    }
-  }, []);
 
   // State management
   const [authToken, setAuthToken] = useState(null);
@@ -38,7 +34,7 @@ export default function PaymentPage({ params }) {
   const [scanError, setScanError] = useState(null);
   const [encryptedData, setEncryptedData] = useState(null);
   const [customApiPricing, setCustomApiPricing] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState('ach'); // Always default to 'ach' now that card is disabled
+  const [paymentMethod, setPaymentMethod] = useState('ach'); // 'card' or 'ach'
   const [achPaymentResult, setAchPaymentResult] = useState(null);
   const pollingRef = useRef(null);
 
@@ -61,20 +57,6 @@ export default function PaymentPage({ params }) {
     CVV: "",
   });
 
-
-  
-// Add this helper function to your PaymentPage component
-const isACHFormValid = () => {
-  return (
-    formData.email && 
-    formData.email.trim() !== '' &&
-    // Make contactName optional but recommended
-    formData.city && 
-    formData.city.trim() !== '' &&
-    formData.zipCode && 
-    formData.zipCode.trim() !== ''
-  );
-};
   // Helper functions
   const isMobileDevice = () => {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -98,7 +80,7 @@ const isACHFormValid = () => {
       const result = await response.json();
 
       if (response.ok && result.data && result.data.encrypted_data) {
-        // console.log("Encrypted data received:", result.data);
+        console.log("Encrypted data received:", result.data);
         setEncryptedData(result.data.encrypted_data);
 
         if (pollingRef.current) {
@@ -183,7 +165,7 @@ const isACHFormValid = () => {
   const decryptAndPopulateCardData = async () => {
     try {
       if (!authToken || !encryptedData) {
-        // console.log("Missing authToken or encryptedData");
+        console.log("Missing authToken or encryptedData");
         return;
       }
 
@@ -305,25 +287,6 @@ const isACHFormValid = () => {
       planPrice = `${customPricing.customPrice.toFixed(2)}`;
       planSubtitle = "CUSTOM PACKAGE";
       apiScans = `${customPricing.apiCount.toLocaleString()} API SCANS`;
-      
-      // Debug custom pricing (only in development)
-      if (process.env.NODE_ENV === 'development') {
-        console.log("Custom Pricing Debug:", {
-          planId: apiPlan.id,
-          customPrice: customPricing.customPrice,
-          planPrice,
-          apiCount: customPricing.apiCount,
-        });
-      }
-    }
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log("Plan Mapping Debug:", {
-        apiPlanId: apiPlan.id,
-        hasCustomPricing: !!customPricing,
-        isCustomPlan: customPricing?.isCustomPlan,
-        finalPlanPrice: planPrice,
-      });
     }
 
     return {
@@ -360,17 +323,6 @@ const isACHFormValid = () => {
     const tax = subtotal * taxRate;
     const total = subtotal + tax;
 
-    // Debug pricing calculation (only in development)
-    if (process.env.NODE_ENV === 'development') {
-      console.log("Pricing Debug:", {
-        planId: plan?.id,
-        planPrice: plan?.price,
-        subtotal,
-        total,
-        isCustomPackage: plan?.customPricing ? true : false,
-      });
-    }
-
     return {
       subtotal,
       tax,
@@ -385,44 +337,6 @@ const isACHFormValid = () => {
     console.log("ACH Payment successful:", result);
     setAchPaymentResult(result);
     setNotification("Bank payment completed successfully!");
-    
-    try {
-      // Store ACH payment details in the new endpoint
-      const userObj = userData;
-      if (userObj?.merchant_id) {
-        const achPaymentData = {
-          merchant_id: userObj.merchant_id,
-          ach_string: JSON.stringify(result) // Convert ACH response to JSON string
-        };
-
-        console.log("Storing ACH payment details:", achPaymentData);
-
-        const achResponse = await apiFetch("/Subscriptions/storeAchPayment", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(achPaymentData),
-        });
-
-        if (!achResponse.ok) {
-          const achError = await achResponse.json();
-          console.error("Failed to store ACH payment details:", achError);
-          console.error("ACH Response status:", achResponse.status);
-          console.error("ACH Response statusText:", achResponse.statusText);
-          if (achError.errors) {
-            console.error("Validation errors:", achError.errors);
-          }
-          // Don't throw error here, just log it - continue with subscription
-        } else {
-          const achResult = await achResponse.json();
-          console.log("ACH payment details stored successfully:", achResult);
-        }
-      }
-    } catch (error) {
-      console.error("Error storing ACH payment details:", error);
-      // Don't throw error here, just log it - continue with subscription
-    }
     
     // Proceed with subscription creation
     await handleFinalSubscription('ach', result);
@@ -466,18 +380,12 @@ const isACHFormValid = () => {
             custom_api_count: plan.customPricing.apiCount,
             custom_price: plan.customPricing.customPrice,
           }),
-          // For package ID 3, ensure custom_api_count is included
-          ...(plan.id === 3 && plan.customPricing && {
-            custom_api_count: plan.customPricing.apiCount,
-          }),
           ...(paymentResult && {
             payment_result: paymentResult,
           }),
         };
 
         console.log("Submitting payment details:", paymentData);
-        console.log("Payment - Plan ID:", plan.id);
-        console.log("Payment - Custom API Count (for package 3):", plan.id === 3 ? plan.customPricing?.apiCount : 'N/A');
 
         const paymentResponse = await apiFetch(
           "/payment/storeDetails",
@@ -512,18 +420,12 @@ const isACHFormValid = () => {
           scan_id: scanData.scanID,
         }),
         ...(plan.customPricing && {
-          custom_monthly_price: plan.customPricing.customPrice,
-        }),
-        //  For package ID 3, include custom_api_count
-        ...(plan.id === 3 && plan.customPricing && {
           custom_api_count: plan.customPricing.apiCount,
+          custom_monthly_price: plan.customPricing.customPrice,
         }),
       };
 
-      // console.log("Submitting subscription:", subscriptionData);
-      // console.log("Plan ID:", plan.id);
-      // console.log("Custom API Count (for package 3):", plan.id === 3 ? plan.customPricing?.apiCount : 'N/A');
-      // console.log("Custom Pricing Data:", plan.customPricing);
+      console.log("Submitting subscription:", subscriptionData);
 
       const response = await apiFetch(
         "/Subscriptions",
@@ -637,7 +539,7 @@ const isACHFormValid = () => {
       if (pollingRef.current) {
         clearInterval(pollingRef.current);
       }
-    }; 
+    };
   }, []);
 
   useEffect(() => {
@@ -649,10 +551,8 @@ const isACHFormValid = () => {
         if (customPricingData) {
           const parsedCustomPricing = JSON.parse(customPricingData);
           setCustomApiPricing(parsedCustomPricing);
-        //   console.log("Custom API pricing found:", parsedCustomPricing);
-        //   console.log("Custom API Count from localStorage:", parsedCustomPricing.apiCount);
-        //   console.log("Custom Price from localStorage:", parsedCustomPricing.customPrice);
-         }
+          console.log("Custom API pricing found:", parsedCustomPricing);
+        }
 
         const storedUser = localStorage.getItem("userData");
         if (!storedUser) {
@@ -667,13 +567,6 @@ const isACHFormValid = () => {
         if (userObj.email) {
           setFormData((prev) => ({ ...prev, email: userObj.email }));
         }
-
-
-
-
-
-
-
 
         const response = await apiFetch("/Packages");
         if (!response.ok) {
@@ -696,16 +589,6 @@ const isACHFormValid = () => {
         const customPricing = customPricingData ? JSON.parse(customPricingData) : null;
         const mappedPlan = mapApiDataToPlan(foundPlan, customPricing);
         setPlan(mappedPlan);
-
-        // console.log("Plan ID:", foundPlan.id);
-        // console.log("Found Plan:", foundPlan);
-        // console.log("Custom Pricing Data:", customPricing);
-        // console.log("Mapped Plan:", mappedPlan);
-        
-        if (foundPlan.id === 3 && customPricing) {
-        //   console.log("Package ID 3 - Custom API Count:", customPricing.apiCount);
-        //   console.log("Package ID 3 - Custom Price:", customPricing.customPrice);
-         }
 
         // Only generate scan token for card payments on non-enterprise plans
         if (mappedPlan.price !== "SALES" && (mappedPlan.name.toLowerCase() !== "enterprise" || mappedPlan.customPricing)) {
@@ -800,37 +683,41 @@ const isACHFormValid = () => {
                   {/* Payment Method Selection */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-gray-900">Choose Payment Method</h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setPaymentMethod('ach')}
-                        className={`p-3 rounded-lg border-2 transition-all ${
-                          paymentMethod === 'ach'
-                            ? 'border-green-500 bg-green-50 text-green-700'
-                            : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                        }`}
-                      >
-                        <div className="flex items-center justify-center gap-2">
-                          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" fill="currentColor"/>
-                          </svg>
-                          Bank Account
-                        </div>
-                      </button>
-                      <button
-                        type="button"
-                        disabled
-                        className="p-3 rounded-lg border-2 border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed"
-                      >
-                        <div className="flex items-center justify-center gap-2">
-                          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" strokeWidth="2"/>
-                            <path d="M2 10h20" stroke="currentColor" strokeWidth="2"/>
-                          </svg>
-                          Credit Card (Upcoming)
-                        </div>
-                      </button>
-                    </div>
+                                         <div className="grid grid-cols-2 gap-3">
+                       <button
+                         type="button"
+                         onClick={() => setPaymentMethod('ach')}
+                         className={`p-3 rounded-lg border-2 transition-all ${
+                           paymentMethod === 'ach'
+                             ? 'border-green-500 bg-green-50 text-green-700'
+                             : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                         }`}
+                       >
+                         <div className="flex items-center justify-center gap-2">
+                           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                             <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z" fill="currentColor"/>
+                           </svg>
+                           Bank Account
+                         </div>
+                       </button>
+                       <button
+                         type="button"
+                         onClick={() => setPaymentMethod('card')}
+                         className={`p-3 rounded-lg border-2 transition-all ${
+                           paymentMethod === 'card'
+                             ? 'border-blue-500 bg-blue-50 text-blue-700'
+                             : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                         }`}
+                       >
+                         <div className="flex items-center justify-center gap-2">
+                           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                             <rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" strokeWidth="2"/>
+                             <path d="M2 10h20" stroke="currentColor" strokeWidth="2"/>
+                           </svg>
+                           Card Payments
+                         </div>
+                       </button>
+                     </div>
                   </div>
 
                   {/* Payment Form based on selected method */}
@@ -962,10 +849,12 @@ const isACHFormValid = () => {
                         onPaymentSuccess={handleACHPaymentSuccess}
                         onPaymentError={handleACHPaymentError}
                         formData={formData}
-                        disabled={submitting || pricingCalculation.total <= 0}
-                        plan={plan}
-                        amount={pricingCalculation.total > 0 ? pricingCalculation.total.toFixed(2) : "1.00"}
-                        apiFetch={apiFetch}
+                        disabled={submitting}
+                          plan={plan} // Already passed
+
+                        amount={pricingCalculation.total.toFixed(2)}
+                          apiFetch={apiFetch} // Add this line
+
                       />
                     </div>
                   )}

@@ -327,14 +327,11 @@ const ScanDetailsModal = ({ merchantId, scanData, onClose }) => {
               </div>
               <div>
                 <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                  {merchantInfo?.business_name && merchantInfo.business_name !== 'N/A' ? merchantInfo.business_name : merchantId}
+                  {merchantId}
                 </h3>
-                               <div className="flex items-center space-x-3">
-                <span className="text-sm font-medium text-gray-400">Merchant Key:</span>
-                <span className="text-xs font-mono text-gray-200 bg-black/50 px-3 py-1.5 rounded-lg border border-gray-700/50 truncate max-w-xs sm:max-w-md">
-                  {merchantInfo?.merchant_key}
-                </span>
-              </div>
+                <p className="text-blue-300 text-sm sm:text-base mt-1">
+                  {merchantScans.length} total scan records
+                </p>
               </div>
             </div>
             <button
@@ -372,18 +369,10 @@ const ScanDetailsModal = ({ merchantId, scanData, onClose }) => {
         </div>
 
         {/* Merchant Information */}
-        {/* <div className="px-6 sm:px-8 py-5 sm:py-6 bg-black border-b border-gray-800/50 flex-shrink-0">
+        <div className="px-6 sm:px-8 py-5 sm:py-6 bg-black border-b border-gray-800/50 flex-shrink-0">
           <h4 className="text-lg sm:text-xl font-semibold text-white mb-4">Merchant Information</h4>
           <div className="bg-black/50 rounded-xl p-4 sm:p-5 border border-gray-800/50">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-              {merchantInfo?.business_name && merchantInfo.business_name !== 'N/A' && (
-                <div className="flex items-center space-x-3">
-                  <span className="text-sm font-medium text-gray-400">Business Name:</span>
-                  <span className="text-sm font-semibold bg-black/50 text-gray-200 px-3 py-1.5 rounded-lg border border-gray-700/50">
-                    {merchantInfo.business_name}
-                  </span>
-                </div>
-              )}
               <div className="flex items-center space-x-3">
                 <span className="text-sm font-medium text-gray-400">Merchant ID:</span>
                 <span className="text-sm font-mono bg-black/50 text-gray-200 px-3 py-1.5 rounded-lg border border-gray-700/50">
@@ -398,7 +387,7 @@ const ScanDetailsModal = ({ merchantId, scanData, onClose }) => {
               </div>
             </div>
           </div>
-        </div> */}
+        </div>
 
         {/* Card Scan Records */}
         <div className="px-6 sm:px-8 py-5 sm:py-6 bg-black flex-1 overflow-y-auto">

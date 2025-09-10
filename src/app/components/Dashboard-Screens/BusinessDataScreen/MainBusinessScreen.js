@@ -109,9 +109,9 @@ function MainBusinessScreen({
       if (localData) {
         try {
           const parsedData = JSON.parse(localData);
-          // console.log('Parsed userData:', parsedData);
+          console.log('Parsed userData:', parsedData);
           const userEmail = parsedData?.user?.email || ''; // ← nested inside `user`
-          // console.log('Extracted email:', userEmail);
+          console.log('Extracted email:', userEmail);
           
           setBusinessInfo((prev) => ({
             ...prev,
@@ -209,7 +209,6 @@ function MainBusinessScreen({
       isSubmitting={isSubmitting}
       submitError={submitError}
       submitSuccess={submitSuccess}
-      status={status}
     />
   );
 }

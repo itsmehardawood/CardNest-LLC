@@ -2,7 +2,6 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import PricingSection from '../General/SubscriptionsCard';
 import { apiFetch } from '@/app/lib/api.js';
-import EnterpriseUserDisplay from './EnterpriseUserDisplay';
 
 function SubscriptionsScreen() {
   const router = useRouter();
@@ -41,21 +40,9 @@ function SubscriptionsScreen() {
                 
                 if (response.ok) {
                   const data = await response.json();
-                  // console.log("Full subscription response:", data);
-                  
                   if (data.status === true && data.data) {
                     setHasActiveSubscription(true);
                     setSubscriptionData(data.data);
-                    
-                    // Console logging for package ID 3
-                    // if (data.data.package_id === 3) {
-                    //   console.log("Package ID 3 - Subscription Data:", data.data);
-                    //   console.log("Package ID 3 - Custom API Count:", data.data.custom_api_count);
-                    //   console.log("Package ID 3 - Custom Calls Used:", data.data.custom_calls_used);
-                    //   console.log("Package ID 3 - Custom Price:", data.data.custom_price);
-                    //   console.log("Package ID 3 - Custom Status:", data.data.custom_status);
-                    // }
-                    
                     subscriptionFound = true;
                   } else if (data.status === true) {
                     setHasActiveSubscription(true);
@@ -64,7 +51,7 @@ function SubscriptionsScreen() {
                   break;
                 } else if (response.status === 404) {
                   // No subscription found - this is expected for new users
-                  // console.log('No subscription found for user - this is normal for new users');
+                  console.log('No subscription found for user - this is normal for new users');
                   setHasActiveSubscription(false);
                   setSubscriptionData(null);
                   subscriptionFound = true;
@@ -106,65 +93,35 @@ function SubscriptionsScreen() {
 
   const formatCurrency = (amount) => amount ? `$${parseFloat(amount).toFixed(2)}` : '$0.00';
 
-  // Safe number formatting function
-  const formatNumber = (value) => {
-    if (value === null || value === undefined || isNaN(value)) return '0';
-    return Number(value).toLocaleString();
-  };
-
-  // Navigation function for sub-businesses screen
-  const handleNavigateToSubBusinesses = () => {
-    router.push('/dashboard'); // This will navigate to sub-businesses screen in the dashboard
-  };
-
   // Helper functions for package data based on package_id
   const getMonthlyLimit = () => {
     if (!subscriptionData) return 0;
-    if (subscriptionData.package_id === 3) {
-      return subscriptionData.custom_api_count || 0;
-    }
-    return subscriptionData.package?.monthly_limit || 0;
+    return subscriptionData.package_id === 3 ? subscriptionData.custom_api_count : subscriptionData.package.monthly_limit;
   };
 
   const getUsedCalls = () => {
     if (!subscriptionData) return 0;
-    if (subscriptionData.package_id === 3) {
-      return subscriptionData.custom_calls_used || 0;
-    }
-    return subscriptionData.api_calls_used || 0;
+    return subscriptionData.package_id === 3 ? subscriptionData.custom_calls_used : subscriptionData.api_calls_used;
   };
 
   const getRemainingCalls = () => {
-    const limit = getMonthlyLimit();
-    const used = getUsedCalls();
-    return Math.max(0, limit - used);
+    return getMonthlyLimit() - getUsedCalls();
   };
 
   const getUsagePercentage = () => {
     const limit = getMonthlyLimit();
-    const used = getUsedCalls();
     if (limit === 0) return 0;
-    return Math.round((used / limit) * 100);
+    return Math.round((getUsedCalls() / limit) * 100);
   };
 
   const getPlanName = () => {
     if (!subscriptionData) return 'No Plan';
-    if (subscriptionData.package_id === 3) return 'Custom Enterprise Plan';
-    return subscriptionData.package?.package_name ? `${subscriptionData.package.package_name} Plan` : 'Unknown Plan';
+    return subscriptionData.package_id === 3 ? 'Custom Enterprise Plan' : `${subscriptionData.package.package_name} Plan`;
   };
 
   const getPlanPrice = () => {
     if (!subscriptionData) return 0;
-    if (subscriptionData.package_id === 3) {
-      return subscriptionData.custom_price || 0;
-    }
-    return subscriptionData.package?.package_price || 0;
-  };
-
-  const getPlanPeriod = () => {
-    if (!subscriptionData) return 'month';
-    if (subscriptionData.package_id === 3) return 'month';
-    return subscriptionData.package?.package_period || 'month';
+    return subscriptionData.package_id === 3 ? subscriptionData.custom_price : subscriptionData.package.package_price;
   };
 
   const isCustomPackage = () => {
@@ -195,43 +152,34 @@ if (loading) {
     <div className="min-h-screen bg-black py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
 
-        {/* Enterprise User Display - Show only this for enterprise users */}
-        {userObj && userObj.role === 'ENTERPRISE_USER' ? (
-          <EnterpriseUserDisplay 
-            onNavigateToSubBusinesses={handleNavigateToSubBusinesses}
-          />
-        ) : (
-          /* Main Content for non-enterprise users */
-          <div className="space-y-8">
-            {/* Status Section */}
-            {hasActiveSubscription ? (
-              <div className="space-y-6">
-                {/* Active Subscription Banner */}
-                <div className="bg-black rounded-xl shadow-sm border border-gray-800 p-6">
-                  <div className="flex items-center">
-                    <div className="bg-green-900 p-2 rounded-full mr-4">
-                      <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h2 className="text-lg font-semibold text-white">Active Subscription</h2>
-                      <p className="text-gray-300">Your subscription is active and ready to use</p>
-                    </div>
+        {/* Main Content */}
+        <div className="space-y-8">
+          {/* Status Section */}
+          {hasActiveSubscription ? (
+            <div className="space-y-6">
+              {/* Active Subscription Banner */}
+              <div className="bg-black rounded-xl shadow-sm border border-gray-800 p-6">
+                <div className="flex items-center">
+                  <div className="bg-green-900 p-2 rounded-full mr-4">
+                    <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-semibold text-white">Active Subscription</h2>
+                    <p className="text-gray-300">Your subscription is active and ready to use</p>
                   </div>
                 </div>
+              </div>
 
               {/* Plan Details */}
-              {subscriptionData && (subscriptionData.package || subscriptionData.package_id === 3) && (
+              {subscriptionData?.package && (
                 <div className="bg-black rounded-xl shadow-sm border border-gray-800 overflow-hidden">
                   <div className="p-6 border-b border-gray-700">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                       <div>
                         <h3 className="text-2xl font-bold text-white mb-1">{getPlanName()}</h3>
-                        {/* Show price/period for all packages including package ID 3 */}
-                        <p className="text-gray-300 text-lg">
-                          {formatCurrency(getPlanPrice())} / {getPlanPeriod()}
-                        </p>
+                        <p className="text-gray-300 text-lg">{formatCurrency(getPlanPrice())} / {subscriptionData.package.package_period}</p>
                         {isCustomPackage() && (
                           <div className="mt-2">
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-900 text-purple-300">
@@ -244,24 +192,22 @@ if (loading) {
                         <svg className="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
-                        {isCustomPackage() && subscriptionData.custom_status === 'inactive' ? 'Activated' : 'Approved'}
+                        {isCustomPackage() && subscriptionData.custom_status === 'inactive' ? 'Pending Activation' : 'Approved'}
                       </div>
                     </div>
                   </div>
 
                   <div className="p-6">
-                    {/* Usage Stats - Show for all packages including package ID 3 */}
+                    {/* Usage Stats */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                       <div className="bg-blue-900 p-5 rounded-lg border border-blue-800">
                         <div className="flex items-center mb-2">
                           <svg className="w-5 h-5 text-blue-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                           </svg>
-                          <h4 className="text-sm font-medium text-gray-400 uppercase tracking-wider">
-                            {subscriptionData.package_id === 3 ? 'Custom API Limit' : 'Monthly Limit'}
-                          </h4>
+                          <h4 className="text-sm font-medium text-gray-400 uppercase tracking-wider">Monthly Limit</h4>
                         </div>
-                        <p className="text-3xl font-bold text-white">{formatNumber(getMonthlyLimit())}</p>
+                        <p className="text-3xl font-bold text-white">{getMonthlyLimit().toLocaleString()}</p>
                         <p className="text-sm text-gray-400">API Calls</p>
                       </div>
 
@@ -272,7 +218,7 @@ if (loading) {
                           </svg>
                           <h4 className="text-sm font-medium text-gray-400 uppercase tracking-wider">Used</h4>
                         </div>
-                        <p className="text-3xl font-bold text-white">{formatNumber(getUsedCalls())}</p>
+                        <p className="text-3xl font-bold text-white">{getUsedCalls().toLocaleString()}</p>
                         <p className="text-sm text-gray-400">API Calls</p>
                       </div>
 
@@ -283,12 +229,12 @@ if (loading) {
                           </svg>
                           <h4 className="text-sm font-medium text-gray-400 uppercase tracking-wider">Remaining</h4>
                         </div>
-                        <p className="text-3xl font-bold text-white">{formatNumber(getRemainingCalls())}</p>
+                        <p className="text-3xl font-bold text-white">{getRemainingCalls().toLocaleString()}</p>
                         <p className="text-sm text-gray-400">API Calls</p>
                       </div>
                     </div>
 
-                    {/* Progress Bar - Show for all packages including package ID 3 */}
+                    {/* Progress Bar */}
                     <div className="mb-8">
                       <div className="flex justify-between items-center mb-2">
                         <h4 className="text-sm font-medium text-gray-400 uppercase tracking-wider">Usage Progress</h4>
@@ -310,29 +256,29 @@ if (loading) {
                       </div>
                     </div>
 
-                    {/* Custom Package Info - Show additional details for package ID 3 */}
-                    {subscriptionData.package_id === 3 && (
+                    {/* Custom Package Info */}
+                    {isCustomPackage() && (
                       <div className="mb-8 bg-purple-900 p-5 rounded-lg border border-purple-800">
                         <h4 className="text-sm font-medium text-purple-300 uppercase tracking-wider mb-3">Custom Package Details</h4>
                         <div className="grid grid-cols-2 gap-4 text-sm">
-                          {/* <div>
+                          <div>
                             <span className="text-purple-300 font-medium">Custom API Count:</span>
-                            <span className="ml-2 text-purple-200">{formatNumber(subscriptionData.custom_api_count)}</span>
-                          </div> */}
+                            <span className="ml-2 text-purple-200">{subscriptionData.custom_api_count.toLocaleString()}</span>
+                          </div>
+                          <div>
+                            <span className="text-purple-300 font-medium">Custom Price:</span>
+                            <span className="ml-2 text-purple-200">{formatCurrency(subscriptionData.custom_price)}</span>
+                          </div>
                           {/* <div>
-                            <span className="text-purple-300 font-medium">Package ID:</span>
-                            <span className="ml-2 text-purple-200">{subscriptionData.package_id}</span>
-                          </div> */}
-                          <div>
-                            <span className="text-purple-300 font-medium">Subscription Date:</span>
-                            <span className="ml-2 text-purple-200">{formatDate(subscriptionData.subscription_date)}</span>
-                          </div>
-                          <div>
                             <span className="text-purple-300 font-medium">Status:</span>
-                            <span className="ml-2 px-2 py-1 rounded-full text-xs font-medium bg-green-900 text-green-300">
-                              Active
+                            <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                              subscriptionData.custom_status === 'active' 
+                                ? 'bg-green-900 text-green-300' 
+                                : 'bg-yellow-900 text-yellow-300'
+                            }`}>
+                              {subscriptionData.custom_status === 'active' ? 'Active' : 'Pending Activation'}
                             </span>
-                          </div>
+                          </div> */}
                         </div>
                       </div>
                     )}
@@ -409,8 +355,7 @@ if (loading) {
               <PricingSection  isDark={true} />
             </div>
           )}
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
