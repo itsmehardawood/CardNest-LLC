@@ -24,6 +24,70 @@
   }
 }
 
+/* styles/print.css or in your global CSS */
+@media print {
+  body * {
+    visibility: hidden;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .invoice-container,
+  .invoice-container * {
+    visibility: visible;
+  }
+  
+  .invoice-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: auto;
+    background: #000 !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 20px !important;
+  }
+  
+  /* Hide elements that shouldn't be printed */
+  .no-print,
+  button,
+  [onclick] {
+    display: none !important;
+  }
+  
+  /* Ensure good contrast for printing */
+  .bg-gray-800 {
+    background: #1f2937 !important;
+  }
+  
+  .bg-gray-700 {
+    background: #374151 !important;
+  }
+  
+  .text-white {
+    color: #fff !important;
+  }
+  
+  .text-gray-300 {
+    color: #d1d5db !important;
+  }
+  
+  .text-gray-400 {
+    color: #9ca3af !important;
+  }
+  
+  .border-gray-600 {
+    border-color: #4b5563 !important;
+  }
+  
+  .border-gray-700 {
+    border-color: #374151 !important;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

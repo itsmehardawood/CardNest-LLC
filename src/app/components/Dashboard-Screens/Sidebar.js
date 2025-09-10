@@ -17,6 +17,7 @@ import {
   Settings,
   Building2,
 } from 'lucide-react';
+import { FaFileInvoice } from 'react-icons/fa';
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen, activeTab, setActiveTab, status }) => {
   const [email, setEmail] = useState('');
@@ -45,6 +46,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, activeTab, setActiveTab, status 
     { id: 'Card', label: 'Security Scan Settings', icon: <BadgeDollarSign className="w-5 h-5" /> },
     { id: 'scanshistory', label: 'Scan History', icon: <History className="w-5 h-5" /> },
     { id: 'billing', label: 'Billing Logs', icon: <Receipt className="w-5 h-5" /> },
+    { id: 'invoices', label: 'Invoices', icon: <FaFileInvoice className="w-5 h-5" /> },
     { id: 'documents', label: 'Documents', icon: <FileText className="w-5 h-5" /> },
     { id: 'displaysettings', label: 'Display Settings', icon: <Settings className="w-5 h-5" /> },
     { id: 'developers', label: 'Developers', icon: <Zap className="w-5 h-5" /> },

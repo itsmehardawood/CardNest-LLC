@@ -14,6 +14,7 @@ import BillingLogsSection from "../components/Dashboard-Screens/BillingLogsSecti
 import DisplaySettings from "../components/Dashboard-Screens/DisplaySettings";
 import SubBusinessesScreen from "../components/Dashboard-Screens/SubBusinessesScreen";
 import useAutoLogout from "../hooks/Autologout";
+import InvoiceScreen from "../components/Dashboard-Screens/InvoicesScreen";
 
 // Loading component for Suspense fallback
 function DashboardLoader() {
@@ -679,11 +680,15 @@ function DashboardContent() {
         return <ScanHistorySection />;
       case "billing":
         return <BillingLogsSection />;
+
+      case "invoices":
+        return <InvoiceScreen />;
+
       case "displaysettings":
         return <DisplaySettings />;
 
-        case "sub-businesses":
-  return <SubBusinessesScreen />;
+      case "sub-businesses":
+        return <SubBusinessesScreen />;
       case "developers":
         return <DevelopersScreen />;
 

@@ -1,9 +1,11 @@
+/* eslint-disable @next/next/no-img-element */
+
 import React, { useState } from 'react';
 import { 
   XCircle, CheckCircle, AlertCircle, Download, Eye, ShieldCheck, 
-  Briefcase, MapPin, User, Home, CreditCard, FileText, Mail, ExternalLink 
+  Briefcase, MapPin, User, Home, CreditCard, FileText, Mail, ExternalLink, 
+  ChevronUp, ChevronDown
 } from 'lucide-react';
-import Image from 'next/image';
 
 // Document Preview Component
 const DocumentPreview = ({ 
@@ -11,7 +13,8 @@ const DocumentPreview = ({
   documentName, 
   documentType = 'registration', // 'registration' or 'id'
   onDownload,
-  downloadLoading = false 
+  downloadLoading = false ,
+  showPreview = true
 }) => {
   const [imageError, setImageError] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
@@ -77,6 +80,7 @@ const DocumentPreview = ({
           </div>
           
           {/* Document preview area */}
+          {showPreview && (
           <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
             {isImage && !imageError ? (
               <div className="relative">
@@ -85,13 +89,13 @@ const DocumentPreview = ({
                   alt={`${documentType} document`}
                   className="w-full h-48 object-contain rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
                   onError={handleImageError}
-                  onClick={() => setShowFullScreen(true)}
+                  // onClick={() => setShowFullScreen(true)}
                 />
                 <button
-                  onClick={() => setShowFullScreen(true)}
+                  onClick={() => openInNewTab(true)}
                   className="absolute top-2 right-2 p-2 bg-black/50 text-white rounded-lg hover:bg-black/70 transition-colors"
                 >
-                  <Eye className="h-4 w-4" />
+                  {/* <Eye className="h-4 w-4" /> */}
                 </button>
               </div>
             ) : isPDF ? (
@@ -122,6 +126,7 @@ const DocumentPreview = ({
               </div>
             )}
           </div>
+        )}
         </div>
       </div>
 
@@ -163,6 +168,37 @@ const BusinessModal = ({
   handleDownloadDocument
 }) => {
 
+  // pricing states
+  const [showPricingForm, setShowPricingForm] = useState(false);
+  const [pricingData, setPricingData] = useState({
+    per_api_call: selectedBusiness?.per_api_call || "",
+    overdue_api_call: selectedBusiness?.overdue_api_call || "",
+  });
+
+  // pricing handlers
+  const handlePricingChange = (e) => {
+    setPricingData({
+      ...pricingData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSavePricing = () => {
+    // 🔹 Call your API or update parent state
+    console.log("Saving pricing:", pricingData);
+    // After saving, collapse dropdown
+    setShowPricingForm(false);
+  };
+
+  const handleCancelPricing = () => {
+    // Reset values back to original
+    setPricingData({
+      per_api_call: selectedBusiness?.per_api_call || "",
+      overdue_api_call: selectedBusiness?.overdue_api_call || "",
+    });
+    setShowPricingForm(false);
+  };
+
   const handleRejectClick = () => {
     setShowRejectForm(true);
   };
@@ -176,307 +212,385 @@ const BusinessModal = ({
   if (!isModalOpen || !selectedBusiness) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm overflow-y-auto h-full w-full z-50 p-4">
-      <div className="relative top-4 mx-auto border-0 w-full max-w-6xl shadow-2xl rounded-2xl bg-black border border-gray-800">
-        {/* Enhanced Modal Header */}
-        <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white p-6 rounded-t-2xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-white/10 rounded-lg">
-                <ShieldCheck className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-1">Business Verification Review</h3>
-                <p className="text-gray-300 text-sm">Complete verification assessment</p>
-              </div>
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-md overflow-y-auto h-full w-full z-50 p-4 flex items-center justify-center">
+      <div className="relative top-10 mx-auto border-0 w-full max-w-6xl shadow-2xl rounded-2xl bg-gray-950 border-gray-800 overflow-hidden">
+      {/* Enhanced Modal Header */}
+      <div className="bg-gradient-to-r from-gray-900 via-gray-900 to-gray-800 text-white p-6 rounded-t-2xl border-b border-gray-800">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="p-2.5 bg-white/10 rounded-xl backdrop-blur-sm">
+              <ShieldCheck className="h-6 w-6 text-blue-400" />
             </div>
-            <button
-              onClick={handleCloseModal}
-              className="text-white/70 hover:text-white hover:bg-white/10 rounded-lg p-2 transition-all duration-200"
-              disabled={actionLoading}
-            >
-              <XCircle className="h-5 w-5" />
-            </button>
+            <div>
+              <h3 className="text-xl font-semibold mb-1">Business Verification Review</h3>
+              <p className="text-gray-400 text-sm">Complete verification assessment</p>
+            </div>
+          </div>
+          <button
+            onClick={handleCloseModal}
+            className="text-gray-400 hover:text-white hover:bg-white/10 rounded-xl p-2 transition-all duration-200"
+            disabled={actionLoading}
+          >
+            <XCircle className="h-6 w-6" />
+          </button>
+        </div>
+      </div>
+    
+      <div className="p-6 max-h-[85vh] overflow-y-auto bg-gray-950">
+        <div className="space-y-6">
+        {/* Business Information Section */}
+        <div className="bg-gray-900 rounded-xl p-5 shadow border border-gray-800">
+          <div className="flex items-center mb-5">
+            <div className="p-2.5 bg-blue-900/30 rounded-lg mr-3 border border-blue-800/30">
+              <Briefcase className="h-5 w-5 text-blue-400" />
+            </div>
+            <h4 className="text-lg font-semibold text-white">Business Information</h4>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="bg-gray-800/50 rounded-lg p-4 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+              <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Business Name</label>
+              <p className="text-white text-sm font-medium">{selectedBusiness.business_name}</p>
+            </div>
+            <div className="bg-gray-800/50 rounded-lg p-4 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+              <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Registration Number</label>
+              <p className="text-white text-sm font-medium">{selectedBusiness.business_registration_number}</p>
+            </div>
+            <div className="bg-gray-800/50 rounded-lg p-4 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+              <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Business Email</label>
+              <p className="text-white text-sm font-medium">{selectedBusiness.email}</p>
+            </div>
           </div>
         </div>
-        
-        <div className="p-6 max-h-[85vh] overflow-y-auto bg-gray-900">
-          <div className="space-y-8">
-            {/* Business Information Section */}
-            <div className="bg-black rounded-2xl p-6 shadow-sm border border-gray-800">
-              <div className="flex items-center mb-6">
-                <div className="p-2 bg-blue-900 rounded-lg mr-3">
-                  <Briefcase className="h-5 w-5 text-blue-400" />
-                </div>
-                <h4 className="text-lg font-semibold text-white">Business Information</h4>
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
-                  <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Business Name</label>
-                  <p className="text-white text-sm font-semibold">{selectedBusiness.business_name}</p>
-                </div>
-                <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
-                  <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Registration Number</label>
-                  <p className="text-white text-sm font-semibold">{selectedBusiness.business_registration_number}</p>
-                </div>
-                <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
-                  <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Business Email</label>
-                  <p className="text-white text-sm font-semibold">{selectedBusiness.email}</p>
-                </div>
-              </div>
-            </div>
 
-            {/* Business Address Section */}
-            <div className="bg-black rounded-2xl p-6 shadow-sm border border-gray-800">
-              <div className="flex items-center mb-6">
-                <div className="p-2 bg-green-900 rounded-lg mr-3">
-                  <MapPin className="h-5 w-5 text-green-400" />
-                </div>
-                <h4 className="text-lg font-semibold text-white">Business Address</h4>
-              </div>
-              <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
-                <div className="text-white space-y-1">
-                  <p className="font-semibold text-base">{selectedBusiness.street}</p>
-                  {selectedBusiness.street_line2 && <p className="text-gray-300">{selectedBusiness.street_line2}</p>}
-                  <p className="text-gray-300">{selectedBusiness.city}, {selectedBusiness.state} {selectedBusiness.zip_code}</p>
-                  <p className="font-semibold text-green-400 text-sm">{selectedBusiness.country}</p>
-                </div>
-              </div>
+         {/* Account Status Section */}
+        <div className="bg-gray-900 rounded-xl p-5 shadow border border-gray-800">
+          <div className="flex items-center mb-5">
+            <div className="p-2.5 bg-gray-800 rounded-lg mr-3 border border-gray-700">
+              <ShieldCheck className="h-5 w-5 text-shadow-amber-500" />
             </div>
-            
-            {/* Account Holder Information Section */}
-            <div className="bg-black rounded-2xl p-6 shadow-sm border border-gray-800">
-              <div className="flex items-center mb-6">
-                <div className="p-2 bg-purple-900 rounded-lg mr-3">
-                  <User className="h-5 w-5 text-purple-400" />
-                </div>
-                <h4 className="text-lg font-semibold text-white">Account Holder Details</h4>
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
-                  <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Full Name</label>
-                  <p className="text-white text-sm font-semibold">
-                    {selectedBusiness.account_holder_first_name} {selectedBusiness.account_holder_last_name}
-                  </p>
-                </div>
-                <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
-                  <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Email</label>
-                  <p className="text-white text-sm font-semibold">{selectedBusiness.account_holder_email}</p>
-                </div>
-                <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
-                  <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Date of Birth</label>
-                  <p className="text-white text-sm font-semibold">
-                    {new Date(selectedBusiness.account_holder_date_of_birth).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
-                  <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Phone</label>
-                  <p className="text-white text-sm font-semibold">
-                    {selectedBusiness.user.country_code} {selectedBusiness.user.phone_no}
-                  </p>
-                </div>
-              </div>
+            <h4 className="text-lg font-semibold text-white">Account Status</h4>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="bg-gray-800/50 rounded-lg p-4 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+              <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Merchant ID</label>
+              <p className="text-white text-sm font-medium font-mono">{selectedBusiness.user.merchant_id}</p>
             </div>
+            <div className="bg-gray-800/50 rounded-lg p-4 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+              <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Trial Status</label>
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                selectedBusiness.user.on_trial 
+                  ? 'bg-blue-900/30 text-blue-300 border border-blue-700/30' 
+                  : 'bg-gray-800 text-yellow-300 border border-gray-700'
+              }`}>
+                {selectedBusiness.user.on_trial ? 'Active' : 'Inactive'}
+              </span>
+            </div>
+            <div className="bg-gray-800/50 rounded-lg p-4 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+              <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Trial Calls Remaining</label>
+              <p className="text-white text-sm font-medium">{selectedBusiness.user.trial_calls_remaining}</p>
+            </div>
+            <div className="bg-gray-800/50 rounded-lg p-4 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+              <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Trial Ends</label>
+              <p className="text-white text-sm font-medium">
+                {new Date(selectedBusiness.user.trial_ends_at).toLocaleDateString()}
+              </p>
+            </div>
+            <div className="bg-gray-800/50 rounded-lg p-4 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+              <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Role</label>
+              <p className="text-white text-sm font-medium">{selectedBusiness.user.role}</p>
+            </div>
+          </div>
+        </div>
 
-            {/* Account Holder Address Section */}
-            <div className="bg-black rounded-2xl p-6 shadow-sm border border-gray-800">
-              <div className="flex items-center mb-6">
-                <div className="p-2 bg-amber-900 rounded-lg mr-3">
-                  <Home className="h-5 w-5 text-amber-400" />
-                </div>
-                <h4 className="text-lg font-semibold text-white">Account Holder Address</h4>
+        {/* Pricing Section Drop-down */}
+        {activeTab === 'approved' && (
+        <div className="bg-gray-900 rounded-xl shadow border border-gray-800 overflow-hidden">
+          {/* Header */}
+          <button
+            type="button"
+            onClick={() => setShowPricingForm(!showPricingForm)}
+            className="w-full flex items-center justify-between p-5 hover:bg-gray-800/30 transition-colors duration-150"
+          >
+            <div className="flex items-center">
+              <div className="p-2.5 bg-indigo-900/30 rounded-lg mr-3 border border-indigo-800/30">
+                <CreditCard className="h-5 w-5 text-indigo-400" />
               </div>
-              <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
-                <div className="text-white space-y-1">
-                  <p className="font-semibold text-base">{selectedBusiness.account_holder_street}</p>
-                  {selectedBusiness.account_holder_street_line2 && (
-                    <p className="text-gray-300">{selectedBusiness.account_holder_street_line2}</p>
-                  )}
-                  <p className="text-gray-300">{selectedBusiness.account_holder_city}, {selectedBusiness.account_holder_state} {selectedBusiness.account_holder_zip_code}</p>
-                  <p className="font-semibold text-amber-400 text-sm">{selectedBusiness.account_holder_country}</p>
-                </div>
-              </div>
+              <h4 className="text-lg font-semibold text-white">Add Custom Pricing</h4>
             </div>
-
-            {/* ID Information Section */}
-            <div className="bg-black rounded-2xl p-6 shadow-sm border border-gray-800">
-              <div className="flex items-center mb-6">
-                <div className="p-2 bg-indigo-900 rounded-lg mr-3">
-                  <CreditCard className="h-5 w-5 text-indigo-400" />
-                </div>
-                <h4 className="text-lg font-semibold text-white">Identity Information</h4>
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
-                  <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">ID Type</label>
-                  <p className="text-white text-sm font-semibold">{selectedBusiness.account_holder_id_type}</p>
-                </div>
-                <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
-                  <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">ID Number</label>
-                  <p className="text-white text-sm font-semibold font-mono">
-                    {selectedBusiness.account_holder_id_number}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Account Status Section */}
-            <div className="bg-black rounded-2xl p-6 shadow-sm border border-gray-800">
-              <div className="flex items-center mb-6">
-                <div className="p-2 bg-gray-800 rounded-lg mr-3">
-                  <ShieldCheck className="h-5 w-5 text-gray-400" />
-                </div>
-                <h4 className="text-lg font-semibold text-white">Account Status</h4>
-              </div>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
-                  <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Merchant ID</label>
-                  <p className="text-white text-sm font-semibold font-mono">{selectedBusiness.user.merchant_id}</p>
-                </div>
-                <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
-                  <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Trial Status</label>
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-                    selectedBusiness.user.on_trial 
-                      ? 'bg-blue-900 text-blue-300 border border-blue-700' 
-                      : 'bg-gray-800 text-gray-300 border border-gray-700'
-                  }`}>
-                    {selectedBusiness.user.on_trial ? 'Active' : 'Inactive'}
-                  </span>
-                </div>
-                <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
-                  <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Trial Calls Remaining</label>
-                  <p className="text-white text-sm font-semibold">{selectedBusiness.user.trial_calls_remaining}</p>
-                </div>
-                <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
-                  <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Trial Ends</label>
-                  <p className="text-white text-sm font-semibold">
-                    {new Date(selectedBusiness.user.trial_ends_at).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
-                  <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Role</label>
-                  <p className="text-white text-sm font-semibold">{selectedBusiness.user.role}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Previous verification reason */}
-            {selectedBusiness.user.verification_reason && (
-              <div className="bg-red-900 border border-red-700 rounded-2xl p-6">
-                <div className="flex items-center mb-4">
-                  <AlertCircle className="h-5 w-5 text-red-400 mr-2" />
-                  <label className="text-sm font-semibold text-red-200">Previous Rejection Notes</label>
-                </div>
-                <div className="bg-black rounded-xl p-4 shadow-sm border border-red-800">
-                  <p className="text-red-300 text-sm leading-relaxed">{selectedBusiness.user.verification_reason}</p>
-                </div>
-              </div>
+            {showPricingForm ? (
+              <ChevronUp className="h-5 w-5 text-gray-400" />
+            ) : (
+              <ChevronDown className="h-5 w-5 text-gray-400" />
             )}
+          </button>
 
-            {/* Documents Section */}
-            {activeTab === "pending" && (
-              <div className="space-y-6">
-                {/* Registration Document */}
-                {selectedBusiness.registration_document_path && (
-                  <DocumentPreview
-                    documentPath={selectedBusiness.registration_document_path}
-                    documentName={(selectedBusiness.registration_document_path || '').split('/').pop()}
-                    documentType="registration"
-                    onDownload={() => handleDownloadDocument(
-                      selectedBusiness.registration_document_path,
-                      `${selectedBusiness.business_name}_registration_document.${(selectedBusiness.registration_document_path || '').split('.').pop()}`
-                    )}
-                    downloadLoading={downloadLoading}
+          {/* Dropdown Content */}
+          {showPricingForm && (
+            <div className="p-5 border-t border-gray-800 space-y-5 bg-gray-850">
+              <form className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                  <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">
+                    Price Per API Call
+                  </label>
+                  <input
+                    type="number"
+                    name="per_api_call"
+                    value={pricingData.per_api_call}
+                    onChange={handlePricingChange}
+                    className="w-full rounded-lg bg-gray-900 text-white border border-gray-700 p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   />
-                )}
-
-                {/* ID Document */}
-                {selectedBusiness.account_holder_id_document_path && (
-                  <DocumentPreview
-                    documentPath={selectedBusiness.account_holder_id_document_path}
-                    documentName={(selectedBusiness.account_holder_id_document_path || '').split('/').pop()}
-                    documentType="id"
-                    onDownload={() => handleDownloadDocument(
-                      selectedBusiness.account_holder_id_document_path,
-                      `${selectedBusiness.account_holder_first_name}_${selectedBusiness.account_holder_last_name}_id_document.${(selectedBusiness.account_holder_id_document_path || '').split('.').pop()}`
-                    )}
-                    downloadLoading={downloadLoading}
-                  />
-                )}
-              </div>
-            )}
-
-            {/* Reject Reason Form */}
-            {showRejectForm && (
-              <div className="bg-red-900 border border-red-700 rounded-2xl p-6">
-                <div className="flex items-center mb-4">
-                  <XCircle className="h-5 w-5 text-red-400 mr-2" />
-                  <label className="text-sm font-semibold text-red-200">Reason for Rejection *</label>
                 </div>
-                <textarea
-                  value={rejectReason}
-                  onChange={(e) => setRejectReason(e.target.value)}
-                  className="w-full px-4 py-3 border text-white border-red-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm resize-none bg-black"
-                  rows="4"
-                  placeholder="Please provide a detailed reason for rejection. This will help the business understand what needs to be corrected."
-                  required
-                />
+
+                <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                  <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">
+                    Price Overdue API Call
+                  </label>
+                  <input
+                    type="number"
+                    name="overdue_api_call"
+                    value={pricingData.overdue_api_call}
+                    onChange={handlePricingChange}
+                    className="w-full rounded-lg bg-gray-900 text-white border border-gray-700 p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  />
+                </div>
+              </form>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end space-x-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleCancelPricing}
+                  className="px-4 py-2.5 text-gray-300 bg-gray-800 border border-gray-700 hover:bg-gray-700 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSavePricing}
+                  className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold shadow-md transition-colors"
+                >
+                  Save Pricing
+                </button>
               </div>
-            )}
-          </div>   
-
-          {/* Enhanced Action Buttons */}
-          {activeTab === 'pending' && (
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end space-y-3 sm:space-y-0 sm:space-x-3 mt-8 pt-6 border-t border-gray-800">
-              <button
-                onClick={() => handleApprove(selectedBusiness.id)}
-                disabled={actionLoading}
-                className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white text-sm font-semibold rounded-xl hover:from-emerald-700 hover:to-emerald-800 disabled:opacity-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                {actionLoading ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
-                ) : (
-                  <CheckCircle className="h-4 w-4 mr-2" />
-                )}
-                Approve Business
-              </button>
-
-              {!showRejectForm ? (
-                <button
-                  onClick={handleRejectClick}
-                  disabled={actionLoading}
-                  className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white text-sm font-semibold rounded-xl hover:from-red-700 hover:to-red-800 disabled:opacity-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                >
-                  <XCircle className="h-4 w-4 mr-2" />
-                  Reject Business
-                </button>
-              ) : (
-                <button
-                  onClick={() => handleReject(selectedBusiness.id)}
-                  disabled={actionLoading || !rejectReason.trim()}
-                  className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white text-sm font-semibold rounded-xl hover:from-red-700 hover:to-red-800 disabled:opacity-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                >
-                  {actionLoading ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
-                  ) : (
-                    <XCircle className="h-4 w-4 mr-2" />
-                  )}
-                  Confirm Rejection
-                </button>
-              )}
-              
-              <button
-                onClick={handleCloseModal}
-                disabled={actionLoading}
-                className="px-6 py-3 text-gray-300 bg-black border border-gray-700 hover:bg-gray-900 text-sm font-semibold rounded-xl disabled:opacity-50 transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                Cancel
-              </button>
             </div>
           )}
         </div>
-      </div>
+        )}
+
+        {/* Business Address Section */}
+        <div className="bg-gray-900 rounded-xl p-5 shadow border border-gray-800">
+          <div className="flex items-center mb-5">
+            <div className="p-2.5 bg-green-900/30 rounded-lg mr-3 border border-green-800/30">
+              <MapPin className="h-5 w-5 text-green-400" />
+            </div>
+            <h4 className="text-lg font-semibold text-white">Business Address</h4>
+          </div>
+          <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+            <div className="text-white space-y-1.5">
+              <p className="font-medium text-base">{selectedBusiness.street}</p>
+              {selectedBusiness.street_line2 && <p className="text-gray-300 text-sm">{selectedBusiness.street_line2}</p>}
+              <p className="text-gray-300 text-sm">{selectedBusiness.city}, {selectedBusiness.state} {selectedBusiness.zip_code}</p>
+              <p className="font-medium text-green-400 text-sm mt-2">{selectedBusiness.country}</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Account Holder Information Section */}
+        <div className="bg-gray-900 rounded-xl p-5 shadow border border-gray-800">
+          <div className="flex items-center mb-5">
+            <div className="p-2.5 bg-purple-900/30 rounded-lg mr-3 border border-purple-800/30">
+              <User className="h-5 w-5 text-purple-400" />
+            </div>
+            <h4 className="text-lg font-semibold text-white">Account Holder Details</h4>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="bg-gray-800/50 rounded-lg p-4 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+              <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Full Name</label>
+              <p className="text-white text-sm font-medium">
+                {selectedBusiness.account_holder_first_name} {selectedBusiness.account_holder_last_name}
+              </p>
+            </div>
+            <div className="bg-gray-800/50 rounded-lg p-4 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+              <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Email</label>
+              <p className="text-white text-sm font-medium">{selectedBusiness.account_holder_email}</p>
+            </div>
+            <div className="bg-gray-800/50 rounded-lg p-4 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+              <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Date of Birth</label>
+              <p className="text-white text-sm font-medium">
+                {new Date(selectedBusiness.account_holder_date_of_birth).toLocaleDateString()}
+              </p>
+            </div>
+            <div className="bg-gray-800/50 rounded-lg p-4 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+              <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">Phone</label>
+              <p className="text-white text-sm font-medium">
+                {selectedBusiness.user.country_code} {selectedBusiness.user.phone_no}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Account Holder Address Section */}
+        <div className="bg-gray-900 rounded-xl p-5 shadow border border-gray-800">
+          <div className="flex items-center mb-5">
+            <div className="p-2.5 bg-amber-900/30 rounded-lg mr-3 border border-amber-800/30">
+              <Home className="h-5 w-5 text-amber-400" />
+            </div>
+            <h4 className="text-lg font-semibold text-white">Account Holder Address</h4>
+          </div>
+          <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+            <div className="text-white space-y-1.5">
+              <p className="font-medium text-base">{selectedBusiness.account_holder_street}</p>
+              {selectedBusiness.account_holder_street_line2 && (
+                <p className="text-gray-300 text-sm">{selectedBusiness.account_holder_street_line2}</p>
+              )}
+              <p className="text-gray-300 text-sm">{selectedBusiness.account_holder_city}, {selectedBusiness.account_holder_state} {selectedBusiness.account_holder_zip_code}</p>
+              <p className="font-medium text-amber-400 text-sm mt-2">{selectedBusiness.account_holder_country}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* ID Information Section */}
+        <div className="bg-gray-900 rounded-xl p-5 shadow border border-gray-800">
+          <div className="flex items-center mb-5">
+            <div className="p-2.5 bg-indigo-900/40 rounded-lg mr-3 border border-indigo-800/30">
+              <CreditCard className="h-5 w-5 text-indigo-400" />
+            </div>
+            <h4 className="text-lg font-semibold text-white">Identity Information</h4>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div className="bg-gray-800/50 rounded-lg p-4 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+              <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">ID Type</label>
+              <p className="text-white text-sm font-medium">{selectedBusiness.account_holder_id_type}</p>
+            </div>
+            <div className="bg-gray-800/50 rounded-lg p-4 transition-all duration-200 border border-gray-700 hover:border-gray-600">
+              <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wider">ID Number</label>
+              <p className="text-white text-sm font-medium font-mono">
+                {selectedBusiness.account_holder_id_number}
+              </p>
+            </div>
+          </div>
+        </div>
+
+       
+
+        {/* Previous verification reason */}
+        {selectedBusiness.user.verification_reason && (
+          <div className="bg-red-900/20 border border-red-700/30 rounded-xl p-5">
+            <div className="flex items-center mb-4">
+              <AlertCircle className="h-5 w-5 text-red-400 mr-2" />
+              <label className="text-sm font-semibold text-red-200">Previous Rejection Notes</label>
+            </div>
+            <div className="bg-gray-900 rounded-lg p-4 border border-red-800/30">
+              <p className="text-red-300 text-sm leading-relaxed">{selectedBusiness.user.verification_reason}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Documents Section */}
+        {/* {activeTab === "pending" || "approved" && ( */}
+          <div className="space-y-5">
+            {/* Registration Document */}
+            {selectedBusiness.registration_document_path && (
+              <DocumentPreview
+                documentPath={selectedBusiness.registration_document_path}
+                documentName={(selectedBusiness.registration_document_path || '').split('/').pop()}
+                documentType="registration"
+                onDownload={() => handleDownloadDocument(
+                  selectedBusiness.registration_document_path,
+                  `${selectedBusiness.business_name}_registration_document.${(selectedBusiness.registration_document_path || '').split('.').pop()}`
+                )}
+                downloadLoading={downloadLoading}
+                showPreview={activeTab === "pending"} // ⬅️ Add a new prop
+              />
+            )}
+
+            {/* ID Document */}
+            {selectedBusiness.account_holder_id_document_path && (
+              <DocumentPreview
+                documentPath={selectedBusiness.account_holder_id_document_path}
+                documentName={(selectedBusiness.account_holder_id_document_path || '').split('/').pop()}
+                documentType="id"
+                onDownload={() => handleDownloadDocument(
+                  selectedBusiness.account_holder_id_document_path,
+                  `${selectedBusiness.account_holder_first_name}_${selectedBusiness.account_holder_last_name}_id_document.${(selectedBusiness.account_holder_id_document_path || '').split('.').pop()}`
+                )}
+                downloadLoading={downloadLoading}
+                showPreview={activeTab === "pending"} // ⬅️ Add a new prop
+              />
+            )}
+          </div>
+
+        {/* Reject Reason Form */}
+        {showRejectForm && (
+          <div className="bg-red-900/20 border border-red-700/30 rounded-xl p-5">
+            <div className="flex items-center mb-4">
+              <XCircle className="h-5 w-5 text-red-400 mr-2" />
+              <label className="text-sm font-semibold text-red-200">Reason for Rejection *</label>
+            </div>
+            <textarea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              className="w-full px-4 py-3 border text-white border-red-600/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm resize-none bg-gray-900 transition-all"
+              rows="4"
+              placeholder="Please provide a detailed reason for rejection. This will help the business understand what needs to be corrected."
+              required
+            />
+          </div>
+        )}
+      </div>   
+
+      {/* Enhanced Action Buttons */}
+      {activeTab === 'pending' && (
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end space-y-3 sm:space-y-0 sm:space-x-3 mt-8 pt-6 border-t border-gray-800">
+          <button
+            onClick={() => handleApprove(selectedBusiness.id)}
+            disabled={actionLoading}
+            className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white text-sm font-semibold rounded-lg hover:from-emerald-700 hover:to-emerald-800 disabled:opacity-50 transition-all duration-200 shadow-lg hover:shadow-xl"
+          >
+            {actionLoading ? (
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+            ) : (
+              <CheckCircle className="h-4 w-4 mr-2" />
+            )}
+            Approve Business
+          </button>
+
+          {!showRejectForm ? (
+            <button
+              onClick={handleRejectClick}
+              disabled={actionLoading}
+              className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white text-sm font-semibold rounded-lg hover:from-red-700 hover:to-red-800 disabled:opacity-50 transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              <XCircle className="h-4 w-4 mr-2" />
+              Reject Business
+            </button>
+          ) : (
+            <button
+              onClick={() => handleReject(selectedBusiness.id)}
+              disabled={actionLoading || !rejectReason.trim()}
+              className="flex items-center justify-center px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white text-sm font-semibold rounded-lg hover:from-red-700 hover:to-red-800 disabled:opacity-50 transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              {actionLoading ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+              ) : (
+                <XCircle className="h-4 w-4 mr-2" />
+              )}
+              Confirm Rejection
+            </button>
+          )}
+          
+          <button
+            onClick={handleCloseModal}
+            disabled={actionLoading}
+            className="px-6 py-3 text-gray-300 bg-gray-800 border border-gray-700 hover:bg-gray-700 text-sm font-semibold rounded-lg disabled:opacity-50 transition-all duration-200 shadow-sm hover:shadow-md"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </div>
+  </div>
+</div>
   );
 };
 

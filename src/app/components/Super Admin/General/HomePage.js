@@ -249,6 +249,7 @@ export default function HomePage() {
               <Legend />
               <Bar dataKey="Pending" fill="#FF8042" stackId="a" />
               <Bar dataKey="Approved" fill="#00C49F" stackId="a" />
+              
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -258,7 +259,7 @@ export default function HomePage() {
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={histogramData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" tick={{ fontSize: 10 }} />
+              <XAxis dataKey="date" tick={{ fontSize: 11 }} />
               <YAxis allowDecimals={false} />
               <Tooltip />
               <Bar dataKey="Total" fill="#8884d8" />
