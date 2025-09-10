@@ -16,9 +16,11 @@ const ACHPaymentForm = ({
   const [isLoading, setIsLoading] = useState(false);
   const [squareLoaded, setSquareLoaded] = useState(false);
   const [credentialsError, setCredentialsError] = useState(false);
+  const [squareDetectionAttempts, setSquareDetectionAttempts] = useState(0);
 
   const achRef = useRef(null);
   const paymentsRef = useRef(null);
+  const detectionTimeoutRef = useRef(null);
 
   // Sandbox
   // const appId = "sandbox-sq0idb-MBvG49FH6Nz_mhhrBrclhg";
@@ -249,6 +251,52 @@ const ACHPaymentForm = ({
     }
   };
 
+  // Enhanced Square.js detection with fallback
+  const detectSquareLoaded = () => {
+    if (window.Square) {
+      setSquareLoaded(true);
+      if (detectionTimeoutRef.current) {
+        clearTimeout(detectionTimeoutRef.current);
+      }
+      return true;
+    }
+    return false;
+  };
+
+  // Early detection effect - checks immediately when component mounts
+  useEffect(() => {
+    // Check if Square is already loaded (e.g., from previous page visit)
+    if (detectSquareLoaded()) {
+      return;
+    }
+
+    // Set up early detection timeout (1 second)
+    const earlyDetectionTimeout = setTimeout(() => {
+      if (detectSquareLoaded()) {
+        setSquareDetectionAttempts(prev => prev + 1);
+      }
+    }, 1000);
+
+    // Set up fallback detection timeout (3 seconds)
+    detectionTimeoutRef.current = setTimeout(() => {
+      if (!detectSquareLoaded()) {
+        console.warn('Square.js detection timeout, attempting manual check...');
+        setSquareDetectionAttempts(prev => prev + 1);
+        // Force enable button after timeout if Square seems unavailable
+        if (window.Square) {
+          setSquareLoaded(true);
+        }
+      }
+    }, 3000);
+
+    return () => {
+      clearTimeout(earlyDetectionTimeout);
+      if (detectionTimeoutRef.current) {
+        clearTimeout(detectionTimeoutRef.current);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     if (squareLoaded) {
       initializeSquare();
@@ -336,10 +384,35 @@ const ACHPaymentForm = ({
        
  <Script
   src="https://web.squarecdn.com/v1/square.js"
-  onLoad={() => setSquareLoaded(true)}
+  onLoad={() => {
+    console.log('Square.js script loaded');
+    setSquareLoaded(true);
+  }}
+  onError={(e) => {
+    console.error('Square.js script failed to load:', e);
+    // Still try to detect if Square is available
+    setTimeout(() => {
+      if (window.Square) {
+        setSquareLoaded(true);
+      }
+    }, 500);
+  }}
 /> 
 
       <div className="space-y-4">
+        {/* Debug info - only show in development */}
+       
+
+        {/* {process.env.NODE_ENV === 'development' && (
+          <div className="bg-gray-100 p-2 rounded text-xs text-gray-600">
+            <div>Square Loaded: {squareLoaded ? '✅' : '❌'}</div>
+            <div>Detection Attempts: {squareDetectionAttempts}</div>
+            <div>Is Loading: {isLoading ? '✅' : '❌'}</div>
+            <div>Disabled Prop: {disabled ? '✅' : '❌'}</div>
+            <div>Window.Square Available: {typeof window !== 'undefined' && window.Square ? '✅' : '❌'}</div>
+          </div>
+        )} */}
+        
         <button
           type="button"
           onClick={handlePaymentSubmission}
@@ -350,6 +423,11 @@ const ACHPaymentForm = ({
             <>
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
               Processing Bank Payment...
+            </>
+          ) : !squareLoaded ? (
+            <>
+              <div className="animate-pulse w-5 h-5 bg-current rounded opacity-50"></div>
+              Loading Bank Payment System...
             </>
           ) : (
             <>

@@ -701,12 +701,13 @@ export default function PaymentPage({ params }) {
                          </div>
                        </button>
                        <button
+                        disabled
                          type="button"
                          onClick={() => setPaymentMethod('card')}
                          className={`p-3 rounded-lg border-2 transition-all ${
                            paymentMethod === 'card'
                              ? 'border-blue-500 bg-blue-50 text-blue-700'
-                             : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                             : 'border-gray-300 bg-white text-gray-500 hover:border-gray-400'
                          }`}
                        >
                          <div className="flex items-center justify-center gap-2">
@@ -714,7 +715,7 @@ export default function PaymentPage({ params }) {
                              <rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" strokeWidth="2"/>
                              <path d="M2 10h20" stroke="currentColor" strokeWidth="2"/>
                            </svg>
-                           Card Payments
+                           Card Payments Upcoming
                          </div>
                        </button>
                      </div>
