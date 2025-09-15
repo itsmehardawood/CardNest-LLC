@@ -381,7 +381,7 @@ const ACHPaymentForm = ({
         onLoad={() => setSquareLoaded(true)}
       /> */}
 
-       
+      
  <Script
   src="https://web.squarecdn.com/v1/square.js"
   onLoad={() => {
@@ -397,7 +397,8 @@ const ACHPaymentForm = ({
       }
     }, 500);
   }}
-/> 
+/>  
+
 
       <div className="space-y-4">
         {/* Debug info - only show in development */}

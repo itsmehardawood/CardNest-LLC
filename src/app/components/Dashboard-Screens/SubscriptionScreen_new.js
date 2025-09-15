@@ -91,37 +91,55 @@ function SubscriptionsScreen() {
     });
   };
 
-  const formatCurrency = (amount) => amount ? `$${parseFloat(amount).toFixed(2)}` : '$0.00';
+  const formatCurrency = (amount) => {
+    if (amount === null || amount === undefined || isNaN(amount)) return '$0.00';
+    return `$${parseFloat(amount).toFixed(2)}`;
+  };
 
   // Helper functions for package data based on package_id
   const getMonthlyLimit = () => {
     if (!subscriptionData) return 0;
-    return subscriptionData.package_id === 3 ? subscriptionData.custom_api_count : subscriptionData.package.monthly_limit;
+    if (subscriptionData.package_id === 3) {
+      return subscriptionData.custom_api_count || 0;
+    }
+    return subscriptionData.package?.monthly_limit || 0;
   };
 
   const getUsedCalls = () => {
     if (!subscriptionData) return 0;
-    return subscriptionData.package_id === 3 ? subscriptionData.custom_calls_used : subscriptionData.api_calls_used;
+    if (subscriptionData.package_id === 3) {
+      return subscriptionData.custom_calls_used || 0;
+    }
+    return subscriptionData.api_calls_used || 0;
   };
 
   const getRemainingCalls = () => {
-    return getMonthlyLimit() - getUsedCalls();
+    const limit = getMonthlyLimit();
+    const used = getUsedCalls();
+    return Math.max(0, limit - used);
   };
 
   const getUsagePercentage = () => {
     const limit = getMonthlyLimit();
     if (limit === 0) return 0;
-    return Math.round((getUsedCalls() / limit) * 100);
+    const used = getUsedCalls();
+    return Math.round((used / limit) * 100);
   };
 
   const getPlanName = () => {
     if (!subscriptionData) return 'No Plan';
-    return subscriptionData.package_id === 3 ? 'Custom Enterprise Plan' : `${subscriptionData.package.package_name} Plan`;
+    if (subscriptionData.package_id === 3) {
+      return 'Custom Enterprise Plan';
+    }
+    return subscriptionData.package?.package_name ? `${subscriptionData.package.package_name} Plan` : 'Unknown Plan';
   };
 
   const getPlanPrice = () => {
     if (!subscriptionData) return 0;
-    return subscriptionData.package_id === 3 ? subscriptionData.custom_price : subscriptionData.package.package_price;
+    if (subscriptionData.package_id === 3) {
+      return subscriptionData.custom_price || 0;
+    }
+    return subscriptionData.package?.package_price || 0;
   };
 
   const isCustomPackage = () => {
@@ -173,13 +191,13 @@ if (loading) {
               </div>
 
               {/* Plan Details */}
-              {subscriptionData?.package && (
+              {subscriptionData && (
                 <div className="bg-black rounded-xl shadow-sm border border-gray-800 overflow-hidden">
                   <div className="p-6 border-b border-gray-700">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                       <div>
                         <h3 className="text-2xl font-bold text-white mb-1">{getPlanName()}</h3>
-                        <p className="text-gray-300 text-lg">{formatCurrency(getPlanPrice())} / {subscriptionData.package.package_period}</p>
+                        <p className="text-gray-300 text-lg">{formatCurrency(getPlanPrice())} / {subscriptionData.package?.package_period || 'month'}</p>
                         {isCustomPackage() && (
                           <div className="mt-2">
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-900 text-purple-300">
@@ -263,12 +281,12 @@ if (loading) {
                         <div className="grid grid-cols-2 gap-4 text-sm">
                           <div>
                             <span className="text-purple-300 font-medium">Custom API Count:</span>
-                            <span className="ml-2 text-purple-200">{subscriptionData.custom_api_count.toLocaleString()}</span>
+                            <span className="ml-2 text-purple-200">{(subscriptionData.custom_api_count || 0).toLocaleString()}</span>
                           </div>
-                          <div>
+                          {/* <div>
                             <span className="text-purple-300 font-medium">Custom Price:</span>
-                            <span className="ml-2 text-purple-200">{formatCurrency(subscriptionData.custom_price)}</span>
-                          </div>
+                            <span className="ml-2 text-purple-200">{formatCurrency(subscriptionData.custom_price || 0)}</span>
+                          </div> */}
                           {/* <div>
                             <span className="text-purple-300 font-medium">Status:</span>
                             <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
