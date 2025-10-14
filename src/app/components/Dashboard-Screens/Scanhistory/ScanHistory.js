@@ -187,13 +187,17 @@ const fetchScanHistory = async () => {
   </div>
 ) : (
           <div className="space-y-3">
-            {scanHistory.map((scan) => {
+            {scanHistory.map((scan, index) => {
               // Add null checks for scan object and its properties
               if (!scan) return null;
               
+              // Create a guaranteed unique key using index as primary identifier
+              // This ensures uniqueness even with duplicate IDs and timestamps
+              const uniqueKey = `scan-${index}-${scan.id || 'no-id'}-${scan.created_at || 'no-date'}`;
+              
               return (
                 <div
-                  key={scan.id || Math.random()}
+                  key={uniqueKey}
                   className="border border-gray-700 rounded-lg p-3 sm:p-4 hover:shadow-md hover:border-gray-600 transition-all"
                 >
                   {/* Mobile Layout (stacked) */}

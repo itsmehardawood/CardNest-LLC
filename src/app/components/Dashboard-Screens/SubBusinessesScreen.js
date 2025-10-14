@@ -12,7 +12,7 @@ const SubBusinessesScreen = () => {
 
   const handleSubBusinessAdded = (newBusiness) => {
     // Handle the new business data here
-    console.log("New sub-business added:", newBusiness);
+    // console.log("New sub-business added:", newBusiness);
     setShowAddModal(false);
   };
 

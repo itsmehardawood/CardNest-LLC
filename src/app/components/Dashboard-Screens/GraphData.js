@@ -28,23 +28,23 @@ const fetchScanData = async () => {
     const userData = JSON.parse(localStorage.getItem('userData') || '{}');
     const merchantId = userData.user?.merchant_id;
 
-    console.log('Merchant ID:', merchantId);
-    console.log('Full userData:', userData);
+    // console.log('Merchant ID:', merchantId);
+    // console.log('Full userData:', userData);
 
     if (!merchantId) {
       throw new Error('Merchant ID not found');
     }
 
     const url = `https://admin.cardnest.io/api/merchant/getCardScans?id=${merchantId}`;
-    console.log('Fetching from URL:', url);
+    // console.log('Fetching from URL:', url);
 
     const response = await fetch(url, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     });
 
-    console.log('Response status:', response.status);
-    console.log('Response ok:', response.ok);
+    // console.log('Response status:', response.status);
+    // console.log('Response ok:', response.ok);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -53,7 +53,7 @@ const fetchScanData = async () => {
     }
 
     const data = await response.json();
-    console.log('Parsed response data:', data);
+    // console.log('Parsed response data:', data);
 
     if (data.status && data.data) {
       // ✅ Only use the card_scans array
@@ -61,7 +61,7 @@ const fetchScanData = async () => {
         ? data.data.card_scans
         : [];
 
-      console.log('Card scans extracted:', cardScans);
+      // console.log('Card scans extracted:', cardScans);
       setScanData(cardScans);
       processData(cardScans);
     } else {
