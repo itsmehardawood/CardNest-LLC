@@ -61,7 +61,7 @@ const fetchScanData = async () => {
         ? data.data.card_scans
         : [];
 
-      // console.log('Card scans extracted:', cardScans);
+      console.log('Card scans extracted:', cardScans);
       setScanData(cardScans);
       processData(cardScans);
     } else {
