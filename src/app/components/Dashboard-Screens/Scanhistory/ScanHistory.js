@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Eye, Calendar, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
 import ScanHistoryModal from './ScanHistoryModal';
-import { apiFetch } from '@/app/lib/api.js';
+import { decryptWithAES128 } from '@/app/lib/decrypt';
 
 const ScanHistorySection = () => {
   const [scanHistory, setScanHistory] = useState([]);
@@ -16,69 +16,72 @@ const ScanHistorySection = () => {
     fetchScanHistory();
   }, []);
 
-  const fetchScanHistory = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+const fetchScanHistory = async () => {
+  try {
+    setLoading(true);
+    setError(null);
 
-      // Extract merchant_id from userData in localStorage
-      const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-      const merchantId = userData.user?.merchant_id || userData.merchant_id;
-      
-      if (!merchantId) {
-        throw new Error('Merchant ID not found in user data');
-      }
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    const merchantId = userData.user?.merchant_id;
 
-      // Try multiple param name variations similar to subscriptions API
-      const paramVariations = [
-        `id=${merchantId}`,
-        `merchant_id=${merchantId}`,
-        `merchantId=${merchantId}`,
-        `MerchantID=${merchantId}`,
-        `UserID=${merchantId}`
-      ];
-
-      let fetched = false;
-      for (const param of paramVariations) {
-        if (fetched) break;
-        try {
-          const response = await apiFetch(`/merchant/getCardScans?${param}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            }
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            if (data.status) {
-              setScanHistory(Array.isArray(data.data) ? data.data : []);
-              fetched = true;
-              break;
-            }
-          } else if (response.status === 404 || response.status === 400) {
-            // No history or bad param name – try next variation
-            console.warn(`${response.status} from getCardScans with param: ${param}`);
-            continue;
-          } else {
-            console.warn(`Unexpected status ${response.status} from getCardScans with param: ${param}`);
-          }
-        } catch (innerErr) {
-          console.error(`Error calling getCardScans with param ${param}:`, innerErr);
-        }
-      }
-
-      // If nothing worked, assume no history for now (new user)
-      if (!fetched) {
-        setScanHistory([]);
-      }
-    } catch (err) {
-      setError(err.message);
-      console.error('Error fetching scan history:', err);
-    } finally {
-      setLoading(false);
+    if (!merchantId) {
+      throw new Error('Merchant ID not found');
     }
-  };
+
+    const url = `/api/card-scans?id=${merchantId}`;
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`API request failed: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+
+    if (data.status && data.data) {
+      // ✅ Extract the card_scans array from the API response
+      const cardScans = Array.isArray(data.data.card_scans)
+        ? data.data.card_scans
+        : [];
+
+      // ✅ Process each scan to decrypt the encrypted_data
+      const processedScans = cardScans.map(scan => {
+        if (scan.encrypted_data && scan.encryption_key) {
+          try {
+            const decryptedData = decryptWithAES128(scan.encrypted_data, scan.encryption_key);
+            // console.log('🔓 Decrypted data for scan ID:', scan.id, decryptedData);
+            
+            // Add decrypted data to the scan object
+            return {
+              ...scan,
+              decrypted_data: decryptedData
+            };
+          } catch (decryptError) {
+            console.error('❌ Decryption failed for scan ID:', scan.id, decryptError);
+            return scan; // Return original scan if decryption fails
+          }
+        }
+        return scan;
+      });
+
+      setScanHistory(processedScans);
+    } else {
+      throw new Error(data.message || 'Failed to retrieve scan history');
+    }
+
+  } catch (err) {
+    console.error('Error fetching scan history:', err);
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -276,5 +279,6 @@ const ScanHistorySection = () => {
     </div>
   );
 };
+ 
 
 export default ScanHistorySection;

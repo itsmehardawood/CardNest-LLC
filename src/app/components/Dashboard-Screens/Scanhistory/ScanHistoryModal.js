@@ -1,29 +1,41 @@
-'use client';
+"use client";
 
-import { X, CreditCard, User, Key, Calendar, CheckCircle, AlertCircle, Hash } from 'lucide-react';
+import {
+  X,
+  CreditCard,
+  User,
+  Key,
+  Calendar,
+  CheckCircle,
+  AlertCircle,
+  Hash,
+  Building,
+  UserCheck,
+  CreditCard as CardIcon,
+} from "lucide-react";
 
 const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
   if (!isOpen || !scan) return null;
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
     });
   };
 
   const getStatusColor = (status) => {
-    return status === 'success' 
-      ? 'text-green-300 bg-green-900 border-green-700'
-      : 'text-red-300 bg-red-900 border-red-700';
+    return status === "success"
+      ? "text-green-300 bg-green-900 border-green-700"
+      : "text-red-300 bg-red-900 border-red-700";
   };
 
   const getStatusIcon = (status) => {
-    return status === 'success' ? (
+    return status === "success" ? (
       <CheckCircle className="w-5 h-5 text-green-400" />
     ) : (
       <AlertCircle className="w-5 h-5 text-red-400" />
@@ -32,7 +44,7 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text).then(() => {
-      console.log('Copied to clipboard:', text);
+      console.log("Copied to clipboard:", text);
     });
   };
 
@@ -40,7 +52,7 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
     if (!key || key.length <= 6) return key;
     const start = key.substring(0, 3);
     const end = key.substring(key.length - 3);
-    return `${start}${'*'.repeat(Math.min(8, key.length - 6))}${end}`;
+    return `${start}${"*".repeat(Math.min(8, key.length - 6))}${end}`;
   };
 
   return (
@@ -77,11 +89,19 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
               <div className="flex items-center space-x-2 sm:space-x-3">
                 {getStatusIcon(scan.status)}
                 <div>
-                  <h3 className="font-medium text-white text-sm sm:text-base">Scan Status</h3>
-                  <p className="text-xs sm:text-sm text-gray-300">Current processing status</p>
+                  <h3 className="font-medium text-white text-sm sm:text-base">
+                    Scan Status
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-300">
+                    Current processing status
+                  </p>
                 </div>
               </div>
-              <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium border self-start sm:self-auto ${getStatusColor(scan.status)}`}>
+              <span
+                className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium border self-start sm:self-auto ${getStatusColor(
+                  scan.status
+                )}`}
+              >
                 {scan.status.charAt(0).toUpperCase() + scan.status.slice(1)}
               </span>
             </div>
@@ -92,12 +112,14 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
             <h3 className="text-base sm:text-lg font-medium text-white border-b border-gray-700 pb-2">
               Card Information
             </h3>
-            
+
             <div className="grid grid-cols-1 gap-3 sm:gap-4">
               <div className="bg-gray-900 rounded-lg p-3 sm:p-4">
                 <div className="flex items-center space-x-2 mb-2">
                   <CreditCard className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
-                  <span className="text-xs sm:text-sm font-medium text-gray-300">Card Number</span>
+                  <span className="text-xs sm:text-sm font-medium text-gray-300">
+                    Card Number
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-sm sm:text-lg text-white break-all">
@@ -111,39 +133,165 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
                   </button>
                 </div>
               </div>
-
-              <div className="bg-gray-900 rounded-lg p-3 sm:p-4">
-                <div className="flex items-center space-x-2 mb-2">
-                  <Hash className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
-                  <span className="text-xs sm:text-sm font-medium text-gray-300">Scan ID</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm sm:text-lg text-white">#{scan.id}</span>
-                  <button
-                    onClick={() => copyToClipboard(scan.id.toString())}
-                    className="text-blue-400 hover:text-blue-300 text-xs font-medium flex-shrink-0"
-                  >
-                    Copy
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
+
+          {/* OCR Extracted Information */}
+          {scan.decrypted_data?.final_ocr && (
+            <div className="space-y-3 sm:space-y-4">
+              <h3 className="text-base sm:text-lg font-medium text-white border-b border-gray-700 pb-2">
+                OCR Extracted Information
+              </h3>
+
+              <div className="grid grid-cols-1 gap-3 sm:gap-4">
+                {/* Bank Name */}
+                {scan.decrypted_data.final_ocr.bank_name?.value && (
+                  <div className="bg-gray-900 rounded-lg p-3 sm:p-4">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Building className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
+                      <span className="text-xs sm:text-sm font-medium text-gray-300">
+                        Bank Name
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm sm:text-lg text-white">
+                        {scan.decrypted_data.final_ocr.bank_name.value}
+                      </span>
+                      <button
+                        onClick={() =>
+                          copyToClipboard(
+                            scan.decrypted_data.final_ocr.bank_name.value
+                          )
+                        }
+                        className="text-blue-400 hover:text-blue-300 text-xs font-medium flex-shrink-0"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Confidence:{" "}
+                      {(
+                        scan.decrypted_data.final_ocr.bank_name.confidence * 100
+                      ).toFixed(0)}
+                      %
+                    </p>
+                  </div>
+                )}
+
+                {/* Cardholder Name */}
+                {scan.decrypted_data.final_ocr.cardholder_name?.value && (
+                  <div className="bg-gray-900 rounded-lg p-3 sm:p-4">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <UserCheck className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
+                      <span className="text-xs sm:text-sm font-medium text-gray-300">
+                        Cardholder Name
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm sm:text-lg text-white">
+                        {scan.decrypted_data.final_ocr.cardholder_name.value}
+                      </span>
+                      <button
+                        onClick={() =>
+                          copyToClipboard(
+                            scan.decrypted_data.final_ocr.cardholder_name.value
+                          )
+                        }
+                        className="text-blue-400 hover:text-blue-300 text-xs font-medium flex-shrink-0"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">
+                      Confidence:{" "}
+                      {(
+                        scan.decrypted_data.final_ocr.cardholder_name
+                          .confidence * 100
+                      ).toFixed(0)}
+                      %
+                    </p>
+                  </div>
+                )}
+
+                {/* BIN Details */}
+                {scan.decrypted_data.final_ocr.bin_details && (
+                  <div className="bg-gray-900 rounded-lg p-3 sm:p-4">
+                    <div className="flex items-center space-x-2 mb-3">
+                      <CardIcon className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
+                      <span className="text-xs sm:text-sm font-medium text-gray-300">
+                        Card Details
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {scan.decrypted_data.final_ocr.bin_details.card && (
+                        <div>
+                          <p className="text-xs text-gray-400 mb-1">
+                            Card Brand
+                          </p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-white">
+                              {scan.decrypted_data.final_ocr.bin_details.card}
+                            </span>
+                            <button
+                              onClick={() =>
+                                copyToClipboard(
+                                  scan.decrypted_data.final_ocr.bin_details.card
+                                )
+                              }
+                              className="text-blue-400 hover:text-blue-300 text-xs font-medium ml-2"
+                            >
+                              Copy
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                      {scan.decrypted_data.final_ocr.bin_details.type && (
+                        <div>
+                          <p className="text-xs text-gray-400 mb-1">
+                            Card Type
+                          </p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-white">
+                              {scan.decrypted_data.final_ocr.bin_details.type}
+                            </span>
+                            <button
+                              onClick={() =>
+                                copyToClipboard(
+                                  scan.decrypted_data.final_ocr.bin_details.type
+                                )
+                              }
+                              className="text-blue-400 hover:text-blue-300 text-xs font-medium ml-2"
+                            >
+                              Copy
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Merchant Information */}
           <div className="space-y-3 sm:space-y-4">
             <h3 className="text-base sm:text-lg font-medium text-white border-b border-gray-700 pb-2">
               Merchant Information
             </h3>
-            
+
             <div className="grid grid-cols-1 gap-3 sm:gap-4">
               <div className="bg-gray-900 rounded-lg p-3 sm:p-4">
                 <div className="flex items-center space-x-2 mb-2">
                   <User className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
-                  <span className="text-xs sm:text-sm font-medium text-gray-300">Merchant ID</span>
+                  <span className="text-xs sm:text-sm font-medium text-gray-300">
+                    Merchant ID
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-sm sm:text-base text-white break-all">{scan.merchant_id}</span>
+                  <span className="font-mono text-sm sm:text-base text-white break-all">
+                    {scan.merchant_id}
+                  </span>
                   <button
                     onClick={() => copyToClipboard(scan.merchant_id)}
                     className="text-blue-400 hover:text-blue-300 text-xs font-medium ml-2 flex-shrink-0"
@@ -156,7 +304,9 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
               <div className="bg-gray-900 rounded-lg p-3 sm:p-4">
                 <div className="flex items-center space-x-2 mb-2">
                   <Key className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
-                  <span className="text-xs sm:text-sm font-medium text-gray-300">Merchant Key</span>
+                  <span className="text-xs sm:text-sm font-medium text-gray-300">
+                    Merchant Key
+                  </span>
                 </div>
                 <div className="flex items-start justify-between">
                   <span className="font-mono text-xs sm:text-sm text-white break-all mr-2">
@@ -170,16 +320,22 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
                     Copy
                   </button>
                 </div>
-                <p className="text-xs text-gray-400 mt-1">Click copy to get the full key</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Click copy to get the full key
+                </p>
               </div>
 
               <div className="bg-gray-900 rounded-lg p-3 sm:p-4">
                 <div className="flex items-center space-x-2 mb-2">
                   <User className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
-                  <span className="text-xs sm:text-sm font-medium text-gray-300">User ID</span>
+                  <span className="text-xs sm:text-sm font-medium text-gray-300">
+                    User ID
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm sm:text-base text-white">{scan.user_id}</span>
+                  <span className="text-sm sm:text-base text-white">
+                    {scan.user_id}
+                  </span>
                   <button
                     onClick={() => copyToClipboard(scan.user_id.toString())}
                     className="text-blue-400 hover:text-blue-300 text-xs font-medium flex-shrink-0"
@@ -196,14 +352,18 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
             <h3 className="text-base sm:text-lg font-medium text-white border-b border-gray-700 pb-2">
               Timeline
             </h3>
-            
+
             <div className="space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-2 space-y-1 sm:space-y-0">
                 <div className="flex items-center space-x-2 sm:space-x-3">
                   <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
                   <div>
-                    <span className="text-xs sm:text-sm font-medium text-gray-300">Created</span>
-                    <p className="text-xs text-gray-400">When the scan was initiated</p>
+                    <span className="text-xs sm:text-sm font-medium text-gray-300">
+                      Created
+                    </span>
+                    <p className="text-xs text-gray-400">
+                      When the scan was initiated
+                    </p>
                   </div>
                 </div>
                 <span className="text-xs sm:text-sm text-white ml-5 sm:ml-0">
@@ -215,8 +375,12 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
                 <div className="flex items-center space-x-2 sm:space-x-3">
                   <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
                   <div>
-                    <span className="text-xs sm:text-sm font-medium text-gray-300">Last Updated</span>
-                    <p className="text-xs text-gray-400">Most recent status change</p>
+                    <span className="text-xs sm:text-sm font-medium text-gray-300">
+                      Last Updated
+                    </span>
+                    <p className="text-xs text-gray-400">
+                      Most recent status change
+                    </p>
                   </div>
                 </div>
                 <span className="text-xs sm:text-sm text-white ml-5 sm:ml-0">
@@ -235,7 +399,7 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
           >
             Close
           </button>
-             </div>
+        </div>
       </div>
     </div>
   );

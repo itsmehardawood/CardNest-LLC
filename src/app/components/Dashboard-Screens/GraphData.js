@@ -20,48 +20,75 @@ const GraphData = () => {
     fetchScanData();
   }, []);
 
-  const fetchScanData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+const fetchScanData = async () => {
+  try {
+    setLoading(true);
+    setError(null);
 
-      const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-      const merchantId = userData.user?.merchant_id;
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    const merchantId = userData.user?.merchant_id;
 
-      if (!merchantId) {
-        throw new Error('Merchant ID not found');
-      }
+    console.log('Merchant ID:', merchantId);
+    console.log('Full userData:', userData);
 
-      const response = await apiFetch(`/merchant/getCardScans?id=${merchantId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch scan data');
-      }
-
-      const data = await response.json();
-
-      if (data.status && data.data) {
-        setScanData(data.data);
-        processData(data.data);
-      } else {
-        throw new Error(data.message || 'Failed to retrieve scan data');
-      }
-    } catch (err) {
-      setError(err.message);
-      console.error('Error fetching scan data:', err);
-    } finally {
-      setLoading(false);
+    if (!merchantId) {
+      throw new Error('Merchant ID not found');
     }
-  };
+
+    const url = `https://admin.cardnest.io/api/merchant/getCardScans?id=${merchantId}`;
+    console.log('Fetching from URL:', url);
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    console.log('Response status:', response.status);
+    console.log('Response ok:', response.ok);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Response error:', errorText);
+      throw new Error(`API request failed: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('Parsed response data:', data);
+
+    if (data.status && data.data) {
+      // ✅ Only use the card_scans array
+      const cardScans = Array.isArray(data.data.card_scans)
+        ? data.data.card_scans
+        : [];
+
+      console.log('Card scans extracted:', cardScans);
+      setScanData(cardScans);
+      processData(cardScans);
+    } else {
+      // Set empty array if no data
+      setScanData([]);
+      processData([]);
+      throw new Error(data.message || 'Failed to retrieve scan data');
+    }
+
+  } catch (err) {
+    console.error('Error fetching scan data:', err);
+    setError(err.message);
+    // Ensure scanData is always an array even on error
+    setScanData([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   const processData = (data) => {
-    const totalScans = data.length;
-    const successfulScans = data.filter(scan => scan.status === 'success').length;
+    // Ensure data is an array
+    const dataArray = Array.isArray(data) ? data : [];
+    
+    const totalScans = dataArray.length;
+    const successfulScans = dataArray.filter(scan => scan && scan.status === 'success').length;
     const failedScans = totalScans - successfulScans;
     const successRate = totalScans > 0 ? Math.round((successfulScans / totalScans) * 100) : 0;
 
@@ -81,6 +108,9 @@ const GraphData = () => {
   };
 
   const getLast7DaysData = () => {
+    // Ensure scanData is an array
+    const scanArray = Array.isArray(scanData) ? scanData : [];
+    
     const last7Days = [];
     const today = new Date();
     
@@ -89,8 +119,8 @@ const GraphData = () => {
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
       
-      const dayScans = scanData.filter(scan => 
-        scan.created_at.startsWith(dateStr)
+      const dayScans = scanArray.filter(scan => 
+        scan && scan.created_at && scan.created_at.startsWith(dateStr)
       );
       
       last7Days.push({
@@ -105,8 +135,11 @@ const GraphData = () => {
   };
 
   const getStatusDistribution = () => {
-    const successful = scanData.filter(scan => scan.status === 'success').length;
-    const failed = scanData.filter(scan => scan.status !== 'success').length;
+    // Ensure scanData is an array
+    const scanArray = Array.isArray(scanData) ? scanData : [];
+    
+    const successful = scanArray.filter(scan => scan && scan.status === 'success').length;
+    const failed = scanArray.filter(scan => scan && scan.status !== 'success').length;
     
     return [
       { name: 'Successful', value: successful, color: '#10B981' },
@@ -115,14 +148,21 @@ const GraphData = () => {
   };
 
   const getHourlyDistribution = () => {
+    // Ensure scanData is an array
+    const scanArray = Array.isArray(scanData) ? scanData : [];
+    
     const hourlyData = Array.from({ length: 24 }, (_, i) => ({
       hour: `${i}:00`,
       scans: 0
     }));
 
-    scanData.forEach(scan => {
-      const hour = new Date(scan.created_at).getHours();
-      hourlyData[hour].scans++;
+    scanArray.forEach(scan => {
+      if (scan && scan.created_at) {
+        const hour = new Date(scan.created_at).getHours();
+        if (hour >= 0 && hour < 24) {
+          hourlyData[hour].scans++;
+        }
+      }
     });
 
     return hourlyData.filter(item => item.scans > 0);
