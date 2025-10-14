@@ -188,7 +188,7 @@ const fetchScanData = async () => {
         <div className="text-center py-8">
           <FiActivity className="w-12 h-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-white mb-2">Unable to Load Analytics</h3>
-          <p className="text-gray-300 text-sm mb-4">{error}</p>
+          <p className="text-gray-300 text-sm mb-4">Something went wrong while fetching analytics data.</p>
           <button
             onClick={fetchScanData}
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm"

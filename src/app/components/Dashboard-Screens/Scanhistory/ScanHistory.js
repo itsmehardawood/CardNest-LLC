@@ -147,7 +147,7 @@ const fetchScanHistory = async () => {
         <div className="text-center py-6 sm:py-8">
           <AlertCircle className="w-10 h-10 sm:w-12 sm:h-12 text-red-400 mx-auto mb-4" />
           <h3 className="text-base sm:text-lg font-medium text-white mb-2">No History Found</h3>
-          <p className="text-sm sm:text-base text-gray-300 mb-4 px-4">{error}</p>
+          <p className="text-sm sm:text-base text-gray-300 mb-4 px-4">Something went wrong while fetching scan history.</p>
           <button
             onClick={fetchScanHistory}
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm sm:text-base"
