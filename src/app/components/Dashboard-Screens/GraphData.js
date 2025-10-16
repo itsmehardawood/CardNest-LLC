@@ -53,15 +53,16 @@ const fetchScanData = async () => {
     }
 
     const data = await response.json();
-    // console.log('Parsed response data:', data);
+    // console.log('📊 Full API response:', data);
 
     if (data.status && data.data) {
-      // ✅ Only use the card_scans array
-      const cardScans = Array.isArray(data.data.card_scans)
-        ? data.data.card_scans
+      // ✅ Extract the scans array from the API response
+      // The API returns data directly in data.data as an array, not wrapped in card_scans
+      const cardScans = Array.isArray(data.data)
+        ? data.data
         : [];
 
-      console.log('Card scans extracted:', cardScans);
+      // console.log('🔍 Extracted card scans:', cardScans);
       setScanData(cardScans);
       processData(cardScans);
     } else {

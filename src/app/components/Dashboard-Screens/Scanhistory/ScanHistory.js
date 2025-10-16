@@ -40,12 +40,16 @@ const fetchScanHistory = async () => {
     }
 
     const data = await response.json();
+    // console.log('📊 Full API response:', data);
 
     if (data.status && data.data) {
-      // ✅ Extract the card_scans array from the API response
-      const cardScans = Array.isArray(data.data.card_scans)
-        ? data.data.card_scans
+      // ✅ Extract the scans array from the API response
+      // The API returns data directly in data.data as an array, not wrapped in card_scans
+      const cardScans = Array.isArray(data.data)
+        ? data.data
         : [];
+
+      // console.log('🔍 Extracted card scans:', cardScans);
 
       // ✅ Process each scan to decrypt the encrypted_data
       const processedScans = cardScans.map(scan => {

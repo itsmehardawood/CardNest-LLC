@@ -105,6 +105,45 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
                 {scan.status.charAt(0).toUpperCase() + scan.status.slice(1)}
               </span>
             </div>
+
+            {/* Failure Information - Only show if status is failure and data exists */}
+            {scan.status === 'failure' && (scan.failure_reason || scan.failure_stage) && (
+              <div className="mt-4 pt-4 border-t border-gray-700">
+                {scan.failure_reason && (
+                  <div className="mb-3">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 text-red-400" />
+                      <span className="text-xs sm:text-sm font-medium text-gray-300">
+                        Failure Reason
+                      </span>
+                    </div>
+                    <div className="flex items-start justify-between">
+                      <p className="text-xs sm:text-sm text-red-300 break-words mr-2 w-[90%] ">
+                        {scan.failure_reason}
+                      </p>
+                   
+                    </div>
+                  </div>
+                )}
+                
+                {scan.failure_stage && (
+                  <div>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4 text-red-400" />
+                      <span className="text-xs sm:text-sm font-medium text-gray-300">
+                        Failure Location
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs sm:text-sm text-red-300">
+                        ({scan.failure_stage})  side
+                      </span>
+                 
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Card Information */}
@@ -125,12 +164,7 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
                   <span className="font-mono text-sm sm:text-lg text-white break-all">
                     {scan.card_number_masked}
                   </span>
-                  <button
-                    onClick={() => copyToClipboard(scan.card_number_masked)}
-                    className="text-blue-400 hover:text-blue-300 text-xs font-medium ml-2 flex-shrink-0"
-                  >
-                    Copy
-                  </button>
+                
                 </div>
               </div>
             </div>
@@ -157,16 +191,7 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
                       <span className="text-sm sm:text-lg text-white">
                         {scan.decrypted_data.final_ocr.bank_name.value}
                       </span>
-                      <button
-                        onClick={() =>
-                          copyToClipboard(
-                            scan.decrypted_data.final_ocr.bank_name.value
-                          )
-                        }
-                        className="text-blue-400 hover:text-blue-300 text-xs font-medium flex-shrink-0"
-                      >
-                        Copy
-                      </button>
+                    
                     </div>
                     <p className="text-xs text-gray-400 mt-1">
                       Confidence:{" "}
@@ -191,16 +216,7 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
                       <span className="text-sm sm:text-lg text-white">
                         {scan.decrypted_data.final_ocr.cardholder_name.value}
                       </span>
-                      <button
-                        onClick={() =>
-                          copyToClipboard(
-                            scan.decrypted_data.final_ocr.cardholder_name.value
-                          )
-                        }
-                        className="text-blue-400 hover:text-blue-300 text-xs font-medium flex-shrink-0"
-                      >
-                        Copy
-                      </button>
+                   
                     </div>
                     <p className="text-xs text-gray-400 mt-1">
                       Confidence:{" "}
@@ -232,16 +248,7 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
                             <span className="text-sm text-white">
                               {scan.decrypted_data.final_ocr.bin_details.card}
                             </span>
-                            <button
-                              onClick={() =>
-                                copyToClipboard(
-                                  scan.decrypted_data.final_ocr.bin_details.card
-                                )
-                              }
-                              className="text-blue-400 hover:text-blue-300 text-xs font-medium ml-2"
-                            >
-                              Copy
-                            </button>
+                         
                           </div>
                         </div>
                       )}
@@ -292,12 +299,7 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
                   <span className="font-mono text-sm sm:text-base text-white break-all">
                     {scan.merchant_id}
                   </span>
-                  <button
-                    onClick={() => copyToClipboard(scan.merchant_id)}
-                    className="text-blue-400 hover:text-blue-300 text-xs font-medium ml-2 flex-shrink-0"
-                  >
-                    Copy
-                  </button>
+                
                 </div>
               </div>
 
@@ -312,13 +314,7 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
                   <span className="font-mono text-xs sm:text-sm text-white break-all mr-2">
                     {maskMerchantKey(scan.merchant_key)}
                   </span>
-                  <button
-                    onClick={() => copyToClipboard(scan.merchant_key)}
-                    className="text-blue-400 hover:text-blue-300 text-xs font-medium flex-shrink-0"
-                    title="Copy full merchant key"
-                  >
-                    Copy
-                  </button>
+               
                 </div>
                 <p className="text-xs text-gray-400 mt-1">
                   Click copy to get the full key
@@ -336,12 +332,7 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
                   <span className="text-sm sm:text-base text-white">
                     {scan.user_id}
                   </span>
-                  <button
-                    onClick={() => copyToClipboard(scan.user_id.toString())}
-                    className="text-blue-400 hover:text-blue-300 text-xs font-medium flex-shrink-0"
-                  >
-                    Copy
-                  </button>
+                
                 </div>
               </div>
             </div>
