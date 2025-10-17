@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Eye, Calendar, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
 import ScanHistoryModal from './ScanHistoryModal';
 import { decryptWithAES128 } from '@/app/lib/decrypt';
+import { apiFetch } from '@/app/lib/api.js';
 
 const ScanHistorySection = () => {
   const [scanHistory, setScanHistory] = useState([]);
@@ -11,12 +12,78 @@ const ScanHistorySection = () => {
   const [error, setError] = useState(null);
   const [selectedScan, setSelectedScan] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [aesKey, setAesKey] = useState(null); // Add state for AES key
 
   useEffect(() => {
-    fetchScanHistory();
+    fetchAesKeyAndScanHistory();
   }, []);
 
-const fetchScanHistory = async () => {
+// Function to fetch AES key from business verification API
+const fetchAesKey = async () => {
+  try {
+    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+    const userObj = userData.user || userData;
+
+    if (!userObj.id) {
+      console.warn('⚠️ User ID not found for AES key fetch');
+      return null;
+    }
+
+    const response = await apiFetch(
+      `/business-profile/business-verification-status?user_id=${userObj.id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${userObj.token}`,
+        },
+      }
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      const fetchedAesKey = data?.data?.aes_key;
+      
+      // console.log('🔑 Fetched AES key:', fetchedAesKey ? 'Available' : 'Not available');
+      return fetchedAesKey;
+    } else {
+      console.error('❌ Failed to fetch AES key:', response.status);
+      return null;
+    }
+  } catch (error) {
+    console.error('❌ Error fetching AES key:', error);
+    return null;
+  }
+};
+
+// Combined function to fetch AES key and then scan history
+const fetchAesKeyAndScanHistory = async () => {
+  try {
+    // First fetch the AES key
+    const fetchedAesKey = await fetchAesKey();
+    setAesKey(fetchedAesKey);
+    
+    // console.log('🔑 AES Key status:', fetchedAesKey ? `Available (${fetchedAesKey.substring(0, 4)}...)` : 'Not available');
+    
+    // Then fetch scan history with the AES key
+    await fetchScanHistory(fetchedAesKey);
+  } catch (error) {
+    console.error('❌ Error in fetchAesKeyAndScanHistory:', error);
+    setError(error.message);
+    setLoading(false);
+  }
+};
+
+// Refresh function that uses existing AES key if available
+const refreshScanHistory = async () => {
+  if (aesKey) {
+    // console.log('🔄 Refreshing with existing AES key');
+    await fetchScanHistory(aesKey);
+  } else {
+    // console.log('🔄 Refreshing and fetching new AES key');
+    await fetchAesKeyAndScanHistory();
+  }
+};
+
+const fetchScanHistory = async (encryptionKey = null) => {
   try {
     setLoading(true);
     setError(null);
@@ -53,10 +120,28 @@ const fetchScanHistory = async () => {
 
       // ✅ Process each scan to decrypt the encrypted_data
       const processedScans = cardScans.map(scan => {
-        if (scan.encrypted_data && scan.encryption_key) {
+        // console.log('🔍 Processing scan:', scan.id, 'Has encrypted_data:', !!scan.encrypted_data, 'Has encryption_key:', !!scan.encryption_key);
+        
+        // Use the encryption key from API response, or fall back to the fetched AES key
+        const keyToUse = scan.encryption_key || encryptionKey || aesKey;
+        
+        if (scan.encrypted_data && keyToUse) {
+          // console.log('🔑 Using encryption key for scan:', scan.id, 'Source:', scan.encryption_key ? 'API' : 'AES Key');
+          
           try {
-            const decryptedData = decryptWithAES128(scan.encrypted_data, scan.encryption_key);
+            // Check if encrypted data is long enough (should be at least 24 characters for IV + some data)
+            if (scan.encrypted_data.length < 24) {
+              console.warn('⚠️ Encrypted data too short for scan ID:', scan.id, 'Length:', scan.encrypted_data.length);
+              return {
+                ...scan,
+                decrypted_data: null
+              };
+            }
+            
+            const decryptedData = decryptWithAES128(scan.encrypted_data, keyToUse);
             // console.log('🔓 Decrypted data for scan ID:', scan.id, decryptedData);
+            // console.log('🔍 Type of decrypted data:', typeof decryptedData);
+            // console.log('🔍 Decrypted data structure:', JSON.stringify(decryptedData, null, 2));
             
             // Add decrypted data to the scan object
             return {
@@ -65,10 +150,22 @@ const fetchScanHistory = async () => {
             };
           } catch (decryptError) {
             console.error('❌ Decryption failed for scan ID:', scan.id, decryptError);
-            return scan; // Return original scan if decryption fails
+            console.error('❌ Encrypted data:', scan.encrypted_data);
+            console.error('❌ Encryption key used:', keyToUse);
+            return {
+              ...scan,
+              decrypted_data: null // Explicitly set to null when decryption fails
+            };
           }
+        } else {
+          if (scan.encrypted_data && !keyToUse) {
+            console.warn('⚠️ Encrypted data found but no encryption key available for scan:', scan.id);
+          }
+          return {
+            ...scan,
+            decrypted_data: null // Set to null when no encrypted data or key
+          };
         }
-        return scan;
       });
 
       setScanHistory(processedScans);
@@ -120,6 +217,24 @@ const fetchScanHistory = async () => {
       : `${baseClasses} bg-red-900 text-red-300`;
   };
 
+  // Helper function to truncate long card number messages for list display
+  const getTruncatedCardNumber = (cardNumber) => {
+    if (!cardNumber) return 'N/A';
+    
+    // If it's a regular masked card number (like XXXX-XXXX-XXXX-X376), show as is
+    if (cardNumber.match(/^[X\d\-\*]+$/)) {
+      return cardNumber;
+    }
+    
+    // If it's a long message, truncate to first 3-4 words
+    const words = cardNumber.split(' ');
+    if (words.length > 4) {
+      return words.slice(0, 4).join(' ') + '...';
+    }
+    
+    return cardNumber;
+  };
+
   const handleViewDetails = (scan) => {
     setSelectedScan(scan);
     setIsModalOpen(true);
@@ -153,7 +268,7 @@ const fetchScanHistory = async () => {
           <h3 className="text-base sm:text-lg font-medium text-white mb-2">No History Found</h3>
           <p className="text-sm sm:text-base text-gray-300 mb-4 px-4">Something went wrong while fetching scan history.</p>
           <button
-            onClick={fetchScanHistory}
+            onClick={fetchAesKeyAndScanHistory}
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm sm:text-base"
           >
             Try Again
@@ -174,7 +289,7 @@ const fetchScanHistory = async () => {
             </p>
           </div>
           <button
-            onClick={fetchScanHistory}
+            onClick={refreshScanHistory}
             className="text-blue-400 hover:text-blue-300 text-sm font-medium self-start sm:self-auto"
           >
             Refresh
@@ -225,7 +340,7 @@ const fetchScanHistory = async () => {
                     <div className="flex items-center space-x-2 text-gray-300">
                       <CreditCard className="w-4 h-4 flex-shrink-0" />
                       <span className="font-mono text-sm break-all">
-                        {scan.card_number_masked || 'N/A'}
+                        {getTruncatedCardNumber(scan.card_number_masked)}
                       </span>
                     </div>
                     
@@ -250,7 +365,7 @@ const fetchScanHistory = async () => {
                       <div className="flex items-center space-x-2 text-gray-300">
                         <CreditCard className="w-4 h-4 flex-shrink-0" />
                         <span className="font-mono text-sm">
-                          {scan.card_number_masked || 'N/A'}
+                          {getTruncatedCardNumber(scan.card_number_masked)}
                         </span>
                       </div>
                       

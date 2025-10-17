@@ -80,7 +80,7 @@ export default function PaymentPage({ params }) {
       const result = await response.json();
 
       if (response.ok && result.data && result.data.encrypted_data) {
-        console.log("Encrypted data received:", result.data);
+        // console.log("Encrypted data received:", result.data);
         setEncryptedData(result.data.encrypted_data);
 
         if (pollingRef.current) {
@@ -177,7 +177,7 @@ export default function PaymentPage({ params }) {
       }
 
       const decryptedData = decryptWithAES128(encryptedData, encryptionKey);
-      console.log("Decrypted card data:", decryptedData);
+      // console.log("Decrypted card data:", decryptedData);
 
       if (!decryptedData.complete_scan) {
         throw new Error("Card scan was not completed successfully");
