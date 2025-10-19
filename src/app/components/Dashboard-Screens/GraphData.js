@@ -88,9 +88,9 @@ const fetchScanData = async () => {
     // Ensure data is an array
     const dataArray = Array.isArray(data) ? data : [];
     
-    const totalScans = dataArray.length;
     const successfulScans = dataArray.filter(scan => scan && scan.status === 'success').length;
-    const failedScans = totalScans - successfulScans;
+    const failedScans = dataArray.filter(scan => scan && scan.status === 'failed').length;
+    const totalScans = successfulScans + failedScans;
     const successRate = totalScans > 0 ? Math.round((successfulScans / totalScans) * 100) : 0;
 
     setStats({
@@ -128,7 +128,7 @@ const fetchScanData = async () => {
         date: formatDate(date),
         scans: dayScans.length,
         successful: dayScans.filter(scan => scan.status === 'success').length,
-        failed: dayScans.filter(scan => scan.status !== 'success').length
+        failed: dayScans.filter(scan => scan.status === 'failed').length
       });
     }
     
@@ -140,7 +140,7 @@ const fetchScanData = async () => {
     const scanArray = Array.isArray(scanData) ? scanData : [];
     
     const successful = scanArray.filter(scan => scan && scan.status === 'success').length;
-    const failed = scanArray.filter(scan => scan && scan.status !== 'success').length;
+    const failed = scanArray.filter(scan => scan && scan.status === 'failed').length;
     
     return [
       { name: 'Successful', value: successful, color: '#10B981' },

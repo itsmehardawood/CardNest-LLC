@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Eye, Calendar, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
+import { Eye, Calendar, CreditCard, CheckCircle, AlertCircle, ChevronDown, ChevronRight, Layers } from 'lucide-react';
 import ScanHistoryModal from './ScanHistoryModal';
 import { decryptWithAES128 } from '@/app/lib/decrypt';
 import { apiFetch } from '@/app/lib/api.js';
@@ -13,6 +13,7 @@ const ScanHistorySection = () => {
   const [selectedScan, setSelectedScan] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [aesKey, setAesKey] = useState(null); // Add state for AES key
+  const [expandedSessions, setExpandedSessions] = useState({}); // Track expanded sessions
 
   useEffect(() => {
     fetchAesKeyAndScanHistory();
@@ -245,6 +246,49 @@ const fetchScanHistory = async (encryptionKey = null) => {
     setSelectedScan(null);
   };
 
+  // Group scans by session_id
+  const groupScansBySession = (scans) => {
+    const grouped = {};
+    const ungrouped = [];
+
+    scans.forEach(scan => {
+      if (scan.session_id) {
+        if (!grouped[scan.session_id]) {
+          grouped[scan.session_id] = [];
+        }
+        grouped[scan.session_id].push(scan);
+      } else {
+        ungrouped.push(scan);
+      }
+    });
+
+    return { grouped, ungrouped };
+  };
+
+  // Toggle session expansion
+  const toggleSession = (sessionId) => {
+    setExpandedSessions(prev => ({
+      ...prev,
+      [sessionId]: !prev[sessionId]
+    }));
+  };
+
+  // Get session summary info
+  const getSessionSummary = (scans) => {
+    const successCount = scans.filter(s => s.status === 'success').length;
+    const failureCount = scans.filter(s => s.status === 'failure').length;
+    const latestScan = scans.reduce((latest, current) => {
+      return new Date(current.created_at) > new Date(latest.created_at) ? current : latest;
+    }, scans[0]);
+    
+    return {
+      totalScans: scans.length,
+      successCount,
+      failureCount,
+      latestDate: latestScan.created_at
+    };
+  };
+
   if (loading) {
     return (
       <div className="bg-black rounded-lg shadow-sm border border-gray-800 p-4 sm:p-6">
@@ -284,9 +328,9 @@ const fetchScanHistory = async (encryptionKey = null) => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
           <div>
             <h2 className="text-lg sm:text-xl font-semibold text-white">Card Scan History</h2>
-            <p className="text-gray-300 text-sm mt-1">
+            {/* <p className="text-gray-300 text-sm mt-1">
               Total scans: {scanHistory.length}
-            </p>
+            </p> */}
           </div>
           <button
             onClick={refreshScanHistory}
@@ -306,88 +350,218 @@ const fetchScanHistory = async (encryptionKey = null) => {
   </div>
 ) : (
           <div className="space-y-3">
-            {scanHistory.map((scan, index) => {
-              // Add null checks for scan object and its properties
-              if (!scan) return null;
-              
-              // Create a guaranteed unique key using index as primary identifier
-              // This ensures uniqueness even with duplicate IDs and timestamps
-              const uniqueKey = `scan-${index}-${scan.id || 'no-id'}-${scan.created_at || 'no-date'}`;
+            {(() => {
+              const { grouped, ungrouped } = groupScansBySession(scanHistory);
               
               return (
-                <div
-                  key={uniqueKey}
-                  className="border border-gray-700 rounded-lg p-3 sm:p-4 hover:shadow-md hover:border-gray-600 transition-all"
-                >
-                  {/* Mobile Layout (stacked) */}
-                  <div className="block sm:hidden space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        {getStatusIcon(scan.status)}
-                        <span className={getStatusBadge(scan.status)}>
-                          {scan.status || 'Unknown'}
-                        </span>
-                      </div>
-                      <button
-                        onClick={() => handleViewDetails(scan)}
-                        className="flex items-center space-x-1 text-blue-400 hover:text-blue-300 text-sm font-medium"
-                      >
-                        <Eye className="w-4 h-4" />
-                        <span className="hidden xs:inline">Details</span>
-                      </button>
-                    </div>
+                <>
+                  {/* Render grouped sessions */}
+                  {Object.entries(grouped).map(([sessionId, sessionScans]) => {
+                    const summary = getSessionSummary(sessionScans);
+                    const isExpanded = expandedSessions[sessionId];
                     
-                    <div className="flex items-center space-x-2 text-gray-300">
-                      <CreditCard className="w-4 h-4 flex-shrink-0" />
-                      <span className="font-mono text-sm break-all">
-                        {getTruncatedCardNumber(scan.card_number_masked)}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2 text-gray-400">
-                      <Calendar className="w-4 h-4 flex-shrink-0" />
-                      <span className="text-sm">
-                        {formatDate(scan.created_at)}
-                      </span>
-                    </div>
-                  </div>
+                    return (
+                      <div key={`session-${sessionId}`} className="border border-gray-700 rounded-lg overflow-hidden">
+                        {/* Session Header */}
+                        <div
+                          onClick={() => toggleSession(sessionId)}
+                          className="bg-gray-800 p-3 sm:p-4 cursor-pointer hover:bg-gray-750 transition-colors"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3 flex-1">
+                              {isExpanded ? (
+                                <ChevronDown className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                              ) : (
+                                <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                              )}
+                              <Layers className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 space-y-1 sm:space-y-0">
+                                  <h3 className="text-sm sm:text-base font-medium text-white truncate">
+                                    Session: {sessionId}
+                                  </h3>
+                                 
+                                </div>
+                                <p className="text-xs text-gray-400 mt-1">
+                                  Latest: {formatDate(summary.latestDate)}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
 
-                  {/* Desktop Layout (horizontal) */}
-                  <div className="hidden sm:flex items-center justify-between">
-                    <div className="flex items-center space-x-2 md:space-x-4 flex-wrap gap-y-2">
-                      <div className="flex items-center space-x-2">
-                        {getStatusIcon(scan.status)}
-                        <span className={getStatusBadge(scan.status)}>
-                          {scan.status || 'Unknown'}
-                        </span>
+                        {/* Session Scans - Collapsible */}
+                        {isExpanded && (
+                          <div className="bg-black border-t border-gray-700">
+                            {sessionScans.slice(0, 5).map((scan, index) => {
+                              if (!scan) return null;
+                              
+                              const uniqueKey = `scan-${sessionId}-${index}-${scan.id || 'no-id'}`;
+                              
+                              return (
+                                <div
+                                  key={uniqueKey}
+                                  className="p-3 sm:p-4 border-b border-gray-800 last:border-b-0 hover:bg-gray-900 transition-colors"
+                                >
+                                  {/* Mobile Layout (stacked) */}
+                                  <div className="block sm:hidden space-y-3">
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center space-x-2">
+                                        {getStatusIcon(scan.status)}
+                                        <span className={getStatusBadge(scan.status)}>
+                                          {scan.status || 'Unknown'}
+                                        </span>
+                                      </div>
+                                      <button
+                                        onClick={() => handleViewDetails(scan)}
+                                        className="flex items-center space-x-1 text-blue-400 hover:text-blue-300 text-sm font-medium"
+                                      >
+                                        <Eye className="w-4 h-4" />
+                                        <span className="hidden xs:inline">Details</span>
+                                      </button>
+                                    </div>
+                                    
+                                    <div className="flex items-center space-x-2 text-gray-300">
+                                      <CreditCard className="w-4 h-4 flex-shrink-0" />
+                                      <span className="font-mono text-sm break-all">
+                                        {getTruncatedCardNumber(scan.card_number_masked)}
+                                      </span>
+                                    </div>
+                                    
+                                    <div className="flex items-center space-x-2 text-gray-400">
+                                      <Calendar className="w-4 h-4 flex-shrink-0" />
+                                      <span className="text-sm">
+                                        {formatDate(scan.created_at)}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  {/* Desktop Layout (horizontal) */}
+                                  <div className="hidden sm:flex items-center justify-between">
+                                    <div className="flex items-center space-x-2 md:space-x-4 flex-wrap gap-y-2">
+                                      <div className="flex items-center space-x-2">
+                                        {getStatusIcon(scan.status)}
+                                        <span className={getStatusBadge(scan.status)}>
+                                          {scan.status || 'Unknown'}
+                                        </span>
+                                      </div>
+                                      
+                                      <div className="flex items-center space-x-2 text-gray-300">
+                                        <CreditCard className="w-4 h-4 flex-shrink-0" />
+                                        <span className="font-mono text-sm">
+                                          {getTruncatedCardNumber(scan.card_number_masked)}
+                                        </span>
+                                      </div>
+                                      
+                                      <div className="flex items-center space-x-2 text-gray-400">
+                                        <Calendar className="w-4 h-4 flex-shrink-0" />
+                                        <span className="text-sm">
+                                          {formatDate(scan.created_at)}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    
+                                    <button
+                                      onClick={() => handleViewDetails(scan)}
+                                      className="flex items-center space-x-1 text-blue-400 hover:text-blue-300 text-sm font-medium ml-4"
+                                    >
+                                      <Eye className="w-4 h-4" />
+                                      <span>View Details</span>
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          
+                          </div>
+                        )}
                       </div>
-                      
-                      <div className="flex items-center space-x-2 text-gray-300">
-                        <CreditCard className="w-4 h-4 flex-shrink-0" />
-                        <span className="font-mono text-sm">
-                          {getTruncatedCardNumber(scan.card_number_masked)}
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2 text-gray-400">
-                        <Calendar className="w-4 h-4 flex-shrink-0" />
-                        <span className="text-sm">
-                          {formatDate(scan.created_at)}
-                        </span>
-                      </div>
-                    </div>
+                    );
+                  })}
+
+                  {/* Render ungrouped scans (those without session_id) */}
+                  {ungrouped.map((scan, index) => {
+                    if (!scan) return null;
                     
-                    <button
-                      onClick={() => handleViewDetails(scan)}
-                      className="flex items-center space-x-1 text-blue-400 hover:text-blue-300 text-sm font-medium ml-4"
-                    >
-                      <Eye className="w-4 h-4" />
-                      <span>View Details</span>
-                    </button>
-                  </div>
-                </div>
+                    const uniqueKey = `scan-ungrouped-${index}-${scan.id || 'no-id'}-${scan.created_at || 'no-date'}`;
+                    
+                    return (
+                      <div
+                        key={uniqueKey}
+                        className="border border-gray-700 rounded-lg p-3 sm:p-4 hover:shadow-md hover:border-gray-600 transition-all"
+                      >
+                        {/* Mobile Layout (stacked) */}
+                        <div className="block sm:hidden space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              {getStatusIcon(scan.status)}
+                              <span className={getStatusBadge(scan.status)}>
+                                {scan.status || 'Unknown'}
+                              </span>
+                            </div>
+                            <button
+                              onClick={() => handleViewDetails(scan)}
+                              className="flex items-center space-x-1 text-blue-400 hover:text-blue-300 text-sm font-medium"
+                            >
+                              <Eye className="w-4 h-4" />
+                              <span className="hidden xs:inline">Details</span>
+                            </button>
+                          </div>
+                          
+                          <div className="flex items-center space-x-2 text-gray-300">
+                            <CreditCard className="w-4 h-4 flex-shrink-0" />
+                            <span className="font-mono text-sm break-all">
+                              {getTruncatedCardNumber(scan.card_number_masked)}
+                            </span>
+                          </div>
+                          
+                          <div className="flex items-center space-x-2 text-gray-400">
+                            <Calendar className="w-4 h-4 flex-shrink-0" />
+                            <span className="text-sm">
+                              {formatDate(scan.created_at)}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Desktop Layout (horizontal) */}
+                        <div className="hidden sm:flex items-center justify-between">
+                          <div className="flex items-center space-x-2 md:space-x-4 flex-wrap gap-y-2">
+                            <div className="flex items-center space-x-2">
+                              {getStatusIcon(scan.status)}
+                              <span className={getStatusBadge(scan.status)}>
+                                {scan.status || 'Unknown'}
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center space-x-2 text-gray-300">
+                              <CreditCard className="w-4 h-4 flex-shrink-0" />
+                              <span className="font-mono text-sm">
+                                {getTruncatedCardNumber(scan.card_number_masked)}
+                              </span>
+                            </div>
+                            
+                            <div className="flex items-center space-x-2 text-gray-400">
+                              <Calendar className="w-4 h-4 flex-shrink-0" />
+                              <span className="text-sm">
+                                {formatDate(scan.created_at)}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <button
+                            onClick={() => handleViewDetails(scan)}
+                            className="flex items-center space-x-1 text-blue-400 hover:text-blue-300 text-sm font-medium ml-4"
+                          >
+                            <Eye className="w-4 h-4" />
+                            <span>View Details</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </>
               );
-            })}
+            })()}
           </div>
         )}
       </div>
