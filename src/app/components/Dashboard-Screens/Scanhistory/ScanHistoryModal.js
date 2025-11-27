@@ -63,9 +63,9 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
               <h2 className="text-lg sm:text-xl font-semibold text-white">
                 Scan Details
               </h2>
-              <p className="text-xs sm:text-sm text-gray-300">
+              {/* <p className="text-xs sm:text-sm text-gray-300">
                 Scan ID: #{scan.id}
-              </p>
+              </p> */}
             </div>
           </div>
           <button
@@ -267,7 +267,7 @@ const ScanHistoryModal = ({ scan, isOpen, onClose }) => {
                   </span>
                 </div>
                 <p className="text-xs text-gray-400">
-                  The encrypted data could not be decrypted. This may be due to corrupted data, an invalid encryption key, or incomplete encrypted data.
+                  The encrypted data could not be decrypted. This may be due to corrupted data, or an incomplete encrypted data.
                 </p>
                 <div className="mt-3 p-3 bg-gray-800 rounded border border-gray-600">
                   <p className="text-xs text-gray-400 mb-1">

@@ -7,7 +7,13 @@ const ScanDetailsModal = ({ merchantId, scanData, onClose }) => {
   const [showScanDetailModal, setShowScanDetailModal] = useState(false);
 
   const merchantScans = useMemo(() => {
-    return scanData.filter(scan => scan.merchant_id === merchantId);
+    const filtered = scanData.filter(scan => scan.merchant_id === merchantId);
+    // Sort by created_at in descending order (latest first)
+    return filtered.sort((a, b) => {
+      const dateA = new Date(a.created_at);
+      const dateB = new Date(b.created_at);
+      return dateB - dateA;
+    });
   }, [scanData, merchantId]);
 
   const merchantInfo = merchantScans[0];
@@ -26,6 +32,22 @@ const ScanDetailsModal = ({ merchantId, scanData, onClose }) => {
       } else {
         ungrouped.push(scan);
       }
+    });
+
+    // Sort scans within each session by created_at (latest first)
+    Object.keys(grouped).forEach(sessionId => {
+      grouped[sessionId].sort((a, b) => {
+        const dateA = new Date(a.created_at);
+        const dateB = new Date(b.created_at);
+        return dateB - dateA;
+      });
+    });
+
+    // Sort ungrouped scans by created_at (latest first)
+    ungrouped.sort((a, b) => {
+      const dateA = new Date(a.created_at);
+      const dateB = new Date(b.created_at);
+      return dateB - dateA;
     });
 
     return { grouped, ungrouped };
@@ -57,8 +79,9 @@ const ScanDetailsModal = ({ merchantId, scanData, onClose }) => {
     const uniqueUsers = new Set(merchantScans.map(scan => scan.user_id)).size;
     const uniqueCards = new Set(merchantScans.map(scan => scan.card_number_masked)).size;
     const successCount = merchantScans.filter(scan => scan.status === 'success').length;
-    const failedCount = merchantScans.length - successCount;
-    const successRate = ((successCount / merchantScans.length) * 100).toFixed(1);
+    const failedCount = merchantScans.filter(scan => scan.status === 'failed').length;
+    const validScans = successCount + failedCount;
+    const successRate = validScans > 0 ? ((successCount / validScans) * 100).toFixed(1) : 0;
     
     return { uniqueUsers, uniqueCards, successCount, failedCount, successRate };
   }, [merchantScans]);
@@ -200,7 +223,14 @@ const ScanDetailsModal = ({ merchantId, scanData, onClose }) => {
           <h4 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-5">Card Scan Records</h4>
           <div className="space-y-4">
             {/* Render grouped sessions */}
-            {Object.entries(groupedBySession.grouped).map(([sessionId, sessionScans]) => {
+            {Object.entries(groupedBySession.grouped)
+              .sort(([, scansA], [, scansB]) => {
+                // Sort sessions by the latest scan date in each session
+                const latestDateA = new Date(scansA[0].created_at);
+                const latestDateB = new Date(scansB[0].created_at);
+                return latestDateB - latestDateA;
+              })
+              .map(([sessionId, sessionScans]) => {
               const isExpanded = expandedSessions[sessionId];
               const latestScan = sessionScans[0];
               
@@ -349,9 +379,9 @@ const ScanDetailsModal = ({ merchantId, scanData, onClose }) => {
                     </div>
 
                     {/* User Info */}
-                    <div className="text-xs text-gray-400">
+                    {/* <div className="text-xs text-gray-400">
                       User: <span className="text-white font-medium">{scan.user_id}</span>
-                    </div>
+                    </div> */}
 
                     {/* Date */}
                     <div className="text-xs text-gray-400">
@@ -547,9 +577,9 @@ const IndividualScanModal = ({ scan, isOpen, onClose }) => {
               <h2 className="text-lg sm:text-xl font-semibold text-white">
                 Scan Details
               </h2>
-              <p className="text-xs sm:text-sm text-gray-300">
+              {/* <p className="text-xs sm:text-sm text-gray-300">
                 Scan ID: #{scan.id || 'N/A'}
-              </p>
+              </p> */}
             </div>
           </div>
           <button
@@ -769,7 +799,7 @@ const IndividualScanModal = ({ scan, isOpen, onClose }) => {
                   </span>
                 </div>
                 <p className="text-xs text-gray-400">
-                  The encrypted data could not be decrypted. This may be due to corrupted data, an invalid encryption key, or incomplete encrypted data.
+                  The encrypted data could not be decrypted. This may be due to corrupted data, or an incomplete encrypted data.
                 </p>
                 <div className="mt-3 p-3 bg-gray-800 rounded border border-gray-600">
                   <p className="text-xs text-gray-400 mb-1">
@@ -843,7 +873,7 @@ const IndividualScanModal = ({ scan, isOpen, onClose }) => {
                 </div>
               )}
 
-              <div className="bg-gray-900 rounded-lg p-3 sm:p-4">
+              {/* <div className="bg-gray-900 rounded-lg p-3 sm:p-4">
                 <div className="flex items-center space-x-2 mb-2">
                   <svg className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -857,7 +887,7 @@ const IndividualScanModal = ({ scan, isOpen, onClose }) => {
                     {scan.user_id}
                   </span>
                 </div>
-              </div>
+              </div> */}
 
               {scan.session_id && (
                 <div className="bg-gray-900 rounded-lg p-3 sm:p-4">

@@ -29,7 +29,7 @@ const MerchantList = ({ scanData, onMerchantClick, searchQuery }) => {
 
       if (scan.status === "success") {
         acc[merchantId].success_count++;
-      } else {
+      } else if (scan.status === "failed") {
         acc[merchantId].failed_count++;
       }
 
@@ -40,15 +40,17 @@ const MerchantList = ({ scanData, onMerchantClick, searchQuery }) => {
 
     return (
       Object.values(grouped)
-        .map((merchant) => ({
-          ...merchant,
-          unique_users: merchant.unique_users.size,
-          unique_cards: merchant.unique_cards.size,
-          success_rate: (
-            (merchant.success_count / merchant.total_scans) *
-            100
-          ).toFixed(1),
-        }))
+        .map((merchant) => {
+          const validScans = merchant.success_count + merchant.failed_count;
+          return {
+            ...merchant,
+            unique_users: merchant.unique_users.size,
+            unique_cards: merchant.unique_cards.size,
+            success_rate: validScans > 0
+              ? ((merchant.success_count / validScans) * 100).toFixed(1)
+              : 0,
+          };
+        })
         // Fixed implementation with proper null checking
         .filter((merchant) => {
           const query = searchQuery.toLowerCase();
@@ -234,8 +236,12 @@ const StatsOverview = ({ scanData }) => {
     const successCount = scanData.filter(
       (scan) => scan.status === "success"
     ).length;
+    const failedCount = scanData.filter(
+      (scan) => scan.status === "failed"
+    ).length;
+    const validScans = successCount + failedCount;
     const successRate =
-      totalScans > 0 ? ((successCount / totalScans) * 100).toFixed(1) : 0;
+      validScans > 0 ? ((successCount / validScans) * 100).toFixed(1) : 0;
 
     return { totalScans, uniqueUsers, uniqueCards, successRate };
   }, [scanData]);
