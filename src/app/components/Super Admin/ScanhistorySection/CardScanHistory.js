@@ -1,6 +1,7 @@
 import { apiFetch } from "@/app/lib/api.js";
 import React, { useState, useEffect, useMemo } from "react";
 import ScanDetailsModal from "./ScanModal";
+import { decryptWithAES128 } from "@/app/lib/decrypt";
 
 // Merchant List Component
 const MerchantList = ({ scanData, onMerchantClick, searchQuery }) => {
@@ -368,8 +369,28 @@ const CardScanHistory = () => {
       const result = await response.json();
 
       if (result.status) {
-        setScanData(result.data);
-        console.log("Fetched scan data:", result.data);
+        // Process each scan to decrypt the encrypted_data using merchant_key
+        const processedScans = result.data.map(scan => {
+          let decryptedData = null;
+          
+          // Attempt to decrypt if encrypted_data and merchant_key are present
+          if (scan.encrypted_data && scan.merchant_key) {
+            try {
+              decryptedData = decryptWithAES128(scan.encrypted_data, scan.merchant_key);
+              console.log(`✅ Decrypted scan for merchant ${scan.merchant_id}:`, decryptedData);
+            } catch (error) {
+              console.error(`❌ Decryption failed for merchant ${scan.merchant_id}:`, error.message);
+            }
+          }
+
+          return {
+            ...scan,
+            decrypted_data: decryptedData
+          };
+        });
+
+        setScanData(processedScans);
+        console.log("Fetched and processed scan data:", processedScans);
       } else {
         setError("Failed to fetch scan data");
       }
