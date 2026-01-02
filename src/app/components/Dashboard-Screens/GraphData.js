@@ -35,7 +35,7 @@ const fetchScanData = async () => {
       throw new Error('Merchant ID not found');
     }
 
-    const url = `https://admin.cardnest.io/api/merchant/getCardScans?id=${merchantId}`;
+    const url = `http://52.55.249.9:8001/api/merchant/getCardScans?id=${merchantId}`;
     // console.log('Fetching from URL:', url);
 
     const response = await fetch(url, {

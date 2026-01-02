@@ -26,6 +26,8 @@ const BillingLogsSection = () => {
         return;
       }
 
+      // console.log('merchantId:', merchantId);
+
       const response = await apiFetch(`/merchant/getOldSubscriptions?id=${merchantId}`, {
         method: 'GET',
         headers: {
@@ -40,7 +42,9 @@ const BillingLogsSection = () => {
       const result = await response.json();
       
       if (result.status) {
-        setSubscriptions(result.data || []);
+        // Convert object to array since API returns data as an object with numeric keys
+        const data = result.data || {};
+        setSubscriptions(Array.isArray(data) ? data : Object.values(data));
       } else {
         setError(result.message || 'Failed to fetch billing logs');
       }

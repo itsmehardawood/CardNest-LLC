@@ -12,7 +12,7 @@ export async function GET(request) {
       );
     }
 
-    const apiUrl = `https://admin.cardnest.io/api/merchant/getCardScans?id=${merchantId}`;
+    const apiUrl = `http://52.55.249.9:8001/api/merchant/getCardScans?id=${merchantId}`;
     
     const response = await fetch(apiUrl, {
       method: 'GET',
