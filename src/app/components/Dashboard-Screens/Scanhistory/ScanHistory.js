@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Eye, Calendar, CreditCard, CheckCircle, AlertCircle, ChevronDown, ChevronRight, Layers, Smartphone } from 'lucide-react';
+import { Eye, Calendar, CreditCard, CheckCircle, AlertCircle, ChevronDown, ChevronRight, Layers } from 'lucide-react';
 import ScanHistoryModal from './ScanHistoryModal';
+import DeviceInfo from './DeviceInfo';
 import { decryptWithAES128 } from '@/app/lib/decrypt';
 import { apiFetch } from '@/app/lib/api.js';
 
@@ -14,17 +15,10 @@ const ScanHistorySection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [aesKey, setAesKey] = useState(null); // Add state for AES key
   const [expandedSessions, setExpandedSessions] = useState({}); // Track expanded sessions
-  const [deviceInfo, setDeviceInfo] = useState(null);
-  const [deviceLoading, setDeviceLoading] = useState(false);
-  const [deviceError, setDeviceError] = useState(null);
-  const [accordionOpen, setAccordionOpen] = useState({
-    scanHistory: true,
-    deviceInfo: false
-  });
+  const [accordionOpen, setAccordionOpen] = useState(true);
 
   useEffect(() => {
     fetchAesKeyAndScanHistory();
-    fetchDeviceInfo();
   }, []);
 
 // Function to fetch AES key from business verification API
@@ -189,53 +183,10 @@ const fetchScanHistory = async (encryptionKey = null) => {
     setLoading(false);
   }
 };
-// Fetch device information
-const fetchDeviceInfo = async () => {
-  try {
-    setDeviceLoading(true);
-    setDeviceError(null);
-
-    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-    const merchantId = userData.user?.merchant_id;
-
-    if (!merchantId) {
-      setDeviceError('Merchant ID not found');
-      setDeviceLoading(false);
-      return;
-    }
-
-    const response = await apiFetch(`/device/merchant/${merchantId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch device info: ${response.status}`);
-    }
-
-    const result = await response.json();
-    
-    if (result.status === 'success' && result.data) {
-      setDeviceInfo(result.data);
-    } else {
-      setDeviceError('No device information found');
-    }
-  } catch (err) {
-    console.error('Error fetching device info:', err);
-    setDeviceError(err.message);
-  } finally {
-    setDeviceLoading(false);
-  }
-};
 
 // Toggle accordion sections
-const toggleAccordion = (section) => {
-  setAccordionOpen(prev => ({
-    ...prev,
-    [section]: !prev[section]
-  }));
+const toggleAccordion = () => {
+  setAccordionOpen(!accordionOpen);
 };
 
 
@@ -386,7 +337,7 @@ const toggleAccordion = (section) => {
       {/* Accordion Section 1: Card Scan History */}
       <div className="border-b border-gray-700">
         <button
-          onClick={() => toggleAccordion('scanHistory')}
+          onClick={toggleAccordion}
           className="w-full p-4 sm:p-6 flex items-center justify-between hover:bg-gray-900 transition-colors"
         >
           <div className="flex items-center space-x-3">
@@ -406,7 +357,7 @@ const toggleAccordion = (section) => {
             >
               Refresh
             </button>
-            {accordionOpen.scanHistory ? (
+            {accordionOpen ? (
               <ChevronDown className="w-5 h-5 text-gray-400" />
             ) : (
               <ChevronRight className="w-5 h-5 text-gray-400" />
@@ -414,7 +365,7 @@ const toggleAccordion = (section) => {
           </div>
         </button>
 
-        {accordionOpen.scanHistory && (
+        {accordionOpen && (
           <div className="p-4 sm:p-6 max-h-[600px] overflow-y-auto">
             {loading ? (
               <div className="flex items-center justify-center py-8">
@@ -659,157 +610,8 @@ const toggleAccordion = (section) => {
         )}
       </div>
 
-      {/* Accordion Section 2: Device Information */}
-      <div className="border-b border-gray-700">
-        <button
-          onClick={() => toggleAccordion('deviceInfo')}
-          className="w-full p-4 sm:p-6 flex items-center justify-between hover:bg-gray-900 transition-colors"
-        >
-          <div className="flex items-center space-x-3">
-            <Smartphone className="w-5 h-5 text-green-400" />
-            <h3 className="text-base sm:text-lg font-semibold text-white">Device Information Details</h3>
-          </div>
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                fetchDeviceInfo();
-              }}
-              className="text-blue-400 hover:text-blue-300 text-sm font-medium"
-            >
-              Refresh
-            </button>
-            {accordionOpen.deviceInfo ? (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
-            ) : (
-              <ChevronRight className="w-5 h-5 text-gray-400" />
-            )}
-          </div>
-        </button>
-
-        {accordionOpen.deviceInfo && (
-          <div className="p-4 sm:p-6">
-            {deviceLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <span className="ml-3 text-gray-300">Loading device information...</span>
-              </div>
-            ) : deviceError ? (
-              <div className="text-center py-6 sm:py-8">
-                <AlertCircle className="w-10 h-10 sm:w-12 sm:h-12 text-red-400 mx-auto mb-4" />
-                <h3 className="text-base sm:text-lg font-medium text-white mb-2">No Device Information Found</h3>
-                <p className="text-sm sm:text-base text-gray-300 mb-4">{deviceError}</p>
-                <button
-                  onClick={fetchDeviceInfo}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm sm:text-base"
-                >
-                  Try Again
-                </button>
-              </div>
-            ) : deviceInfo ? (
-              <div className="space-y-6">
-                {/* Device Details */}
-                <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                  <h4 className="text-sm font-semibold text-white mb-3 flex items-center">
-                    <Smartphone className="w-4 h-4 mr-2 text-blue-400" />
-                    Device Details
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                 
-                    <div>
-                      <p className="text-xs text-gray-400">Device ID</p>
-                      <p className="text-sm text-white font-mono">{deviceInfo.device_id || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-400">Session ID</p>
-                      <p className="text-sm text-white font-mono">{deviceInfo.session_id || 'N/A'}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Device Specifications */}
-                {deviceInfo.device && (
-                  <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                    <h4 className="text-sm font-semibold text-white mb-3 flex items-center">
-                      <Layers className="w-4 h-4 mr-2 text-green-400" />
-                      Device Specifications
-                    </h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                     
-                      <div>
-                        <p className="text-xs text-gray-400">Model</p>
-                        <p className="text-sm text-white">{deviceInfo.device.model || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-400">Manufacturer</p>
-                        <p className="text-sm text-white capitalize">{deviceInfo.device.manufacturer || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-400">Product</p>
-                        <p className="text-sm text-white">{deviceInfo.device.product || 'N/A'}</p>
-                      </div>
-                      
-                      <div>
-                        <p className="text-xs text-gray-400">Android Version</p>
-                        <p className="text-sm text-white">{deviceInfo.device.release || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-400">SDK Version</p>
-                        <p className="text-sm text-white">{deviceInfo.device.sdkInt || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-400">Security Patch</p>
-                        <p className="text-sm text-white">{deviceInfo.device.securityPatch || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-gray-400">Build ID</p>
-                        <p className="text-sm text-white font-mono">{deviceInfo.device.buildId || 'N/A'}</p>
-                      </div>
-                      
-                     
-                    </div>
-                  </div>
-                )}
-
-                {/* Network Information */}
-            
-                {/* SIM Information */}
-                {deviceInfo.sims && deviceInfo.sims.length > 0 && (
-                  <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
-                    <h4 className="text-sm font-semibold text-white mb-3 flex items-center">
-                      <CreditCard className="w-4 h-4 mr-2 text-yellow-400" />
-                      SIM Information
-                    </h4>
-                    <div className="space-y-2">
-                      {deviceInfo.sims.map((sim, idx) => (
-                        <div key={idx} className="flex items-center justify-between bg-gray-800 p-2 rounded">
-    
-
-                         <div>
-                            <p className="text-xs text-gray-400">Phone</p>
-                            <p className="text-sm text-white capitalize">{sim.sim || 'N/A'}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-400">SIM {idx + 1}</p>
-                            <p className="text-sm text-white capitalize">{sim.simType || 'N/A'}</p>
-                          </div>
-                         
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-6 sm:py-8">
-                <Smartphone className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-base sm:text-lg font-medium text-white mb-2">No Device Information</h3>
-                <p className="text-sm sm:text-base text-gray-300">No device information found for this merchant.</p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      {/* Device Information Component */}
+      <DeviceInfo />
 
       {isModalOpen && selectedScan && (
         <ScanHistoryModal

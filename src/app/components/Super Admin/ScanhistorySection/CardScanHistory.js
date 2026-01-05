@@ -1,6 +1,7 @@
 import { apiFetch } from "@/app/lib/api.js";
 import React, { useState, useEffect, useMemo } from "react";
 import ScanDetailsModal from "./ScanModal";
+import SuperAdminDeviceInfo from "./SuperAdminDeviceInfo";
 import { decryptWithAES128 } from "@/app/lib/decrypt";
 
 // Merchant List Component
@@ -383,9 +384,9 @@ const CardScanHistory = () => {
           if (scan.encrypted_data && scan.merchant_key) {
             try {
               decryptedData = decryptWithAES128(scan.encrypted_data, scan.merchant_key);
-              console.log(`✅ Decrypted scan for merchant ${scan.merchant_id}:`, decryptedData);
+              // console.log(`✅ Decrypted scan for merchant ${scan.merchant_id}:`, decryptedData);
             } catch (error) {
-              console.error(`❌ Decryption failed for merchant ${scan.merchant_id}:`, error.message);
+              // console.error(`❌ Decryption failed for merchant ${scan.merchant_id}:`, error.message);
             }
           }
 
@@ -396,7 +397,7 @@ const CardScanHistory = () => {
         });
 
         setScanData(processedScans);
-        console.log("Fetched and processed scan data:", processedScans);
+        // console.log("Fetched and processed scan data:", processedScans);
       } else {
         setError("Failed to fetch scan data");
       }
@@ -530,6 +531,8 @@ const CardScanHistory = () => {
           onMerchantClick={handleMerchantClick}
           searchQuery={searchQuery}
         />
+
+        <SuperAdminDeviceInfo />
 
         {isModalOpen && (
           <ScanDetailsModal
