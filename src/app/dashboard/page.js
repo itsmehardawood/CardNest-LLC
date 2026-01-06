@@ -342,7 +342,7 @@ function DashboardContent() {
       }
       // Make API call
       const response = await fetch(
-        "https://admin.cardnest.io/api/business-profile",
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/business-profile`,
         {
           method: "POST",
           body: formData,

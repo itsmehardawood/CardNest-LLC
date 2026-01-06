@@ -27,7 +27,7 @@ export default function AdminLoginPage() {
         // In your actual Next.js project, use:
         localStorage.setItem('userData', JSON.stringify(data));
         // For demo purposes in this environment:
-        console.log('Login successful:', data);
+        // console.log('Login successful:', data);
         // alert('Login successful! Redirecting to dashboard...');
         // In your actual Next.js project, use:
         // window.location.href = '/dashboard';

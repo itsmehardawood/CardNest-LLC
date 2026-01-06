@@ -15,7 +15,7 @@ const ScanHistorySection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [aesKey, setAesKey] = useState(null); // Add state for AES key
   const [expandedSessions, setExpandedSessions] = useState({}); // Track expanded sessions
-  const [accordionOpen, setAccordionOpen] = useState(true);
+  const [accordionOpen, setAccordionOpen] = useState(false);
 
   useEffect(() => {
     fetchAesKeyAndScanHistory();

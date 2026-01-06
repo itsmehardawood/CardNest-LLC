@@ -3,9 +3,12 @@ import React, { useState, useEffect, useMemo } from "react";
 import ScanDetailsModal from "./ScanModal";
 import SuperAdminDeviceInfo from "./SuperAdminDeviceInfo";
 import { decryptWithAES128 } from "@/app/lib/decrypt";
+import { Building, ChevronDown, ChevronRight } from 'lucide-react';
 
 // Merchant List Component
 const MerchantList = ({ scanData, onMerchantClick, searchQuery }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  
   const merchantStats = useMemo(() => {
     const grouped = scanData.reduce((acc, scan) => {
       const merchantId = scan.merchant_id;
@@ -87,17 +90,34 @@ const MerchantList = ({ scanData, onMerchantClick, searchQuery }) => {
   };
 
   return (
-    <div className="bg-black/50 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden border border-gray-700/50 p-8">
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-gray-100">
-          Merchant Performance
-        </h2>
-        <p className="text-sm text-gray-400 mt-1">
-          Overview of scan activities across all merchants
-        </p>
-      </div>
-      <div>
-        {merchantStats.length === 0 ? (
+    <div className="bg-black/50 backdrop-blur-md shadow-2xl rounded-2xl overflow-hidden border border-gray-700/50">
+      {/* Accordion Header */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full px-8 py-6 flex items-center justify-between hover:bg-white/5 transition-colors"
+      >
+        <div>
+         <div className="flex space-x-3">
+         <Building></Building>
+           <h2 className="text-2xl font-semibold text-gray-100 text-left">
+            Merchant Performance
+          </h2>
+         </div>
+          <p className="text-sm text-gray-400 mt-1 text-left">
+            Overview of scan activities across all merchants
+          </p>
+        </div>
+        {isOpen ? (
+          <ChevronDown className="w-6 h-6 text-gray-400" />
+        ) : (
+          <ChevronRight className="w-6 h-6 text-gray-400" />
+        )}
+      </button>
+
+      {/* Accordion Content */}
+      {isOpen && (
+        <div className="px-8 pb-8">
+          {merchantStats.length === 0 ? (
           <div className="text-center py-12 text-gray-400 bg-black/30 rounded-lg backdrop-blur-sm">
             <svg
               className="mx-auto h-12 w-12 text-gray-500"
@@ -222,7 +242,8 @@ const MerchantList = ({ scanData, onMerchantClick, searchQuery }) => {
             ))}
           </div>
         )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

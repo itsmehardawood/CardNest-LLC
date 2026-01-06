@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AlertCircle, ChevronDown, ChevronRight, Layers, Smartphone, CreditCard, Wifi } from 'lucide-react';
+import { AlertCircle, ChevronDown, ChevronRight, Smartphone, Eye } from 'lucide-react';
 import { apiFetch } from '@/app/lib/api.js';
+import DeviceInfoModal from './DeviceInfoModal';
 
 const DeviceInfo = () => {
   const [deviceRecords, setDeviceRecords] = useState([]);
@@ -13,7 +14,8 @@ const DeviceInfo = () => {
   const [selectedMonth, setSelectedMonth] = useState(0);
   const [selectedDate, setSelectedDate] = useState(0);
   const [yearOptions, setYearOptions] = useState([]);
-  const [expandedRecords, setExpandedRecords] = useState({});
+  const [selectedDevice, setSelectedDevice] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     // Generate year options (current year and 2 previous years)
@@ -26,12 +28,16 @@ const DeviceInfo = () => {
     fetchDeviceInfo();
   }, [selectedYear, selectedMonth, selectedDate]);
 
-  // Toggle individual record expansion
-  const toggleRecord = (index) => {
-    setExpandedRecords(prev => ({
-      ...prev,
-      [index]: !prev[index]
-    }));
+  // Open modal with selected device
+  const openDeviceModal = (device, index) => {
+    setSelectedDevice({ ...device, index });
+    setModalOpen(true);
+  };
+
+  // Close modal
+  const closeDeviceModal = () => {
+    setModalOpen(false);
+    setSelectedDevice(null);
   };
 
   // Fetch device information
@@ -187,35 +193,24 @@ const DeviceInfo = () => {
             </div>
           ) : deviceRecords && deviceRecords.length > 0 ? (
             <div className="space-y-3">
-              {deviceRecords.map((deviceInfo, index) => {
-                const isExpanded = expandedRecords[index];
-                return (
-                  <div key={index} className="bg-gray-900 rounded-lg border border-gray-700 overflow-hidden">
-                    {/* Collapsible Header */}
-                    <button
-                      onClick={() => toggleRecord(index)}
-                      className="w-full p-4 flex items-center justify-between hover:bg-gray-800 transition-colors"
-                    >
-                      <div className="flex items-center space-x-3 flex-1">
-                        {isExpanded ? (
-                          <ChevronDown className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                        ) : (
-                          <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                        )}
-                        <Smartphone className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                        <div className="flex-1 text-left">
-                          <h4 className="text-sm sm:text-base font-semibold text-white">
-                            Device Record #{index + 1}
-                          </h4>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <p className="text-xs text-gray-400 font-mono">
-                              {deviceInfo.device_id || 'No Device ID'} • {deviceInfo.session_id || 'No Session'}
-                            </p>
-                          </div>
-                        </div>
+              {deviceRecords.map((deviceInfo, index) => (
+                <div key={index} className="bg-gray-900 rounded-lg border border-gray-700 p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3 flex-1">
+                      <Smartphone className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                      <div className="flex-1">
+                        <h4 className="text-sm sm:text-base font-semibold text-white">
+                          Device Record #{index + 1}
+                        </h4>
+                        <p className="text-xs text-gray-400 font-mono mt-1">
+                          {deviceInfo.device_id || 'No Device ID'} • {deviceInfo.session_id || 'No Session'}
+                        </p>
                       </div>
-                      <div className="text-right ml-4">
-                        <p className="text-xs text-gray-400">
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <div className="text-right">
+                        <p className="text-xs text-gray-400">Created</p>
+                        <p className="text-sm text-gray-300">
                           {deviceInfo.created_at ? new Date(deviceInfo.created_at).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric',
@@ -223,171 +218,17 @@ const DeviceInfo = () => {
                           }) : 'N/A'}
                         </p>
                       </div>
-                    </button>
-
-                    {/* Expanded Content */}
-                    {isExpanded && (
-                      <div className="border-t border-gray-700 p-4 bg-black">
-                        {/* Device ID & Session ID */}
-                        <div className="mb-4 bg-gray-800 rounded-lg p-4">
-                          <h5 className="text-sm font-semibold text-white mb-3 flex items-center">
-                            <Smartphone className="w-4 h-4 mr-2 text-blue-400" />
-                            Device Identification
-                          </h5>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                              <p className="text-xs text-gray-400">Device ID</p>
-                              <p className="text-sm text-white font-mono">{deviceInfo.device_id || 'N/A'}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-gray-400">Session ID</p>
-                              <p className="text-sm text-white font-mono">{deviceInfo.session_id || 'N/A'}</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Device Specifications */}
-                        {deviceInfo.device && (
-                          <div className="mb-4 bg-gray-800 rounded-lg p-4">
-                            <h5 className="text-sm font-semibold text-white mb-3 flex items-center">
-                              <Layers className="w-4 h-4 mr-2 text-green-400" />
-                              Device Specifications
-                            </h5>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                              <div>
-                                <p className="text-xs text-gray-400">Model</p>
-                                <p className="text-sm text-white">{deviceInfo.device.model || 'N/A'}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-400">Manufacturer</p>
-                                <p className="text-sm text-white capitalize">{deviceInfo.device.manufacturer || 'N/A'}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-400">Brand</p>
-                                <p className="text-sm text-white capitalize">{deviceInfo.device.brand || 'N/A'}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-400">Product</p>
-                                <p className="text-sm text-white">{deviceInfo.device.product || 'N/A'}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-400">Android Version</p>
-                                <p className="text-sm text-white">{deviceInfo.device.release || 'N/A'}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-400">SDK Version</p>
-                                <p className="text-sm text-white">{deviceInfo.device.sdkInt || 'N/A'}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-400">Security Patch</p>
-                                <p className="text-sm text-white">{deviceInfo.device.securityPatch || 'N/A'}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-400">Build ID</p>
-                                <p className="text-sm text-white font-mono">{deviceInfo.device.buildId || 'N/A'}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs text-gray-400">Boot Count</p>
-                                <p className="text-sm text-white">{deviceInfo.device.bootCount || 'N/A'}</p>
-                              </div>
-                              <div className="sm:col-span-2">
-                                <p className="text-xs text-gray-400">Build Fingerprint</p>
-                                <p className="text-sm text-white font-mono break-all">{deviceInfo.device.buildFingerprint || 'N/A'}</p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Network Information */}
-                        {deviceInfo.network && (
-                          <div className="mb-4 bg-gray-800 rounded-lg p-4">
-                            <h5 className="text-sm font-semibold text-white mb-3 flex items-center">
-                              <Wifi className="w-4 h-4 mr-2 text-purple-400" />
-                              Network Information
-                            </h5>
-                            <div className="space-y-3">
-                              {deviceInfo.network.ipv4 && deviceInfo.network.ipv4.length > 0 && (
-                                <div>
-                                  <p className="text-xs text-gray-400 mb-1">IPv4 Addresses</p>
-                                  <div className="flex flex-wrap gap-2">
-                                    {deviceInfo.network.ipv4.map((ip, idx) => (
-                                      <span key={idx} className="text-sm text-white bg-gray-700 px-2 py-1 rounded font-mono">
-                                        {ip}
-                                      </span>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                              {deviceInfo.network.ipv6 && deviceInfo.network.ipv6.length > 0 && (
-                                <div>
-                                  <p className="text-xs text-gray-400 mb-1">IPv6 Addresses</p>
-                                  <div className="flex flex-wrap gap-2">
-                                    {deviceInfo.network.ipv6.map((ip, idx) => (
-                                      <span key={idx} className="text-sm text-white bg-gray-700 px-2 py-1 rounded font-mono break-all">
-                                        {ip}
-                                      </span>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                              {deviceInfo.network.dns && deviceInfo.network.dns.length > 0 && (
-                                <div>
-                                  <p className="text-xs text-gray-400 mb-1">DNS Servers</p>
-                                  <div className="flex flex-wrap gap-2">
-                                    {deviceInfo.network.dns.map((dns, idx) => (
-                                      <span key={idx} className="text-sm text-white bg-gray-700 px-2 py-1 rounded font-mono">
-                                        {dns}
-                                      </span>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* SIM Information */}
-                        {deviceInfo.sims && deviceInfo.sims.length > 0 && (
-                          <div className="bg-gray-800 rounded-lg p-4">
-                            <h5 className="text-sm font-semibold text-white mb-3 flex items-center">
-                              <CreditCard className="w-4 h-4 mr-2 text-yellow-400" />
-                              SIM Information
-                            </h5>
-                            <div className="space-y-2">
-                              {deviceInfo.sims.map((sim, idx) => (
-                                <div key={idx} className="bg-gray-700 p-3 rounded">
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    <div>
-                                      <p className="text-xs text-gray-400">SIM {idx + 1} Type</p>
-                                      <p className="text-sm text-white capitalize">{sim.simType || 'N/A'}</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-xs text-gray-400">Phone Number</p>
-                                      <p className="text-sm text-white font-mono">{sim.sim || 'N/A'}</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-xs text-gray-400">MCC/MNC</p>
-                                      <p className="text-sm text-white font-mono">{sim.mccmmc || 'N/A'}</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-xs text-gray-400">Carrier ID</p>
-                                      <p className="text-sm text-white">{sim.carrierId || 'N/A'}</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-xs text-gray-400">Subscription ID</p>
-                                      <p className="text-sm text-white">{sim.subscriptionId || 'N/A'}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                      <button
+                        onClick={() => openDeviceModal(deviceInfo, index)}
+                        className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm"
+                      >
+                        <Eye className="w-4 h-4" />
+                        <span>View Details</span>
+                      </button>
+                    </div>
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           ) : (
             <div className="text-center py-6 sm:py-8">
@@ -398,6 +239,14 @@ const DeviceInfo = () => {
           )}
         </div>
       )}
+
+      {/* Device Info Modal */}
+      <DeviceInfoModal 
+        isOpen={modalOpen}
+        onClose={closeDeviceModal}
+        deviceInfo={selectedDevice}
+        recordIndex={selectedDevice?.index || 0}
+      />
     </div>
   );
 };
