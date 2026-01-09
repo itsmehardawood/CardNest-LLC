@@ -146,7 +146,7 @@ const ScanDetailsModal = ({ merchantId, scanData, onClose }) => {
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8" 
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4" 
       onClick={handleBackdropClick}
     >
       {/* Backdrop */}
@@ -154,7 +154,7 @@ const ScanDetailsModal = ({ merchantId, scanData, onClose }) => {
       
       {/* Modal Container */}
       <div 
-        className="relative bg-black rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-gray-800/50 transform transition-all duration-300 scale-100 sm:scale-105"
+        className="relative bg-black rounded-2xl shadow-2xl max-w-5xl w-full max-h-[80vh] overflow-hidden flex flex-col border border-gray-800/50 transform transition-all duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
