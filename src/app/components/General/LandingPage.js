@@ -16,6 +16,106 @@ const LandingPage = () => {
     //   description: "We bring together everything that is required to build websites and apps that accept payments and send payouts globally.",
     //   media: ''
     // },
+    kyc: {
+      title: "",
+      heading: "",
+      description: "Welcome to CardNest KYC Verification Thank you for choosing CardNest LLC. To ensure the highest level of security, compliance, and fraud prevention, your organization uses CardNest to ensure that all users complete a Know Your Customer (KYC) verification process before accessing the services or system.",
+      media: null,
+      darkMode: true,
+      sections: [
+        {
+          content: "CardNest is an advanced fraud prevention intelligence platform designed to stop credit and debit card fraud before it occurs. Our technology protects businesses from unauthorized transactions, financial losses, and chargebacks. As part of this commitment, identity verification is a critical step in maintaining a trusted and secure ecosystem for all parties involved."
+        },
+        {
+          emoji: "🔐",
+          title: "Why is KYC Verification Important",
+          content: "The KYC process allows CardNest to:",
+          points: [
+            "Verify identities accurately and prevent impersonation or fraudulent activity",
+            "Comply with global regulatory and financial security standards",
+            "Protect merchants, customers, and partners from card fraud and chargebacks",
+            "Ensure only legitimate users access CardNest's fraud-prevention infrastructure"
+          ],
+          footer: "Your cooperation helps us maintain a secure environment and deliver reliable fraud prevention services."
+        },
+        {
+          emoji: "🧭",
+          title: "What to Expect: CardNest KYC Verification Steps",
+          content: "Our KYC process is designed to be secure, efficient, and user-friendly. Below is a step-by-step overview of how verification works:",
+          steps: [
+            {
+              emoji: "🪪",
+              title: "Step 1: Identity Document Submission",
+              content: "You will be asked to upload a valid government-issued identification document, such as:",
+              points: [
+                "Passport",
+                "National ID card",
+                "Driver's license and many others"
+              ],
+              footer: "Please ensure the document is clear, unexpired, and fully visible."
+            },
+            {
+              emoji: "🤳",
+              title: "Step 2: Facial Recognition Verification",
+              content: "Next, you will complete a facial verification check using your device's camera. This step confirms that you are the rightful owner of the submitted identification and helps prevent identity misuse."
+            },
+            {
+              emoji: "🧠",
+              title: "Step 3: Intelligent Verification Analysis",
+              content: "CardNest's proprietary KYC intelligence system securely analyzes your information by:",
+              points: [
+                "Authenticating document legitimacy",
+                "Matching facial biometrics with submitted documents",
+                "Detecting anomalies or potential fraud indicators"
+              ],
+              footer: "All data is encrypted and processed in compliance with strict security and privacy standards."
+            },
+            {
+              emoji: "✅",
+              title: "Step 4: Verification Outcome",
+              content: "Once the review is complete:",
+              points: [
+                "Approved users will gain access to CardNest services",
+                "If additional information is required, you will be guided through the next steps"
+              ],
+              footer: "Most verifications are completed quickly, with minimal user effort."
+            }
+          ]
+        },
+        {
+          emoji: "🛡️",
+          title: "Your Privacy & Security",
+          content: "CardNest takes data protection seriously. All personal information is:",
+          points: [
+            "Encrypted during transmission and storage",
+            "Used strictly for verification and compliance purposes",
+            "Handled in accordance with applicable data protection regulations"
+          ]
+        },
+        {
+          emoji: "🚀",
+          title: "Moving Forward with CardNest",
+          content: "Completing the KYC process ensures you can fully benefit from CardNest's fraud prevention intelligence—helping stop fraud in advance, reduce chargebacks, and build trust across payment ecosystems.",
+          footer: "We appreciate your cooperation and look forward to supporting your secure journey with CardNest."
+        },
+        
+{
+  emoji: "💬",
+  title: "Need Help During Verification?",
+  content: "If you encounter any issues during the KYC process, CardNest provides dedicated support to assist you at every step.",
+  points: [
+    "Real-time guidance if document uploads fail",
+    "Clear instructions when additional information is required",
+    "Assistance with verification delays or technical issues"
+  ],
+footer: "",
+}
+
+
+      ]
+    },
+
+
     payments: {
       title: "Payments",
       heading: "Accept and optimize payments, globally",
@@ -306,7 +406,7 @@ const LandingPage = () => {
       <section id="about" className="py-5 px-6 bg-gray-100 w-full">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-10 text-gray-900 text-center">
-            About Us
+            CardNest Card Scan
           </h2>
 
           <div className="flex flex-col md:flex-row items-center md:items-start gap-10">
@@ -386,8 +486,176 @@ const LandingPage = () => {
         </div>
       </section>
 
-{/* Video Section  */}
+      {/* CardNest KYC Section */}
+      <section id="kyc" className="bg-slate-900">
+        <div className="w-full">
+          <div className="flex flex-col max-w-[1320px] mx-auto justify-center py-10 px-4 sm:px-6">
+            <div className="w-full text-center lg:text-left space-y-6">
+              <h3 className="text-blue-400 font-bold text-3xl text-center">
+                CardNest KYC Verification
+              </h3>
+            
+              <p className="text-sm sm:text-base text-gray-300 max-w-7xl mx-auto text-center">
+                {sectionsData.kyc.description}
+              </p>
 
+              {/* Intro paragraph */}
+              {/* <p className="text-sm sm:text-base text-gray-300 max-w-3xl mx-auto text-center">
+                {sectionsData.kyc.sections[0].content}
+              </p> */}
+
+              {/* All KYC Items */}
+              <div className="mt-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Left Column */}
+                  <div className="space-y-4">
+                    {/* Why is KYC Important */}
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 text-2xl mt-1">
+                        {sectionsData.kyc.sections[1].emoji}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-left text-base sm:text-lg text-white mb-2">
+                          {sectionsData.kyc.sections[1].title}
+                        </h4>
+                        <p className="text-sm sm:text-base text-justify text-gray-300 mb-2">
+                          {sectionsData.kyc.sections[1].content}
+                        </p>
+                        <ul className="space-y-2 ml-4">
+                          {sectionsData.kyc.sections[1].points.map((point, idx) => (
+                            <li key={idx} className="text-gray-300 text-sm">• {point}</li>
+                          ))}
+                        </ul>
+                        <p className="text-sm sm:text-base text-justify text-gray-300 mt-2">
+                          {sectionsData.kyc.sections[1].footer}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Verification Steps 1-2 */}
+                    {sectionsData.kyc.sections[2].steps.slice(0, 2).map((step, idx) => (
+                      <div key={idx} className="flex items-start space-x-3">
+                        <div className="flex-shrink-0 text-2xl mt-1">
+                          {step.emoji}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-bold text-left text-base sm:text-lg text-white mb-2">
+                            {step.title}
+                          </h4>
+                          <p className="text-sm sm:text-base text-justify text-gray-300">
+                            {step.content}
+                          </p>
+                          {step.points && (
+                            <ul className="space-y-1 ml-4 mt-2">
+                              {step.points.map((point, pIdx) => (
+                                <li key={pIdx} className="text-gray-300 text-sm">• {point}</li>
+                              ))}
+                            </ul>
+                          )}
+                          {step.footer && (
+                            <p className="text-sm text-gray-400 italic mt-2">{step.footer}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Privacy & Security */}
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 text-2xl mt-1">
+                        {sectionsData.kyc.sections[3].emoji}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-left text-base sm:text-lg text-white mb-2">
+                          {sectionsData.kyc.sections[3].title}
+                        </h4>
+                        <p className="text-sm sm:text-base text-justify text-gray-300 mb-2">
+                          {sectionsData.kyc.sections[3].content}
+                        </p>
+                        <ul className="space-y-2 ml-4">
+                          {sectionsData.kyc.sections[3].points.map((point, idx) => (
+                            <li key={idx} className="text-gray-300 text-sm">• {point}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column */}
+                  <div className="space-y-4">
+                    {/* Verification Steps 3-4 */}
+                    {sectionsData.kyc.sections[2].steps.slice(2, 4).map((step, idx) => (
+                      <div key={idx} className="flex items-start space-x-3">
+                        <div className="flex-shrink-0 text-2xl mt-1">
+                          {step.emoji}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-bold text-left text-base sm:text-lg text-white mb-2">
+                            {step.title}
+                          </h4>
+                          <p className="text-sm sm:text-base text-justify text-gray-300">
+                            {step.content}
+                          </p>
+                          {step.points && (
+                            <ul className="space-y-1 ml-4 mt-2">
+                              {step.points.map((point, pIdx) => (
+                                <li key={pIdx} className="text-gray-300 text-sm">• {point}</li>
+                              ))}
+                            </ul>
+                          )}
+                          {step.footer && (
+                            <p className="text-sm text-gray-400 italic mt-2">{step.footer}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Moving Forward */}
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 text-2xl mt-1">
+                        {sectionsData.kyc.sections[4].emoji}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-left text-base sm:text-lg text-white mb-2">
+                          {sectionsData.kyc.sections[4].title}
+                        </h4>
+                        <p className="text-sm sm:text-base text-justify text-gray-300">
+                          {sectionsData.kyc.sections[4].content}
+                        </p>
+                        <p className="text-sm sm:text-base text-justify text-gray-300 mt-2">
+                          {sectionsData.kyc.sections[4].footer}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Need Help During Verification */}
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 text-2xl mt-1">
+                        {sectionsData.kyc.sections[5].emoji}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-left text-base sm:text-lg text-white mb-2">
+                          {sectionsData.kyc.sections[5].title}
+                        </h4>
+                        <p className="text-sm sm:text-base text-justify text-gray-300 mb-2">
+                          {sectionsData.kyc.sections[5].content}
+                        </p>
+                        <ul className="space-y-2 ml-4">
+                          {sectionsData.kyc.sections[5].points.map((point, idx) => (
+                            <li key={idx} className="text-gray-300 text-sm">• {point}</li>
+                          ))}
+                        </ul>
+                        <p className="text-sm sm:text-base text-justify text-gray-300 mt-2">
+                          {sectionsData.kyc.sections[5].footer}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
 {/* Video Section */}
       <section id="video" className="py-16 px-6 bg-gradient-to-br from-gray-50 to-gray-100">
@@ -465,7 +733,7 @@ const LandingPage = () => {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-5 lg:py-5 px-6 bg-gray-50">
+      <section id="contact-section" className="py-5 lg:py-5 px-6 bg-gray-50">
         <ContactSection />
       </section>
 

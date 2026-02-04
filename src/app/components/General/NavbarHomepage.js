@@ -141,6 +141,15 @@ function NavbarHomepage() {
             </button>
 
             <button
+              onClick={() => scrollToSection("kyc")}
+              className={`hover:text-teal-600 transition-colors duration-200 font-medium ${
+                isScrolled ? "text-gray-800" : "text-white hover:text-teal-300"
+              }`}
+            >
+              CardNest KYC
+            </button>
+
+            <button
               onClick={() => scrollToSection("benefits")}
               className={`hover:text-teal-600 transition-colors duration-200 font-medium ${
                 isScrolled ? "text-gray-800" : "text-white hover:text-teal-300"
@@ -335,6 +344,13 @@ function NavbarHomepage() {
                   className="text-left text-white hover:text-teal-300 hover:bg-gray-800 transition-all duration-200 font-medium py-4 px-4 rounded-lg w-full"
                 >
                   About
+                </button>
+
+                <button
+                  onClick={() => scrollToSection("kyc")}
+                  className="text-left text-white hover:text-teal-300 hover:bg-gray-800 transition-all duration-200 font-medium py-4 px-4 rounded-lg w-full"
+                >
+                  CardNest KYC
                 </button>
 
                 <button
