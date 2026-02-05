@@ -235,7 +235,7 @@ const SuperAdminDeviceInfo = () => {
               </div>
             </div>
           ) : filteredDeviceRecords && filteredDeviceRecords.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
               {filteredDeviceRecords.map((deviceInfo, index) => (
                 <div 
                   key={deviceInfo.id || index} 
@@ -261,9 +261,9 @@ const SuperAdminDeviceInfo = () => {
                     </div>
                     <div className="flex items-center space-x-4">
                       <div className="text-right">
-                        <p className="text-xs text-gray-400">Created</p>
+                        <p className="text-xs text-gray-400">Updated</p>
                         <p className="text-sm text-gray-300">
-                          {deviceInfo.created_at ? new Date(deviceInfo.created_at).toLocaleDateString('en-US', {
+                          {deviceInfo.created_at ? new Date(deviceInfo.updated_at).toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'short',
                             day: 'numeric'

@@ -416,7 +416,7 @@ const PricingSection = ({ isDark = false }) => {
                       onClick={() => handlePlanClick(plan.id, plan.name)}
                       className={`w-full ${plan.buttonColor} text-white block text-center py-2 sm:py-2.5 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5`}
                     >
-                      SUBSCRIBE NOW →
+                      CONTACT US →
                     </button>
                   ) : !userData ? (
                     <button

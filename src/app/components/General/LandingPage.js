@@ -406,7 +406,7 @@ footer: "",
       <section id="about" className="py-5 px-6 bg-gray-100 w-full">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold mb-10 text-gray-900 text-center">
-            CardNest Card Scan
+            CardnNest Card Intelligence | Security Scan 
           </h2>
 
           <div className="flex flex-col md:flex-row items-center md:items-start gap-10">

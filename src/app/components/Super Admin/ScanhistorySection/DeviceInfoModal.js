@@ -1,7 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Smartphone, Layers, Wifi, CreditCard, MapPin, Building2 } from 'lucide-react';
 
 const DeviceInfoModal = ({ isOpen, onClose, deviceInfo, recordIndex }) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen || !deviceInfo) return null;
 
   const handleBackdropClick = (e) => {
@@ -10,9 +22,9 @@ const DeviceInfoModal = ({ isOpen, onClose, deviceInfo, recordIndex }) => {
     }
   };
 
-  return (
+  const modalContent = (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4" 
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4" 
       onClick={handleBackdropClick}
     >
       {/* Backdrop */}
@@ -282,6 +294,10 @@ const DeviceInfoModal = ({ isOpen, onClose, deviceInfo, recordIndex }) => {
       </div>
     </div>
   );
+
+  return typeof window !== 'undefined' 
+    ? createPortal(modalContent, document.body)
+    : null;
 };
 
 export default DeviceInfoModal;
