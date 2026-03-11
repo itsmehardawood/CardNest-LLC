@@ -43,17 +43,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen, activeTab, setActiveTab, status 
   const baseSidebarItems = [
     { id: 'home', label: 'Home', icon: <Home className="w-5 h-5" /> },
     { id: 'profile', label: 'Business Profile', icon: <User className="w-5 h-5" /> },
-    { 
-      id: 'kyc', 
-      label: 'CardNest KYC', 
-      icon: <ShieldCheck className="w-5 h-5" />,
-      hasSubmenu: true,
-      submenu: [
-        { id: 'kyc-dashboard', label: 'KYC Dashboard' },
-        { id: 'face-verification', label: 'Face Verification' },
-        { id: 'documents-verifications', label: 'Documents Results' },
-      ]
-    },
+    // { 
+    //   id: 'kyc', 
+    //   label: 'CardNest KYC', 
+    //   icon: <ShieldCheck className="w-5 h-5" />,
+    //   hasSubmenu: true,
+    //   submenu: [
+    //     { id: 'kyc-dashboard', label: 'KYC Dashboard' },
+    //     { id: 'face-verification', label: 'Face Verification' },
+    //     { id: 'documents-verifications', label: 'Documents Results' },
+    //   ]
+    // },
     { id: 'subscriptions', label: 'Subscriptions', icon: <ClipboardList className="w-5 h-5" /> },
     { id: 'Card', label: 'Security Scan Settings', icon: <BadgeDollarSign className="w-5 h-5" /> },
     { id: 'scanshistory', label: 'Scan History', icon: <History className="w-5 h-5" /> },
