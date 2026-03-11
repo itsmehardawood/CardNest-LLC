@@ -4,7 +4,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Select from "react-select";
 import countryCodes from "../lib/Counttycodes";
 import { auth } from "../lib/firebase";
@@ -17,6 +17,7 @@ import { apiFetch } from "../lib/api.js";
 export default function LoginPage() {
   const router = useRouter();
   const [isOtpMode, setIsOtpMode] = useState(false);
+  const [serviceType, setServiceType] = useState("card_scan");
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,68 +33,20 @@ export default function LoginPage() {
     selectedCountry: "United States",
   });
 
-  // Initialize Firebase reCAPTCHA
-
-  useEffect(() => {
-  if (typeof window !== "undefined") {
-    // If already exists, clear it first
-    if (window.recaptchaVerifier) {
-      try {
-        window.recaptchaVerifier.clear();
-      } catch (e) {
-        console.warn("Failed to clear previous reCAPTCHA", e);
-      }
-      window.recaptchaVerifier = null;
-    }
-
-    try {
-      window.recaptchaVerifier = new RecaptchaVerifier(
-        auth,
-        "recaptcha-container",
-        {
-          size: "invisible",
-          callback: (response) => {
-            console.log("reCAPTCHA solved", response);
-          },
-          "expired-callback": () => {
-            console.log("reCAPTCHA expired");
-            if (window.recaptchaVerifier) {
-              window.recaptchaVerifier.clear();
-              window.recaptchaVerifier = null;
-            }
-          },
-          "error-callback": (error) => {
-            console.error("reCAPTCHA error:", error);
-          }
-        }
-      );
-
-      window.recaptchaVerifier
-        .render()
-        .then((widgetId) => {
-          window.recaptchaWidgetId = widgetId;
-          console.log("reCAPTCHA widget rendered:", widgetId);
-        })
-        .catch((error) => {
-          console.error("reCAPTCHA render error:", error);
-        });
-    } catch (error) {
-      console.error("reCAPTCHA initialization error:", error);
-    }
-
-    // Cleanup on unmount
-    return () => {
-      if (window.recaptchaVerifier) {
-        try {
-          window.recaptchaVerifier.clear();
-        } catch (e) {
-          console.warn("Failed to clear reCAPTCHA on unmount", e);
-        }
+  // Lazily create the reCAPTCHA verifier on demand to avoid StrictMode
+  // double-invoke errors (grecaptcha has no API to fully deregister a widget).
+  const getRecaptchaVerifier = () => {
+    if (window.recaptchaVerifier) return window.recaptchaVerifier;
+    const container = document.getElementById("recaptcha-container-login");
+    if (container) container.innerHTML = "";
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container-login", {
+      size: "invisible",
+      "expired-callback": () => {
         window.recaptchaVerifier = null;
-      }
-    };
-  }
-}, []);
+      },
+    });
+    return window.recaptchaVerifier;
+  };
 
 
   const options = countryCodes.map((country) => ({
@@ -148,6 +101,7 @@ const handleSignIn = async (e) => {
       const requestBody = {
         country_code: formData.countryCode,
         login_input: emailOrPhone,
+        service_type: serviceType,
       };
 
       const response = await apiFetch("/login", {
@@ -263,9 +217,16 @@ localStorage.setItem("userData", JSON.stringify(updatedUserData));
       // Only BUSINESS_USER is allowed
       const userRole = apiUserData?.user?.role;
       
-if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {       
-   setTimeout(() => {
-          router.push("/dashboard");
+if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {
+        const sType = updatedUserData?.user?.service_type || serviceType;
+        const redirectPath =
+          sType === "kyc"
+            ? "/kyc-dashboard"
+            : sType === "crypto"
+            ? "/crypto-dashboard"
+            : "/dashboard";
+        setTimeout(() => {
+          router.push(redirectPath);
         }, 1500);
       } else {
         setTimeout(() => {
@@ -314,12 +275,8 @@ if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {
         throw new Error(`Invalid phone number format: ${fullPhoneNumber}`);
       }
 
-      // Ensure reCAPTCHA is ready
-      if (!window.recaptchaVerifier) {
-        throw new Error("reCAPTCHA verifier not initialized");
-      }
-
-      const appVerifier = window.recaptchaVerifier;
+      window.recaptchaVerifier = null; // force fresh verifier for resend
+      const appVerifier = getRecaptchaVerifier();
       const confirmation = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
       
       setConfirmationResult(confirmation);
@@ -386,9 +343,34 @@ if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {
               {!isOtpMode ? (
                 // Login Form
                 <>
-                  <h2 className="text-xl sm:text-2xl font-medium text-gray-900 mb-6 sm:mb-8">
+                  <h2 className="text-xl sm:text-2xl font-medium text-gray-900 mb-4">
                     Sign in to your account
                   </h2>
+
+                  {/* Service Type Selector */}
+                  <div className="mb-5">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Select Service</p>
+                    <div className="flex rounded-lg border border-gray-200 p-1 bg-gray-50">
+                      {[
+                        { label: "Card Security", value: "card_scan" },
+                        { label: "KYC", value: "kyc" },
+                        { label: "Crypto", value: "crypto" },
+                      ].map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => setServiceType(option.value)}
+                          className={`flex-1 py-2 px-2 text-xs font-medium rounded-md transition-all duration-200 ${
+                            serviceType === option.value
+                              ? "bg-blue-600 text-white shadow-sm"
+                              : "text-gray-600 hover:text-gray-800"
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
                   {/* Error Message */}
                   {error && (
@@ -416,6 +398,8 @@ if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {
 
                       <Select
                         id="countryCode"
+                        inputId="login-country-select"
+                        instanceId="login-country-select"
                         name="countryCode"
                         value={options.find(
                           (opt) =>
@@ -601,7 +585,7 @@ if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {
       </div>
 
       {/* Firebase reCAPTCHA container - Required for Firebase phone auth */}
-      <div id="recaptcha-container"></div>
+      <div id="recaptcha-container-login"></div>
 
       {/* Footer */}
       <footer className="relative z-10 bg-transparent py-4 sm:py-6">

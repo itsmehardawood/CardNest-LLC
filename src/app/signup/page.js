@@ -4,7 +4,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import countryCodes from "../lib/Counttycodes";
 import { auth } from "../lib/firebase";
 import Select from "react-select";
@@ -15,6 +15,7 @@ export default function SignUpPage() {
   const router = useRouter();
 
   const [showOtpForm, setShowOtpForm] = useState(false);
+  const [serviceType, setServiceType] = useState("card_scan");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -35,54 +36,20 @@ export default function SignUpPage() {
 
 
 
-  // Initialize Firebase reCAPTCHA
-useEffect(() => {
-  if (typeof window === "undefined") return;
-
-  // Clear previous verifier if it exists
-  if (window.recaptchaVerifier) {
-    try {
-      window.recaptchaVerifier.clear();
-    } catch (e) {
-      console.warn("Failed to clear existing reCAPTCHA", e);
-    }
-    window.recaptchaVerifier = null;
-  }
-
-  try {
-    window.recaptchaVerifier = new RecaptchaVerifier(
-      auth,
-      "recaptcha-container",
-      {
-        size: "invisible",
-        callback: (response) => {
-          console.log("reCAPTCHA solved");
-        },
-        "expired-callback": () => {
-          console.log("reCAPTCHA expired");
-        },
-      }
-    );
-
-    window.recaptchaVerifier.render().then((widgetId) => {
-      window.recaptchaWidgetId = widgetId;
+  // Lazily create the reCAPTCHA verifier on demand to avoid StrictMode
+  // double-invoke errors (grecaptcha has no API to fully deregister a widget).
+  const getRecaptchaVerifier = () => {
+    if (window.recaptchaVerifier) return window.recaptchaVerifier;
+    const container = document.getElementById("recaptcha-container-signup");
+    if (container) container.innerHTML = "";
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container-signup", {
+      size: "invisible",
+      "expired-callback": () => {
+        window.recaptchaVerifier = null;
+      },
     });
-  } catch (error) {
-    console.error("reCAPTCHA setup failed:", error);
-  }
-
-  // Clean up on unmount
-  return () => {
-    if (window.recaptchaVerifier) {
-      try {
-        window.recaptchaVerifier.clear();
-      } catch (e) {
-        console.warn("Failed to clear reCAPTCHA on unmount", e);
-      }
-      window.recaptchaVerifier = null;
-    }
+    return window.recaptchaVerifier;
   };
-}, []);
 
 
   // Close country dropdown when clicking outside
@@ -213,7 +180,7 @@ useEffect(() => {
       // Step 2: If user doesn't exist, proceed with Firebase OTP
       console.log("User doesn't exist, sending Firebase OTP...");
       const fullPhoneNumber = `${formData.countryCode}${formData.phone}`;
-      const appVerifier = window.recaptchaVerifier;
+      const appVerifier = getRecaptchaVerifier();
       const confirmation = await signInWithPhoneNumber(
         auth,
         fullPhoneNumber,
@@ -272,6 +239,7 @@ useEffect(() => {
         country_code: formData.countryCode,
         phone_no: `${formData.phone}`,
         country_name: formData.country_name,
+        service_type: serviceType,
       };
 
       const response = await apiFetch(
@@ -322,9 +290,16 @@ useEffect(() => {
         "Account created and verified successfully! Redirecting to dashboard..."
       );
 
-      // Redirect to dashboard
+      // Redirect based on service type from API response
+      const sType = data.user?.service_type || serviceType;
+      const redirectPath =
+        sType === "kyc"
+          ? "/kyc-dashboard"
+          : sType === "crypto"
+          ? "/crypto-dashboard"
+          : "/dashboard";
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push(redirectPath);
       }, 1500);
     } catch (err) {
       console.error("Error during OTP verification or account creation:", err);
@@ -357,7 +332,8 @@ useEffect(() => {
     const fullPhoneNumber = `${formData.countryCode}${formData.phone}`;
 
     try {
-      const appVerifier = window.recaptchaVerifier;
+      window.recaptchaVerifier = null; // force fresh verifier for resend
+      const appVerifier = getRecaptchaVerifier();
       const confirmation = await signInWithPhoneNumber(
         auth,
         fullPhoneNumber,
@@ -470,9 +446,34 @@ useEffect(() => {
               {!showOtpForm ? (
                 // Signup Form
                 <>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-8 pt-5 text-center md:text-left">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4 pt-5 text-center md:text-left">
                     Create your account
                   </h2>
+
+                  {/* Service Type Selector */}
+                  <div className="mb-5">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Select Service</p>
+                    <div className="flex rounded-lg border border-gray-200 p-1 bg-gray-50">
+                      {[
+                        { label: "Card Security", value: "card_scan" },
+                        { label: "KYC", value: "kyc" },
+                        { label: "Crypto", value: "crypto" },
+                      ].map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => setServiceType(option.value)}
+                          className={`flex-1 py-2 px-2 text-xs font-medium rounded-md transition-all duration-200 ${
+                            serviceType === option.value
+                              ? "bg-blue-600 text-white shadow-sm"
+                              : "text-gray-600 hover:text-gray-800"
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
                   {/* Error Message */}
                   {error && (
@@ -523,6 +524,8 @@ useEffect(() => {
 
   <Select
     id="countryCode"
+    inputId="signup-country-select"
+    instanceId="signup-country-select"
     name="countryCode"
     value={options.find(
       (opt) =>
@@ -701,7 +704,7 @@ useEffect(() => {
       </div>
 
       {/* Firebase reCAPTCHA container - Required for Firebase phone auth */}
-      <div id="recaptcha-container"></div>
+      <div id="recaptcha-container-signup"></div>
 
       {/* Copyright Footer */}
       <footer className="fixed bottom-4 left-0 right-0 z-30">
