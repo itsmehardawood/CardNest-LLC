@@ -155,11 +155,7 @@ const handleSignIn = async (e) => {
         throw new Error(`Invalid phone number format: ${fullPhoneNumber}`);
       }
 
-      if (!window.recaptchaVerifier) {
-        throw new Error("reCAPTCHA verifier not initialized");
-      }
-
-      const appVerifier = window.recaptchaVerifier;
+      const appVerifier = getRecaptchaVerifier();
       const confirmation = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
 
       setConfirmationResult(confirmation);
