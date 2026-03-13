@@ -16,6 +16,16 @@ import { apiFetch } from "../lib/api.js";
 
 export default function LoginPage() {
   const router = useRouter();
+  const normalizeServiceType = (value) =>
+    (value || "").toString().trim().toLowerCase();
+
+  const getRedirectPathFromServiceType = (value) => {
+    const normalized = normalizeServiceType(value);
+    if (normalized === "kyc") return "/kyc-dashboard";
+    if (normalized === "crypto") return "/crypto-dashboard";
+    return "/dashboard";
+  };
+
   const [isOtpMode, setIsOtpMode] = useState(false);
   const [serviceType, setServiceType] = useState("card_scan");
   const [emailOrPhone, setEmailOrPhone] = useState("");
@@ -220,13 +230,11 @@ const handleSignIn = async (e) => {
       const userRole = apiUserData?.user?.role;
       
 if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {
-        const sType = updatedUserData?.user?.service_type || serviceType;
-        const redirectPath =
-          sType === "kyc"
-            ? "/kyc-dashboard"
-            : sType === "crypto"
-            ? "/crypto-dashboard"
-            : "/dashboard";
+        const sType =
+          updatedUserData?.user?.service_type ||
+          updatedUserData?.service_type ||
+          serviceType;
+        const redirectPath = getRedirectPathFromServiceType(sType);
         setTimeout(() => {
           router.push(redirectPath);
         }, 1500);
