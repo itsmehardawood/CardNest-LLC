@@ -13,6 +13,8 @@ import {
   History,
   Receipt,
   Settings,
+  Shield,
+  Coins,
 } from "lucide-react";
 
 const NavigationSidebar = ({
@@ -43,6 +45,8 @@ const NavigationSidebar = ({
   const tabs = [
     { id: "home", label: "Home", icon: Home },
     { id: "enterprise", label: "Business Approval", icon: Building2 },
+    { id: "kycProfiles", label: "KYC Profiles", icon: Shield },
+    { id: "cryptoProfiles", label: "Crypto Profiles", icon: Coins },
     { id: "scanhistory", label: "Scan History", icon: History },
      { id: "EnterpriseUsers", label: "Enterprise Users", icon: Building2 },
     { id: "pricing", label: "Pricing", icon: DollarSign },

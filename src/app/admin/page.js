@@ -113,6 +113,22 @@ const AdminDashboard = () => {
         return <HomePage/>
       case 'Business Approval':
         return <BusinessApprovalSectionUpdated />;
+      case 'KYC Profiles':
+        return (
+          <BusinessApprovalSectionUpdated
+            pendingEndpoint="/business-profile/kyc"
+            sectionTitle="KYC Profiles"
+            sectionDescription="Manage KYC verification requests"
+          />
+        );
+      case 'Crypto Profiles':
+        return (
+          <BusinessApprovalSectionUpdated
+            pendingEndpoint="/business-profile/crypto"
+            sectionTitle="Crypto Profiles"
+            sectionDescription="Manage crypto verification requests"
+          />
+        );
       case 'Pricing':
         return <PricingSectionAdmin />;
       case 'User Activity':
