@@ -39,6 +39,19 @@ export default function SignUpPage() {
     country_name: "United States",
   });
 
+  const resetRecaptchaVerifier = () => {
+    if (window.recaptchaVerifier?.clear) {
+      try {
+        window.recaptchaVerifier.clear();
+      } catch (e) {
+        console.warn("Failed to clear recaptcha verifier", e);
+      }
+    }
+    window.recaptchaVerifier = null;
+    const container = document.getElementById("recaptcha-container-signup");
+    if (container) container.innerHTML = "";
+  };
+
   const options = countryCodes.map((country) => ({
   value: `${country.code}-${country.name}`,
   label: `${country.flag} ${country.name} (${country.code})`,
@@ -190,6 +203,9 @@ export default function SignUpPage() {
       // Step 2: If user doesn't exist, proceed with Firebase OTP
       console.log("User doesn't exist, sending Firebase OTP...");
       const fullPhoneNumber = `${formData.countryCode}${formData.phone}`;
+
+      // Always use a fresh verifier for a new OTP request.
+      resetRecaptchaVerifier();
       const appVerifier = getRecaptchaVerifier();
       const confirmation = await signInWithPhoneNumber(
         auth,
@@ -207,6 +223,11 @@ export default function SignUpPage() {
       console.log("Firebase OTP sent successfully");
     } catch (err) {
       console.error("Error during signup process:", err);
+
+      // Reset verifier after OTP send failures to prevent stale session issues.
+      if (err?.code?.startsWith("auth/")) {
+        resetRecaptchaVerifier();
+      }
 
       // Handle Firebase-specific errors
       if (err.code === "auth/invalid-phone-number") {
@@ -241,7 +262,7 @@ export default function SignUpPage() {
       const result = await confirmationResult.confirm(otp);
       const user = result.user;
 
-      console.log("Firebase OTP verified successfully:", user);
+      // console.log("Firebase OTP verified successfully:", user);
 
       // Step 2: Now create account via API since OTP is verified
       const apiData = {
@@ -342,7 +363,7 @@ export default function SignUpPage() {
     const fullPhoneNumber = `${formData.countryCode}${formData.phone}`;
 
     try {
-      window.recaptchaVerifier = null; // force fresh verifier for resend
+      resetRecaptchaVerifier();
       const appVerifier = getRecaptchaVerifier();
       const confirmation = await signInWithPhoneNumber(
         auth,
@@ -356,6 +377,9 @@ export default function SignUpPage() {
       console.log("Firebase OTP resent successfully");
     } catch (err) {
       console.error("Resend OTP error:", err);
+      if (err?.code?.startsWith("auth/")) {
+        resetRecaptchaVerifier();
+      }
       setOtpError("Failed to resend verification code. Please try again.");
     } finally {
       setLoading(false);
@@ -699,6 +723,7 @@ export default function SignUpPage() {
                         setOtpError("");
                         setOtp("");
                         setConfirmationResult(null);
+                        resetRecaptchaVerifier();
                       }}
                       disabled={loading}
                       className="text-sm text-gray-500 hover:text-gray-700 disabled:text-gray-300"

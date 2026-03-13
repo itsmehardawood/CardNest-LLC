@@ -36,12 +36,24 @@ export default function LoginPage() {
   const [otpError, setOtpError] = useState("");
   const [showCountryCode, setShowCountryCode] = useState(true);
   const [confirmationResult, setConfirmationResult] = useState(null);
-  const [apiUserData, setApiUserData] = useState(null);
   const [backendPhoneNumber, setBackendPhoneNumber] = useState("");
   const [formData, setFormData] = useState({
     countryCode: "+1",
     selectedCountry: "United States",
   });
+
+  const resetRecaptchaVerifier = () => {
+    if (window.recaptchaVerifier?.clear) {
+      try {
+        window.recaptchaVerifier.clear();
+      } catch (e) {
+        console.warn("Failed to clear recaptcha verifier", e);
+      }
+    }
+    window.recaptchaVerifier = null;
+    const container = document.getElementById("recaptcha-container-login");
+    if (container) container.innerHTML = "";
+  };
 
   // Lazily create the reCAPTCHA verifier on demand to avoid StrictMode
   // double-invoke errors (grecaptcha has no API to fully deregister a widget).
@@ -108,53 +120,27 @@ const handleSignIn = async (e) => {
     setSuccess("");
 
     try {
-      const requestBody = {
-        country_code: formData.countryCode,
-        login_input: emailOrPhone,
-        service_type: serviceType,
-      };
-
-      const response = await apiFetch("/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.status) {
-        throw new Error(data.message || "Login failed. Please check your credentials.");
+      // OTP-first flow requires phone input (not email input) on step 1.
+      const isEmailInput = /[a-zA-Z]/.test(emailOrPhone);
+      if (isEmailInput) {
+        throw new Error("Please use your phone number for OTP login.");
       }
 
-      // ✅ Store user data with expiry (3 hours from now)
-      const expiryTime = new Date().getTime() + 3 * 60 * 60 * 1000; // 3 hours in ms
-    //  const expiryTime = new Date().getTime() + 30 * 1000; // 30 seconds in ms
-
-      const userDataWithExpiry = { ...data, expiry: expiryTime };
-
-      localStorage.setItem("userData", JSON.stringify(userDataWithExpiry));
-      setApiUserData(userDataWithExpiry);
-
-      console.log("User data stored in localStorage with expiry:", userDataWithExpiry);
-
-      // Step 3: Send Firebase OTP
-      const phoneFromBackend = data.user?.phone_no || data.phone_no;
-
-      if (!phoneFromBackend) {
-        throw new Error("No phone number received from backend for OTP verification.");
+      const phoneInput = emailOrPhone.replace(/\D/g, "");
+      if (!phoneInput) {
+        throw new Error("Please enter a valid phone number.");
       }
 
-      setBackendPhoneNumber(phoneFromBackend);
-      const fullPhoneNumber = `${formData.countryCode}${phoneFromBackend}`;
+      setBackendPhoneNumber(phoneInput);
+      const fullPhoneNumber = `${formData.countryCode}${phoneInput}`;
 
       const phoneRegex = /^\+[1-9]\d{1,14}$/;
       if (!phoneRegex.test(fullPhoneNumber)) {
         throw new Error(`Invalid phone number format: ${fullPhoneNumber}`);
       }
 
+      // Always use a fresh verifier for a new OTP request.
+      resetRecaptchaVerifier();
       const appVerifier = getRecaptchaVerifier();
       const confirmation = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
 
@@ -165,6 +151,11 @@ const handleSignIn = async (e) => {
 
     } catch (err) {
       console.error("Error in login process:", err);
+
+      // Reset verifier after OTP send failures to prevent stale session issues.
+      if (err?.code?.startsWith("auth/")) {
+        resetRecaptchaVerifier();
+      }
 
       if (err.code === "auth/invalid-phone-number") {
         setError("Invalid phone number format. Please check your number.");
@@ -199,31 +190,50 @@ const handleSignIn = async (e) => {
       // Verify OTP with Firebase
       const result = await confirmationResult.confirm(otp);
       const user = result.user;
-      let updatedUserData = apiUserData;
+      // console.log("Firebase OTP verified successfully:", user);
 
-      console.log("Firebase OTP verified successfully:", user);
+      // After OTP verification, call login API.
+      const requestBody = {
+        country_code: formData.countryCode,
+        login_input: emailOrPhone,
+        service_type: serviceType,
+      };
 
-      // Update localStorage with Firebase UID
-      if (apiUserData) {
-        updatedUserData = {
-          ...apiUserData,
-          user: {
-            ...apiUserData.user,
-            service_type: apiUserData.user?.service_type || serviceType,
-            firebaseUid: user.uid,
-            firebasePhone: user.phoneNumber,
-            otp_verified: true,
-          },
-        };
+      const response = await apiFetch("/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
 
-        localStorage.setItem("userData", JSON.stringify(updatedUserData));
-        console.log("Updated user data with Firebase info:", updatedUserData);
+      const data = await response.json();
+
+      if (!response.ok || !data.status) {
+        throw new Error(data.message || "Login failed. Please check your credentials.");
       }
+
+      const expiryTime = new Date().getTime() + 3 * 60 * 60 * 1000;
+      const updatedUserData = {
+        ...data,
+        expiry: expiryTime,
+        user: {
+          ...data.user,
+          service_type: data.user?.service_type || serviceType,
+          firebaseUid: user.uid,
+          firebasePhone: user.phoneNumber,
+          otp_verified: true,
+        },
+      };
+
+      localStorage.setItem("userData", JSON.stringify(updatedUserData));
+      console.log("User data stored after OTP verification:", updatedUserData);
 
       setSuccess("Phone verified successfully! Checking access permissions...");
       
       // Only BUSINESS_USER is allowed
-      const userRole = apiUserData?.user?.role;
+      const userRole = updatedUserData?.user?.role;
       
 if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {
         const sType =
@@ -261,8 +271,8 @@ if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {
     setOtp("");
     setOtpError("");
     setConfirmationResult(null);
-    setApiUserData(null);
     setBackendPhoneNumber("");
+    resetRecaptchaVerifier();
   };
 
   const handleResendOtp = async () => {
@@ -281,7 +291,7 @@ if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {
         throw new Error(`Invalid phone number format: ${fullPhoneNumber}`);
       }
 
-      window.recaptchaVerifier = null; // force fresh verifier for resend
+      resetRecaptchaVerifier();
       const appVerifier = getRecaptchaVerifier();
       const confirmation = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
       
@@ -291,6 +301,9 @@ if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {
       console.log("Firebase OTP resent successfully");
     } catch (err) {
       console.error("Resend OTP error:", err);
+      if (err?.code?.startsWith("auth/")) {
+        resetRecaptchaVerifier();
+      }
       setOtpError("Failed to resend verification code. Please try again.");
     } finally {
       setLoading(false);
