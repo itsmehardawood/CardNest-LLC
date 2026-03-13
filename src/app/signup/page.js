@@ -14,6 +14,16 @@ import { apiFetch } from "../lib/api.js";
 export default function SignUpPage() {
   const router = useRouter();
 
+  const normalizeServiceType = (value) =>
+    (value || "").toString().trim().toLowerCase();
+
+  const getRedirectPathFromServiceType = (value) => {
+    const normalized = normalizeServiceType(value);
+    if (normalized === "kyc") return "/kyc-dashboard";
+    if (normalized === "crypto") return "/crypto-dashboard";
+    return "/dashboard";
+  };
+
   const [showOtpForm, setShowOtpForm] = useState(false);
   const [serviceType, setServiceType] = useState("card_scan");
   const [otp, setOtp] = useState("");
@@ -292,13 +302,12 @@ export default function SignUpPage() {
       );
 
       // Redirect based on service type from API response
-      const sType = data.user?.service_type || serviceType;
-      const redirectPath =
-        sType === "kyc"
-          ? "/kyc-dashboard"
-          : sType === "crypto"
-          ? "/crypto-dashboard"
-          : "/dashboard";
+      const sType =
+        data.user?.service_type ||
+        data.service_type ||
+        data.data?.user?.service_type ||
+        serviceType;
+      const redirectPath = getRedirectPathFromServiceType(sType);
       setTimeout(() => {
         router.push(redirectPath);
       }, 1500);
