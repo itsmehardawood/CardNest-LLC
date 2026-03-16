@@ -228,7 +228,7 @@ const handleSignIn = async (e) => {
       };
 
       localStorage.setItem("userData", JSON.stringify(updatedUserData));
-      console.log("User data stored after OTP verification:", updatedUserData);
+      // console.log("User data stored after OTP verification:", updatedUserData);
 
       setSuccess("Phone verified successfully! Checking access permissions...");
       

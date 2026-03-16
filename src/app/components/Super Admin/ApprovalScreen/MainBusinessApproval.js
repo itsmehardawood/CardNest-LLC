@@ -12,6 +12,17 @@ const BusinessApprovalSectionUpdated = ({
   sectionTitle = 'Business Management',
   sectionDescription = 'Manage verification requests',
 }) => {
+  const normalizedEndpoint = (pendingEndpoint || '').toLowerCase();
+  const approvedServiceType = normalizedEndpoint.includes('/kyc')
+    ? 'kyc'
+    : normalizedEndpoint.includes('/crypto')
+    ? 'crypto'
+    : 'card_scan';
+
+  const matchesApprovedService = (business) => {
+    return (business?.service_type || '').toLowerCase() === approvedServiceType;
+  };
+
   const [businesses, setBusinesses] = useState([]);
   const [approvedBusinesses, setApprovedBusinesses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,8 +66,9 @@ const BusinessApprovalSectionUpdated = ({
         const approvedData = await approvedResponse.json();
             
         if (approvedData.status) {
-          setApprovedBusinesses(approvedData.data || []);
-          setStats(prev => ({...prev, approved: approvedData.data?.length || 0}));
+          const approvedByService = (approvedData.data || []).filter(matchesApprovedService);
+          setApprovedBusinesses(approvedByService);
+          setStats(prev => ({...prev, approved: approvedByService.length}));
         }
       } catch (error) {
         console.error('Error fetching businesses:', error);
@@ -78,8 +90,9 @@ const BusinessApprovalSectionUpdated = ({
       const data = await response.json();
           
       if (data.status) {
-        setApprovedBusinesses(data.data || []);
-        setStats(prev => ({...prev, approved: data.data?.length || 0}));
+        const approvedByService = (data.data || []).filter(matchesApprovedService);
+        setApprovedBusinesses(approvedByService);
+        setStats(prev => ({...prev, approved: approvedByService.length}));
       }
     } catch (error) {
       console.error('Error fetching approved businesses:', error);
