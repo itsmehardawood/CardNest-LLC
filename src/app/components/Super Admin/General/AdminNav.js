@@ -15,6 +15,7 @@ import {
   Settings,
   Shield,
   Coins,
+  RefreshCcw,
 } from "lucide-react";
 
 const NavigationSidebar = ({
@@ -44,16 +45,18 @@ const NavigationSidebar = ({
 
   const tabs = [
     { id: "home", label: "Home", icon: Home },
-    { id: "enterprise", label: "Business Approval", icon: Building2 },
-    { id: "kycProfiles", label: "KYC Profiles", icon: Shield },
-    { id: "cryptoProfiles", label: "Crypto Profiles", icon: Coins },
+    { id: "enterprise", label: "Card Scan | Businesses", icon: Building2 },
+
     { id: "scanhistory", label: "Scan History", icon: History },
      { id: "EnterpriseUsers", label: "Enterprise Users", icon: Building2 },
     { id: "pricing", label: "Pricing", icon: DollarSign },
     { id: "billing", label: "Billing Logs", icon: Receipt },
+    { id: "renewalSubscription", label: "Renewal Subscription", icon: RefreshCcw },
     { id: "api-docs", label: "API Documentation", icon: BookOpen },
     { id: "access", label: "Access Grant", icon: CheckCircle },
     { id: "displaysettings", label: "Display Settings", icon: Settings },
+    { id: "cryptoProfiles", label: "Crypto | Business Profiles", icon: Coins },
+    { id: "kycProfiles", label: "KYC | Business Profiles", icon: Shield },
 
     // { id: "content", label: "Content Management", icon: FileText },
     // { id: "activity", label: "User Activity", icon: BarChart2 },

@@ -187,6 +187,32 @@ function NavbarHomepage() {
 
                     {/* Right side menu items */}
                     <div className="flex items-center gap-0.5 md:gap-1">
+
+
+                      <div className="group/item">
+                        <button
+                          onClick={() => scrollToSection("about")}
+                          className="text-gray-800 hover:text-teal-600 transition-colors duration-200 font-semibold text-xs md:text-sm lg:text-base px-2 md:px-4 lg:px-6 py-1 md:py-1.5 lg:py-2 rounded-lg block w-full text-left flex items-center gap-1 md:gap-2"
+                        >
+                          <svg
+                            className="w-3 h-3 md:w-4 md:h-4 lg:w-5 lg:h-5 transition-transform duration-300 group-hover/item:scale-150 group-hover/item:-rotate-12 flex-shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 8a2 2 0 012-2h14a2 2 0 012 2v1H3V8zm0 4h18v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4zm3 2h4"
+                            />
+                          </svg>
+                          Card Security Scan
+                        </button>
+                        <p className="text-[10px] md:text-xs text-gray-500 mt-0.5 md:mt-1 pointer-events-none text-left px-2 md:px-4 lg:px-6 ml-4 md:ml-6 lg:ml-7">
+                          Fraud & Chargeback Prevention
+                        </p>
+                      </div>
                       <div className="group/item">
                         <button
                           onClick={() => scrollToSection("kyc")}
@@ -284,9 +310,10 @@ function NavbarHomepage() {
                           Explore our powerful<br></br> product features
                         </p>
                       </div>
+                    
                       <div className="group/item">
                         <div className="relative">
-                          <div className="flex items-center gap-1 md:gap-2 px-2 md:px-4 lg:px-6 py-1 md:py-1.5 lg:py-2">
+                          <div className="flex items-center transition-colors duration-200   hover:text-teal-800 text-black gap-1 md:gap-2 px-2 md:px-4 lg:px-6 py-1 md:py-1.5 lg:py-2">
                             <svg
                               className="w-3 h-3 md:w-4 md:h-4 lg:w-5 lg:h-5 transition-transform duration-300 group-hover/item:scale-150 group-hover/item:rotate-12 flex-shrink-0"
                               fill="none"
@@ -300,7 +327,7 @@ function NavbarHomepage() {
                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                               />
                             </svg>
-                            <span className="text-gray-800 font-semibold text-xs md:text-sm lg:text-base">
+                            <span className="text-gray-800 hover:text-teal-800 font-semibold text-xs md:text-sm lg:text-base">
                               Documents
                             </span>
                           </div>

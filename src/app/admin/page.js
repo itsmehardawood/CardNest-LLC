@@ -16,6 +16,7 @@ import NavigationSidebar from '../components/Super Admin/General/AdminNav';
 import DashboardFooter from '../components/Super Admin/General/AdminFooter';
 import PageHeader from '../components/Super Admin/General/AdminHeader';
 import EnterpriseUsers from '../components/Super Admin/EnterpriseScreen/EnterpriseUsers';
+import RenewalSubscriptionSection from '../components/Super Admin/General/RenewalSubscriptionSection';
 
 
 const AdminDashboard = () => {
@@ -111,9 +112,9 @@ const AdminDashboard = () => {
     switch (activeTab) {
       case 'Home':
         return <HomePage/>
-      case 'Business Approval':
+      case 'Card Scan | Businesses':
         return <BusinessApprovalSectionUpdated />;
-      case 'KYC Profiles':
+      case 'KYC | Business Profiles':
         return (
           <BusinessApprovalSectionUpdated
             pendingEndpoint="/business-profile/kyc"
@@ -121,7 +122,7 @@ const AdminDashboard = () => {
             sectionDescription="Manage KYC verification requests"
           />
         );
-      case 'Crypto Profiles':
+      case 'Crypto | Business Profiles':
         return (
           <BusinessApprovalSectionUpdated
             pendingEndpoint="/business-profile/crypto"
@@ -143,6 +144,8 @@ const AdminDashboard = () => {
       return <CardScanHistory/>
       case 'Billing Logs':
         return <BillingLogsSection/>
+      case 'Renewal Subscription':
+        return <RenewalSubscriptionSection />
          case 'Display Settings':
         return <TempDisplaySettings/>
         case 'Enterprise Users':

@@ -406,7 +406,7 @@ footer: "",
       <section id="about" className="py-5 px-6 bg-gray-100 w-full">
         <div className="max-w-7xl mx-auto">
           <h2 className="font-bold text-3xl md:text-3xl mb-10 text-gray-900 text-center">
-           CardNest Intelligence Scan
+            Credit | Debit Card Intelligence Scan <br></br> <span className="text-lg text-teal-800">(Real-Time Fraud & Chargeback Prevention)</span>
           </h2>
 
           <div className="flex flex-col md:flex-row items-center md:items-start gap-10">
