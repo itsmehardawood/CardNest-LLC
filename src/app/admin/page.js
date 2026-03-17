@@ -112,9 +112,9 @@ const AdminDashboard = () => {
     switch (activeTab) {
       case 'Home':
         return <HomePage/>
-      case 'Card Scan | Businesses':
+      case 'CardScan | Business':
         return <BusinessApprovalSectionUpdated />;
-      case 'KYC | Business Profiles':
+      case 'KYC | Business':
         return (
           <BusinessApprovalSectionUpdated
             pendingEndpoint="/business-profile/kyc"
@@ -122,7 +122,7 @@ const AdminDashboard = () => {
             sectionDescription="Manage KYC verification requests"
           />
         );
-      case 'Crypto | Business Profiles':
+      case 'Crypto | Business ':
         return (
           <BusinessApprovalSectionUpdated
             pendingEndpoint="/business-profile/crypto"
@@ -177,7 +177,7 @@ const AdminDashboard = () => {
       <div 
         className={`
           min-h-screen pt-16 transition-all duration-300 ease-in-out
-          ${sidebarOpen ? 'sm:ml-64 ml-0' : 'ml-16'}
+          ${sidebarOpen ? 'sm:ml-72 ml-0' : 'ml-16'}
         `}
       >
         <div className="flex flex-col min-h-[calc(100vh-4rem)]">
