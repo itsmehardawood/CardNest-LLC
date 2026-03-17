@@ -5,9 +5,12 @@ import { RefreshCcw, UserRound, Hash, Loader2, CheckCircle2, AlertCircle } from 
 import { apiFetch } from "@/app/lib/api.js";
 
 const RenewalSubscriptionSection = () => {
+  const getTodayDate = () => new Date().toISOString().split("T")[0];
+
   const [merchantId, setMerchantId] = useState("");
   const [renewalMode, setRenewalMode] = useState("default");
   const [customApiCount, setCustomApiCount] = useState("");
+  const [renewalDate, setRenewalDate] = useState(getTodayDate);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState(null);
 
@@ -33,11 +36,17 @@ const RenewalSubscriptionSection = () => {
       return;
     }
 
+    if (isCustomMode && !renewalDate) {
+      showNotification("Date is required for new user setup", "error");
+      return;
+    }
+
     const payload = isCustomMode
       ? {
           merchant_id: normalizedMerchantId,
           is_new_user: true,
           custom_api_count: parsedCount,
+          date: renewalDate,
         }
       : {
           merchant_id: normalizedMerchantId,
@@ -65,6 +74,7 @@ const RenewalSubscriptionSection = () => {
       setMerchantId("");
       setRenewalMode("default");
       setCustomApiCount("");
+      setRenewalDate(getTodayDate());
     } catch (error) {
       showNotification(error.message || "Something went wrong while setting up renewal", "error");
     } finally {
@@ -100,7 +110,7 @@ const RenewalSubscriptionSection = () => {
           Renewal Subscription
         </h2>
         <p className="mt-1 text-sm text-gray-300">
-          Enable auto-renewal for a merchant by Merchant ID. Choose custom API count only for a new user.
+          Enable auto-renewal for a merchant by Merchant ID. For a new user, provide custom API count and a renewal date.
         </p>
       </div>
 
@@ -143,24 +153,36 @@ const RenewalSubscriptionSection = () => {
                 onChange={() => setRenewalMode("custom")}
                 className="h-4 w-4"
               />
-              <span>New user setup (provide custom API count and send is_new_user: true)</span>
+              <span>New user setup (provide custom API count, date, and send is_new_user: true)</span>
             </label>
           </div>
         </div>
 
         {renewalMode === "custom" && (
-          <div>
-            <label className="mb-2 block text-sm font-medium text-gray-200">Custom API Count</label>
-            <div className="relative">
-              <Hash className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-200">Custom API Count</label>
+              <div className="relative">
+                <Hash className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={customApiCount}
+                  onChange={(e) => setCustomApiCount(e.target.value)}
+                  placeholder="Enter custom API count"
+                  className="w-full rounded-lg border border-gray-700 bg-gray-900 py-2.5 pl-9 pr-3 text-sm text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-200">Renewal Date</label>
               <input
-                type="number"
-                min="1"
-                step="1"
-                value={customApiCount}
-                onChange={(e) => setCustomApiCount(e.target.value)}
-                placeholder="Enter custom API count"
-                className="w-full rounded-lg border border-gray-700 bg-gray-900 py-2.5 pl-9 pr-3 text-sm text-white placeholder:text-gray-500 focus:border-blue-500 focus:outline-none"
+                type="date"
+                value={renewalDate}
+                onChange={(e) => setRenewalDate(e.target.value)}
+                className="w-full rounded-lg border border-gray-700 bg-gray-900 px-3 py-2.5 text-sm text-white focus:border-blue-500 focus:outline-none"
               />
             </div>
           </div>

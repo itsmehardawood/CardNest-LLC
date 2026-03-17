@@ -850,7 +850,7 @@ footer: "",
           <div className="">
             <div className="flex flex-col lg:flex-row justify-between items-center space-y-4 lg:space-y-0">
               <div className="text-gray-400 text-sm">
-                © 2025 CardNest. All rights reserved. Built with security in
+                © {new Date().getFullYear()} CardNest. All rights reserved. Built with security in
                 mind.
               </div>
 
