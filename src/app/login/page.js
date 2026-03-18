@@ -145,13 +145,13 @@ const handleSignIn = async (e) => {
         body: JSON.stringify(requestBody),
       });
 
-      if (response.status === 404) {
-        console.error("Login API returned 404", {
-          endpoint: "/login",
-          baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
-        });
-        throw new Error("Invalid credentials or user not found.");
-      }
+      // if (response.status === 404) {
+      //   console.error("Login API returned 404", {
+      //     endpoint: "/login",
+      //     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+      //   });
+      //   throw new Error("Invalid credentials or user not found.");
+      // }
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.status) {
