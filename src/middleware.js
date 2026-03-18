@@ -40,20 +40,22 @@ export function middleware(request) {
   const hostname = request.headers.get('host') || '';
   const subdomain = getSubdomain(hostname);
 
+  const rewriteTo = (targetPath) => {
+    const url = request.nextUrl.clone();
+    url.pathname = targetPath;
+    return NextResponse.rewrite(url);
+  };
+
   // ─── crypto.cardnest.io subdomain ───
   if (subdomain === 'crypto') {
     // If user hits the root of the subdomain, send to crypto dashboard
     if (pathname === '/' || pathname === '') {
-      const url = request.nextUrl.clone();
-      url.pathname = '/crypto-dashboard';
-      return NextResponse.rewrite(url);
+      return rewriteTo('/crypto-dashboard');
     }
 
     // If user hits /dashboard on crypto subdomain, rewrite to crypto-dashboard
     if (pathname === '/dashboard') {
-      const url = request.nextUrl.clone();
-      url.pathname = '/crypto-dashboard';
-      return NextResponse.rewrite(url);
+      return rewriteTo('/crypto-dashboard');
     }
 
     // Allow /login, /signup, /api, /_next, /images, /videos, etc. to pass through as-is
@@ -63,15 +65,19 @@ export function middleware(request) {
   // ─── kyc.cardnest.io subdomain ───
   if (subdomain === 'kyc') {
     if (pathname === '/' || pathname === '') {
-      const url = request.nextUrl.clone();
-      url.pathname = '/kyc-dashboard';
-      return NextResponse.rewrite(url);
+      return rewriteTo('/kyc-dashboard');
     }
 
     if (pathname === '/dashboard') {
-      const url = request.nextUrl.clone();
-      url.pathname = '/kyc-dashboard';
-      return NextResponse.rewrite(url);
+      return rewriteTo('/kyc-dashboard');
+    }
+  }
+
+  // ─── admin subdomains ───
+  // kycadmin.cardnest.io and cryptoadmin.cardnest.io both route to /admin.
+  if (subdomain === 'kycadmin' || subdomain === 'cryptoadmin') {
+    if (pathname === '/' || pathname === '' || pathname === '/dashboard') {
+      return rewriteTo('/admin');
     }
   }
 
