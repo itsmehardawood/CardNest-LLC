@@ -146,12 +146,14 @@ const handleSignIn = async (e) => {
       });
 
       if (response.status === 404) {
-        throw new Error(
-          "Login API endpoint not found (404). Check NEXT_PUBLIC_API_BASE_URL and backend route /login."
-        );
+        console.error("Login API returned 404", {
+          endpoint: "/login",
+          baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+        });
+        throw new Error("Invalid credentials or user not found.");
       }
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
       if (!response.ok || !data.status) {
         throw new Error(data.message || "Login failed. Please check your credentials.");
       }
