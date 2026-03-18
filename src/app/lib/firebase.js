@@ -12,18 +12,19 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-const requiredFirebaseEnvVars = [
-  "NEXT_PUBLIC_FIREBASE_API_KEY",
-  "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN",
-  "NEXT_PUBLIC_FIREBASE_PROJECT_ID",
-  "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET",
-  "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID",
-  "NEXT_PUBLIC_FIREBASE_APP_ID",
-];
-
-const missingFirebaseEnvVars = requiredFirebaseEnvVars.filter(
-  (key) => !process.env[key]
-);
+const missingFirebaseEnvVars = [
+  ["NEXT_PUBLIC_FIREBASE_API_KEY", firebaseConfig.apiKey],
+  ["NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN", firebaseConfig.authDomain],
+  ["NEXT_PUBLIC_FIREBASE_PROJECT_ID", firebaseConfig.projectId],
+  ["NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET", firebaseConfig.storageBucket],
+  [
+    "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID",
+    firebaseConfig.messagingSenderId,
+  ],
+  ["NEXT_PUBLIC_FIREBASE_APP_ID", firebaseConfig.appId],
+]
+  .filter(([, value]) => !value)
+  .map(([name]) => name);
 
 if (missingFirebaseEnvVars.length > 0) {
   throw new Error(
