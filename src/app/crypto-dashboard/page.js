@@ -74,6 +74,15 @@ function CryptoDashboardContent() {
   const searchParams = useSearchParams();
   useAutoLogout();
 
+  const redirectToLogin = () => {
+    const host = window.location.hostname;
+    if (host === "cryptoadmin.cardnest.io" || host === "kycadmin.cardnest.io") {
+      window.location.href = "https://cardnest.io/login";
+      return;
+    }
+    router.push("/login");
+  };
+
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -129,7 +138,7 @@ function CryptoDashboardContent() {
     const checkAuth = () => {
       const stored = getUserDataFromStorage();
       if (!stored) {
-        router.push("/login");
+        redirectToLogin();
         return;
       }
       const userRole = stored.user?.role;
@@ -137,7 +146,7 @@ function CryptoDashboardContent() {
         if (userRole === "SUPER_ADMIN") {
           router.push("/admin");
         } else {
-          router.push("/login");
+          redirectToLogin();
         }
         return;
       }

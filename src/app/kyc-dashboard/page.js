@@ -74,6 +74,15 @@ function KYCDashboardContent() {
   const searchParams = useSearchParams();
   useAutoLogout();
 
+  const redirectToLogin = () => {
+    const host = window.location.hostname;
+    if (host === "cryptoadmin.cardnest.io" || host === "kycadmin.cardnest.io") {
+      window.location.href = "https://cardnest.io/login";
+      return;
+    }
+    router.push("/login");
+  };
+
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -125,25 +134,29 @@ function KYCDashboardContent() {
     }
   };
 
-//   useEffect(() => {
-//     const checkAuth = () => {
-//       const stored = getUserDataFromStorage();
-//       if (!stored) {
-//         router.push("/login");
-//         return;
-//       }
-//       const userRole = stored.user?.role;
-//       if (userRole !== "BUSINESS_USER" && userRole !== "ENTERPRISE_USER") {
-//         router.push(userRole === "SUPER_ADMIN" ? "/admin" : "/login");
-//         return;
-//       }
-//       setIsAuthenticated(true);
-//       const userObj = stored.user || stored;
-//       setUserData(userObj);
-//       setStatus(getStatusFromBusinessVerified(userObj.business_verified));
-//     };
-//     checkAuth();
-//   }, [router]);
+  useEffect(() => {
+    const checkAuth = () => {
+      const stored = getUserDataFromStorage();
+      if (!stored) {
+        redirectToLogin();
+        return;
+      }
+      const userRole = stored.user?.role;
+      if (userRole !== "BUSINESS_USER" && userRole !== "ENTERPRISE_USER") {
+        if (userRole === "SUPER_ADMIN") {
+          router.push("/admin");
+        } else {
+          redirectToLogin();
+        }
+        return;
+      }
+      setIsAuthenticated(true);
+      const userObj = stored.user || stored;
+      setUserData(userObj);
+      setStatus(getStatusFromBusinessVerified(userObj.business_verified));
+    };
+    checkAuth();
+  }, [router]);
 
   useEffect(() => {
     setIsLoading(false);
