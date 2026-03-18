@@ -4,7 +4,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Select from "react-select";
 import countryCodes from "../lib/Counttycodes";
 import { auth } from "../lib/firebase";
@@ -36,6 +36,7 @@ export default function LoginPage() {
   const [otpError, setOtpError] = useState("");
   const [showCountryCode, setShowCountryCode] = useState(true);
   const [confirmationResult, setConfirmationResult] = useState(null);
+  const [apiUserData, setApiUserData] = useState(null);
   const [backendPhoneNumber, setBackendPhoneNumber] = useState("");
   const [formData, setFormData] = useState({
     countryCode: "+1",
@@ -60,7 +61,9 @@ export default function LoginPage() {
   const getRecaptchaVerifier = () => {
     if (window.recaptchaVerifier) return window.recaptchaVerifier;
     const container = document.getElementById("recaptcha-container-login");
-    if (container) container.innerHTML = "";
+    if (!container) {
+      throw new Error("reCAPTCHA container not found");
+    }
     window.recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container-login", {
       size: "invisible",
       "expired-callback": () => {
@@ -69,6 +72,12 @@ export default function LoginPage() {
     });
     return window.recaptchaVerifier;
   };
+
+  useEffect(() => {
+    return () => {
+      resetRecaptchaVerifier();
+    };
+  }, []);
 
 
   const options = countryCodes.map((country) => ({
@@ -120,15 +129,42 @@ const handleSignIn = async (e) => {
     setSuccess("");
 
     try {
-      // OTP-first flow requires phone input (not email input) on step 1.
-      const isEmailInput = /[a-zA-Z]/.test(emailOrPhone);
-      if (isEmailInput) {
-        throw new Error("Please use your phone number for OTP login.");
+      // Step 1: Validate credentials with backend before sending OTP.
+      const requestBody = {
+        country_code: formData.countryCode,
+        login_input: emailOrPhone,
+        service_type: serviceType,
+      };
+
+      const response = await apiFetch("/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (response.status === 404) {
+        throw new Error(
+          "Login API endpoint not found (404). Check NEXT_PUBLIC_API_BASE_URL and backend route /login."
+        );
       }
 
-      const phoneInput = emailOrPhone.replace(/\D/g, "");
+      const data = await response.json();
+      if (!response.ok || !data.status) {
+        throw new Error(data.message || "Login failed. Please check your credentials.");
+      }
+
+      setApiUserData(data);
+
+      // Step 2: Send OTP to the phone provided by backend; fallback to user input.
+      const phoneFromBackend = data.user?.phone_no || data.phone_no;
+      const normalizedInputPhone = emailOrPhone.replace(/\D/g, "");
+      const phoneInput = phoneFromBackend || normalizedInputPhone;
+
       if (!phoneInput) {
-        throw new Error("Please enter a valid phone number.");
+        throw new Error("No phone number found for OTP verification.");
       }
 
       setBackendPhoneNumber(phoneInput);
@@ -139,8 +175,6 @@ const handleSignIn = async (e) => {
         throw new Error(`Invalid phone number format: ${fullPhoneNumber}`);
       }
 
-      // Always use a fresh verifier for a new OTP request.
-      resetRecaptchaVerifier();
       const appVerifier = getRecaptchaVerifier();
       const confirmation = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
 
@@ -151,11 +185,6 @@ const handleSignIn = async (e) => {
 
     } catch (err) {
       console.error("Error in login process:", err);
-
-      // Reset verifier after OTP send failures to prevent stale session issues.
-      if (err?.code?.startsWith("auth/")) {
-        resetRecaptchaVerifier();
-      }
 
       if (err.code === "auth/invalid-phone-number") {
         setError("Invalid phone number format. Please check your number.");
@@ -192,35 +221,17 @@ const handleSignIn = async (e) => {
       const user = result.user;
       // console.log("Firebase OTP verified successfully:", user);
 
-      // After OTP verification, call login API.
-      const requestBody = {
-        country_code: formData.countryCode,
-        login_input: emailOrPhone,
-        service_type: serviceType,
-      };
-
-      const response = await apiFetch("/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.status) {
-        throw new Error(data.message || "Login failed. Please check your credentials.");
+      if (!apiUserData) {
+        throw new Error("Login session expired. Please sign in again.");
       }
 
       const expiryTime = new Date().getTime() + 3 * 60 * 60 * 1000;
       const updatedUserData = {
-        ...data,
+        ...apiUserData,
         expiry: expiryTime,
         user: {
-          ...data.user,
-          service_type: data.user?.service_type || serviceType,
+          ...apiUserData.user,
+          service_type: apiUserData.user?.service_type || serviceType,
           firebaseUid: user.uid,
           firebasePhone: user.phoneNumber,
           otp_verified: true,
@@ -271,6 +282,7 @@ if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {
     setOtp("");
     setOtpError("");
     setConfirmationResult(null);
+    setApiUserData(null);
     setBackendPhoneNumber("");
     resetRecaptchaVerifier();
   };
@@ -291,7 +303,6 @@ if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {
         throw new Error(`Invalid phone number format: ${fullPhoneNumber}`);
       }
 
-      resetRecaptchaVerifier();
       const appVerifier = getRecaptchaVerifier();
       const confirmation = await signInWithPhoneNumber(auth, fullPhoneNumber, appVerifier);
       
@@ -301,9 +312,6 @@ if (userRole === "BUSINESS_USER" || userRole === "ENTERPRISE_USER") {
       console.log("Firebase OTP resent successfully");
     } catch (err) {
       console.error("Resend OTP error:", err);
-      if (err?.code?.startsWith("auth/")) {
-        resetRecaptchaVerifier();
-      }
       setOtpError("Failed to resend verification code. Please try again.");
     } finally {
       setLoading(false);
