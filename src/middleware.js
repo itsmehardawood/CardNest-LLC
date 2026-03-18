@@ -3,18 +3,18 @@ import { NextResponse } from 'next/server';
 /**
  * Middleware for subdomain-based routing.
  * 
- * - crypto.cardnest.io  →  internally rewrites to /crypto-dashboard/*
- * - kyc.cardnest.io     →  internally rewrites to /kyc-dashboard/*
+ * - cryptoadmin.cardnest.io  →  internally rewrites to /crypto-dashboard/*
+ * - kycadmin.cardnest.io     →  internally rewrites to /kyc-dashboard/*
  * - cardnest.io (main)  →  unchanged, serves existing routes
  * 
  * For local development add to your hosts file
  * (C:\Windows\System32\drivers\etc\hosts):
  *     127.0.0.1  cardnest.local
- *     127.0.0.1  crypto.cardnest.local
- *     127.0.0.1  kyc.cardnest.local
+ *     127.0.0.1  cryptoadmin.cardnest.local
+ *     127.0.0.1  kycadmin.cardnest.local
  *   Then access:
- *     http://crypto.cardnest.local:3000
- *     http://kyc.cardnest.local:3000
+ *     http://cryptoadmin.cardnest.local:3000
+ *     http://kycadmin.cardnest.local:3000
  */
 
 // Root domains to strip when extracting subdomains
@@ -46,38 +46,18 @@ export function middleware(request) {
     return NextResponse.rewrite(url);
   };
 
-  // ─── crypto.cardnest.io subdomain ───
-  if (subdomain === 'crypto') {
-    // If user hits the root of the subdomain, send to crypto dashboard
-    if (pathname === '/' || pathname === '') {
-      return rewriteTo('/crypto-dashboard');
-    }
-
-    // If user hits /dashboard on crypto subdomain, rewrite to crypto-dashboard
-    if (pathname === '/dashboard') {
-      return rewriteTo('/crypto-dashboard');
-    }
-
-    // Allow /login, /signup, /api, /_next, /images, /videos, etc. to pass through as-is
-    // so auth pages and static assets work on the subdomain too
-  }
-
-  // ─── kyc.cardnest.io subdomain ───
-  if (subdomain === 'kyc') {
-    if (pathname === '/' || pathname === '') {
-      return rewriteTo('/kyc-dashboard');
-    }
-
-    if (pathname === '/dashboard') {
-      return rewriteTo('/kyc-dashboard');
-    }
-  }
-
-  // ─── admin subdomains ───
-  // kycadmin.cardnest.io and cryptoadmin.cardnest.io both route to /admin.
-  if (subdomain === 'kycadmin' || subdomain === 'cryptoadmin') {
+  // ─── allowed subdomains ───
+  // kycadmin.cardnest.io routes to kyc dashboard and
+  // cryptoadmin.cardnest.io routes to crypto dashboard.
+  if (subdomain === 'kycadmin') {
     if (pathname === '/' || pathname === '' || pathname === '/dashboard') {
-      return rewriteTo('/admin');
+      return rewriteTo('/kyc-dashboard');
+    }
+  }
+
+  if (subdomain === 'cryptoadmin') {
+    if (pathname === '/' || pathname === '' || pathname === '/dashboard') {
+      return rewriteTo('/crypto-dashboard');
     }
   }
 
