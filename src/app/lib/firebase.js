@@ -3,14 +3,33 @@ import { initializeApp } from "firebase/app";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBfIme8ZAGW8wSTMjPkXG3dofDnWIc58QE",
-  authDomain: "cardnest-bc5f4.firebaseapp.com",
-  projectId: "cardnest-bc5f4",
-  storageBucket: "cardnest-bc5f4.firebasestorage.app",
-  messagingSenderId: "706687245488",
-  appId: "1:706687245488:web:edbfa35b251dcd7757af75",
-  measurementId: "G-64EM26JYS5"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
+
+const requiredFirebaseEnvVars = [
+  "NEXT_PUBLIC_FIREBASE_API_KEY",
+  "NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN",
+  "NEXT_PUBLIC_FIREBASE_PROJECT_ID",
+  "NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET",
+  "NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID",
+  "NEXT_PUBLIC_FIREBASE_APP_ID",
+];
+
+const missingFirebaseEnvVars = requiredFirebaseEnvVars.filter(
+  (key) => !process.env[key]
+);
+
+if (missingFirebaseEnvVars.length > 0) {
+  throw new Error(
+    `Missing Firebase environment variables: ${missingFirebaseEnvVars.join(", ")}`
+  );
+}
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
