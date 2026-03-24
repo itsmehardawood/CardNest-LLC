@@ -62,6 +62,15 @@ const NavigationSidebar = ({
         { id: "displaysettings", label: "Display Settings", icon: Settings },
       ],
     },
+
+     {
+      id: "cryptoProfiles",
+      label: "Crypto | Business ",
+      icon: Coins,
+      accentColor: "#f5a2ad",
+      textColor: "#e88290",
+      activeBackground: "rgba(153, 27, 27, 0.16)",
+    },
     {
       id: "kycProfiles",
       label: "KYC | Business",
@@ -70,14 +79,7 @@ const NavigationSidebar = ({
       textColor: "#38bdf8",
       activeBackground: "rgba(56, 189, 248, 0.16)",
     },
-    {
-      id: "cryptoProfiles",
-      label: "Crypto | Business ",
-      icon: Coins,
-      accentColor: "#f5a2ad",
-      textColor: "#e88290",
-      activeBackground: "rgba(153, 27, 27, 0.16)",
-    },
+   
   ];
 
   const handleTabClick = (tabId, tabLabel) => {
