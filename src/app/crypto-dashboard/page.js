@@ -41,7 +41,8 @@ function getStatusFromBusinessVerified(businessVerified) {
   if (businessVerified === null || businessVerified === undefined || businessVerified === "") {
     return "incomplete-profile";
   }
-  switch (businessVerified.toString().toUpperCase()) {
+  const normalized = businessVerified.toString().trim().toUpperCase();
+  switch (normalized) {
     case "INCOMPLETE PROFILE":
     case "INCOMPLETE_PROFILE":
       return "incomplete-profile";
@@ -52,9 +53,13 @@ function getStatusFromBusinessVerified(businessVerified) {
     case "APPROVED":
     case "VERIFIED":
     case "ACTIVE":
+    case "TRUE":
+    case "YES":
       return "approved";
     case "REJECTED":
     case "DECLINED":
+    case "FALSE":
+    case "NO":
       return "rejected";
     case "0":
       return "pending";
@@ -124,39 +129,39 @@ function CryptoDashboardContent() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   // ── Auth check ──
-  // const getUserDataFromStorage = () => {
-  //   try {
-  //     const data = localStorage.getItem("userData");
-  //     if (!data) return null;
-  //     return JSON.parse(data);
-  //   } catch {
-  //     return null;
-  //   }
-  // };
+  const getUserDataFromStorage = () => {
+    try {
+      const data = localStorage.getItem("userData");
+      if (!data) return null;
+      return JSON.parse(data);
+    } catch {
+      return null;
+    }
+  };
 
-  // useEffect(() => {
-  //   const checkAuth = () => {
-  //     const stored = getUserDataFromStorage();
-  //     if (!stored) {
-  //       redirectToLogin();
-  //       return;
-  //     }
-  //     const userRole = stored.user?.role;
-  //     if (userRole !== "BUSINESS_USER" && userRole !== "ENTERPRISE_USER") {
-  //       if (userRole === "SUPER_ADMIN") {
-  //         router.push("/admin");
-  //       } else {
-  //         redirectToLogin();
-  //       }
-  //       return;
-  //     }
-  //     setIsAuthenticated(true);
-  //     const userObj = stored.user || stored;
-  //     setUserData(userObj);
-  //     setStatus(getStatusFromBusinessVerified(userObj.business_verified));
-  //   };
-  //   checkAuth();
-  // }, [router]);
+  useEffect(() => {
+    const checkAuth = () => {
+      const stored = getUserDataFromStorage();
+      if (!stored) {
+        redirectToLogin();
+        return;
+      }
+      const userRole = stored.user?.role;
+      if (userRole !== "BUSINESS_USER" && userRole !== "ENTERPRISE_USER") {
+        if (userRole === "SUPER_ADMIN") {
+          router.push("/admin");
+        } else {
+          redirectToLogin();
+        }
+        return;
+      }
+      setIsAuthenticated(true);
+      const userObj = stored.user || stored;
+      setUserData(userObj);
+      setStatus(getStatusFromBusinessVerified(userObj.business_verified));
+    };
+    checkAuth();
+  }, [router]);
 
   useEffect(() => {
     const verified = searchParams.get("verified");
