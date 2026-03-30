@@ -38,7 +38,7 @@ function ValidationHistoryScreen() {
 
     return {
       id: item?.id,
-      address: resultData?.address || item?.masked_address || 'N/A',
+      address: item?.masked_address || resultData?.address || 'N/A',
       network: resultData?.network || 'N/A',
       sanctionStatus: summary?.sanction_status || sanction?.decision || 'UNKNOWN',
       validationPassed: Boolean(summary?.validation_passed),
