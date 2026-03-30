@@ -389,10 +389,10 @@ function CryptoDashboardContent() {
         return <CryptoValidationScreen />;
       case "address-screening":
         return <AddressScreeningScreen />;
-      case "transaction-monitoring":
-        return <TransactionMonitoringScreen />;
-      case "risk-alerts":
-        return <RiskAlertsScreen />;
+      // case "transaction-monitoring":
+      //   return <TransactionMonitoringScreen />;
+      // case "risk-alerts":
+      //   return <RiskAlertsScreen />;
       case "validation-history":
         return <ValidationHistoryScreen />;
 

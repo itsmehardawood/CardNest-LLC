@@ -1,26 +1,133 @@
 'use client';
 
-import React, { useState } from 'react';
-import { History, Search, Filter, ExternalLink, Copy, CheckCircle, XCircle, Clock } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { History, Search, Copy, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { apiFetch } from '@/app/lib/api.js';
 
 /**
  * Validation History Screen
  * Shows past crypto address validations and screening results.
- * Placeholder — wire to your backend when API is ready.
  */
 function ValidationHistoryScreen() {
+  const pageSize = 10;
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState('all');
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
 
-  // Placeholder — replace with API data
-  const history = [];
+  const getMerchantId = () => {
+    try {
+      const stored = localStorage.getItem('userData');
+      if (!stored) return null;
+      const parsed = JSON.parse(stored);
+      const user = parsed?.user || parsed;
+      return user?.merchant_id || null;
+    } catch {
+      return null;
+    }
+  };
+
+  const mapRecord = (item) => {
+    const result = item?.validation_result || {};
+    const resultData = result?.data || {};
+    const summary = resultData?.summary || {};
+    const sanction = resultData?.sanction_check || {};
+
+    return {
+      id: item?.id,
+      address: resultData?.address || item?.masked_address || 'N/A',
+      network: resultData?.network || 'N/A',
+      sanctionStatus: summary?.sanction_status || sanction?.decision || 'UNKNOWN',
+      validationPassed: Boolean(summary?.validation_passed),
+      timestamp: resultData?.timestamp || item?.created_at || null,
+      riskLevel: (resultData?.risk_level || 'UNKNOWN').toUpperCase(),
+      chain: result?.chain || item?.chain || 'UNKNOWN',
+    };
+  };
+
+  const fetchHistory = async (targetPage = 1) => {
+    setLoading(true);
+    setError('');
+
+    const merchantId = getMerchantId();
+    if (!merchantId) {
+      setError('Merchant ID not found. Please log in again.');
+      setHistory([]);
+      setLoading(false);
+      return;
+    }
+
+    const min = (targetPage - 1) * pageSize + 1;
+    const max = targetPage * pageSize;
+
+    try {
+      const response = await apiFetch(
+        `/api/crypto/history?merchant_id=${encodeURIComponent(merchantId)}&min=${min}&max=${max}`,
+        { method: 'GET' }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch history (${response.status})`);
+      }
+
+      const payload = await response.json();
+      const rows = Array.isArray(payload?.data) ? payload.data.map(mapRecord) : [];
+
+      setHistory(rows);
+      setPage(targetPage);
+      setHasMore(rows.length === pageSize);
+    } catch (err) {
+      setError(err?.message || 'Failed to load validation history.');
+      setHistory([]);
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchHistory(1);
+  }, []);
+
+  const formatTimestamp = (value) => {
+    if (!value) return 'N/A';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return 'N/A';
+    return date.toLocaleString();
+  };
+
+  const filteredHistory = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+
+    return history.filter((item) => {
+      const matchesSearch =
+        q === '' ||
+        item.address.toLowerCase().includes(q) ||
+        item.chain.toLowerCase().includes(q) ||
+        item.network.toLowerCase().includes(q);
+
+      if (!matchesSearch) return false;
+
+      if (filter === 'passed') return item.validationPassed;
+      if (filter === 'failed') return !item.validationPassed;
+      if (filter === 'sanctioned') return item.sanctionStatus.toUpperCase() !== 'CLEAN';
+
+      return true;
+    });
+  }, [history, searchQuery, filter]);
+
+  const canPrev = page > 1 && !loading;
+  const canNext = hasMore && !loading;
 
   return (
     <div className="p-6 space-y-6 text-white">
       <div>
         <h2 className="text-2xl font-bold">Validation History</h2>
         <p className="text-gray-400 mt-1">
-          View all past address validations, screenings, and their results.
+          View all past address validations and their outcomes.
         </p>
       </div>
 
@@ -32,7 +139,7 @@ function ValidationHistoryScreen() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by address or transaction hash..."
+            placeholder="Search by address, chain, or network..."
             className="w-full bg-gray-900 border border-gray-700 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
           />
         </div>
@@ -42,16 +149,27 @@ function ValidationHistoryScreen() {
           className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-purple-500"
         >
           <option value="all">All Results</option>
-          <option value="clean">Clean</option>
-          <option value="flagged">Flagged</option>
+          <option value="passed">Passed</option>
+          <option value="failed">Failed</option>
           <option value="sanctioned">Sanctioned</option>
         </select>
       </div>
 
+      {error && (
+        <div className="bg-red-900/30 border border-red-700 text-red-300 rounded-lg px-4 py-3 text-sm">
+          {error}
+        </div>
+      )}
+
       {/* History Table */}
       <div className="bg-gray-900 border border-gray-700 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
-          {history.length === 0 ? (
+          {loading ? (
+            <div className="px-6 py-16 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-4" />
+              <p className="text-gray-400 font-medium">Loading validation history...</p>
+            </div>
+          ) : filteredHistory.length === 0 ? (
             <div className="px-6 py-16 text-center">
               <History className="w-12 h-12 text-gray-600 mx-auto mb-4" />
               <p className="text-gray-400 font-medium">No validation history yet</p>
@@ -63,18 +181,19 @@ function ValidationHistoryScreen() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-700 text-gray-400">
-                  <th className="text-left px-6 py-3 font-medium">Date</th>
+                  <th className="text-left px-6 py-3 font-medium">Timestamp</th>
                   <th className="text-left px-6 py-3 font-medium">Address</th>
                   <th className="text-left px-6 py-3 font-medium">Chain</th>
-                  <th className="text-left px-6 py-3 font-medium">Result</th>
-                  <th className="text-left px-6 py-3 font-medium">Risk Score</th>
-                  <th className="text-right px-6 py-3 font-medium">Actions</th>
+                  <th className="text-left px-6 py-3 font-medium">Network</th>
+                  <th className="text-left px-6 py-3 font-medium">Sanction Status</th>
+                  <th className="text-left px-6 py-3 font-medium">Validation</th>
+                  <th className="text-left px-6 py-3 font-medium">Risk Level</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-700">
-                {history.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-gray-800/50">
-                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">{item.date}</td>
+                {filteredHistory.map((item) => (
+                  <tr key={item.id} className="hover:bg-gray-800/50">
+                    <td className="px-6 py-4 text-gray-400 whitespace-nowrap">{formatTimestamp(item.timestamp)}</td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <span className="font-mono text-gray-300 truncate max-w-[200px]">{item.address}</span>
@@ -86,38 +205,51 @@ function ValidationHistoryScreen() {
                         </button>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-gray-400 capitalize">{item.chain}</td>
+                    <td className="px-6 py-4 text-gray-400 uppercase">{item.chain}</td>
+                    <td className="px-6 py-4 text-gray-400">{item.network}</td>
+                    <td className="px-6 py-4 text-gray-400 uppercase">{item.sanctionStatus}</td>
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                          item.result === 'clean'
+                          item.validationPassed
                             ? 'bg-green-900/50 text-green-400'
-                            : item.result === 'flagged'
-                              ? 'bg-yellow-900/50 text-yellow-400'
-                              : 'bg-red-900/50 text-red-400'
+                            : 'bg-red-900/50 text-red-400'
                         }`}
                       >
-                        {item.result === 'clean' ? (
+                        {item.validationPassed ? (
                           <CheckCircle className="w-3 h-3" />
-                        ) : item.result === 'flagged' ? (
-                          <Clock className="w-3 h-3" />
                         ) : (
                           <XCircle className="w-3 h-3" />
                         )}
-                        {item.result}
+                        {item.validationPassed ? 'PASSED' : 'FAILED'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-400">{item.riskScore}</td>
-                    <td className="px-6 py-4 text-right">
-                      <button className="text-purple-400 hover:text-purple-300 text-xs">
-                        <ExternalLink className="w-4 h-4" />
-                      </button>
-                    </td>
+                    <td className="px-6 py-4 text-gray-400 uppercase">{item.riskLevel}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           )}
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <p className="text-gray-500 text-xs">Page {page} • Showing up to {pageSize} records</p>
+        <div className="flex gap-2">
+          <button
+            onClick={() => fetchHistory(page - 1)}
+            disabled={!canPrev}
+            className="px-3 py-1.5 rounded-md border border-gray-700 bg-gray-900 text-sm text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-800"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => fetchHistory(page + 1)}
+            disabled={!canNext}
+            className="px-3 py-1.5 rounded-md border border-gray-700 bg-gray-900 text-sm text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-800"
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>

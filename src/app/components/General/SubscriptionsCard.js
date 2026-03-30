@@ -326,13 +326,13 @@ const PricingSection = ({ isDark = false }) => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-7xl mx-auto items-stretch auto-rows-fr">
           {plans.map((plan, index) => (
             <div
               key={plan.id}
               className={`relative rounded-2xl overflow-hidden shadow-lg transform hover:scale-105 transition-all duration-300 ${
                 plan.popular ? 'ring-2 ring-cyan-400' : ''
-              } w-full`}
+              } w-full h-full flex flex-col`}
             >
               {/* Popular badge */}
               {plan.popular && (
@@ -378,7 +378,7 @@ const PricingSection = ({ isDark = false }) => {
               </div>
               
               {/* Features */}
-              <div className={`bg-gradient-to-br ${plan.bgGradient} p-4 sm:p-6 relative`}>
+              <div className={`bg-gradient-to-br ${plan.bgGradient} p-4 sm:p-6 relative flex flex-col flex-1`}>
                 {/* Light wavy overlay at the bottom - behind content */}
                 <div className="absolute bottom-0 left-0 w-full pointer-events-none">
                   <svg viewBox="0 0 400 60" className="w-full h-6 sm:h-8" preserveAspectRatio="none">
@@ -390,8 +390,8 @@ const PricingSection = ({ isDark = false }) => {
                 </div>
                 
                 {/* Content with higher z-index to stay above the wave */}
-                <div className="relative z-10">
-                  <ul className="space-y-1 sm:space-y-1.5 mb-4 sm:mb-6">
+                <div className="relative z-10 flex flex-col flex-1">
+                  <ul className="space-y-1 sm:space-y-1.5 mb-4 sm:mb-6 flex-1">
                     {plan.features.map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-start">
                         {feature.included ? (
@@ -414,28 +414,28 @@ const PricingSection = ({ isDark = false }) => {
                   {plan.id === 'kyc' || plan.name === 'CARDNEST KYC' ? (
                     <button
                       onClick={() => handlePlanClick(plan.id, plan.name)}
-                      className={`w-full ${plan.buttonColor} text-white block text-center py-2 sm:py-2.5 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5`}
+                      className={`w-full mt-auto ${plan.buttonColor} text-white block text-center py-2 sm:py-2.5 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5`}
                     >
                       CONTACT US →
                     </button>
                   ) : !userData ? (
                     <button
                       onClick={() => handlePlanClick(plan.id, plan.name)}
-                      className={`w-full ${plan.buttonColor} text-white block text-center py-2 sm:py-2.5 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5`}
+                      className={`w-full mt-auto ${plan.buttonColor} text-white block text-center py-2 sm:py-2.5 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5`}
                     >
                       {plan.name === 'ENTERPRISE' ? 'SUBSCRIBE NOW →' : 'SUBSCRIBE NOW →'}
                     </button>
                   ) : shouldRedirectToPayments() ? (
                     <Link 
                       href={getRedirectPath(plan.id, plan.name)}
-                      className={`w-full ${plan.buttonColor} text-white block text-center py-2 sm:py-2.5 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5`}
+                      className={`w-full mt-auto ${plan.buttonColor} text-white block text-center py-2 sm:py-2.5 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5`}
                     >
                       {plan.name === 'ENTERPRISE' ? 'SUBSCRIBE NOW →' : 'SUBSCRIBE NOW →'}
                     </Link>
                   ) : (
                     <button
                       onClick={() => handlePlanClick(plan.id, plan.name)}
-                      className={`w-full ${plan.buttonColor} text-white block text-center py-2 sm:py-2.5 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5`}
+                      className={`w-full mt-auto ${plan.buttonColor} text-white block text-center py-2 sm:py-2.5 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5`}
                     >
                       {plan.name === 'ENTERPRISE' ? 'SUBSCRIBE NOW →' : 'SUBSCRIBE NOW →'}
                     </button>

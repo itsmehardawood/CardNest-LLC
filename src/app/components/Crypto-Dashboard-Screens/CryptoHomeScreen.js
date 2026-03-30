@@ -8,15 +8,24 @@ import {
   FiEdit2,
   FiShield,
   FiActivity,
-  FiSearch,
+  FiTrendingUp,
+  FiBarChart2,
 } from 'react-icons/fi';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 /**
- * Crypto dashboard home screen — mirrors the structure of the card-scan HomeScreen
- * but with crypto-validation specific stats, CTAs, and messaging.
+ * Crypto dashboard home screen — minimal, clean design with welcome message,
+ * account status, analytics cards, and key charts.
  */
 function CryptoHomeScreen({ status, setActiveTab }) {
   const [verificationReason, setVerificationReason] = useState('');
+  const [userData, setUserData] = useState(null);
+  const [cryptoStats, setCryptoStats] = useState({
+    totalAddresses: 0,
+    validationsPending: 0,
+    riskAlerts: 0,
+    successRate: 0,
+  });
 
   const getStatusStyling = (currentStatus) => {
     switch (currentStatus) {
@@ -102,16 +111,54 @@ function CryptoHomeScreen({ status, setActiveTab }) {
         const user = parsed?.user || parsed;
         const reason = user?.verification_reason;
         if (reason) setVerificationReason(reason);
+        setUserData(user);
       } catch (err) {
         console.error('Failed to parse user data:', err);
       }
     }
+
+    // Initialize with sample data — replace with API calls as needed
+    setCryptoStats({
+      totalAddresses: 234,
+      validationsPending: 12,
+      riskAlerts: 3,
+      successRate: 98,
+    });
   }, []);
 
   const styling = getStatusStyling(status);
+  const userName = userData?.business_name || 'Welcome';
+
+  // Sample data for pie chart (validation status distribution)
+  const validationData = [
+    { name: 'Validated', value: 189, color: '#10B981' },
+    { name: 'Pending', value: 12, color: '#F59E0B' },
+    { name: 'Failed', value: 3, color: '#EF4444' },
+  ];
+
+  // Sample data for bar chart (activity over last 7 days)
+  const activityData = [
+    { day: 'Mon', validations: 28, alerts: 2 },
+    { day: 'Tue', validations: 35, alerts: 1 },
+    { day: 'Wed', validations: 31, alerts: 3 },
+    { day: 'Thu', validations: 42, alerts: 2 },
+    { day: 'Fri', validations: 38, alerts: 0 },
+    { day: 'Sat', validations: 22, alerts: 1 },
+    { day: 'Sun', validations: 25, alerts: 1 },
+  ];
 
   return (
     <div className="p-6 space-y-6">
+      {/* Welcome Section */}
+      <div>
+        <h1 className="text-3xl font-bold text-white">Welcome back, {userName}</h1>
+        <p className="text-gray-400 text-sm mt-1">
+          {status === 'active' || status === 'approved'
+            ? 'Your crypto validation dashboard is active and ready to use'
+            : 'Complete your profile to start validating crypto transactions'}
+        </p>
+      </div>
+
       {/* Status Banner */}
       <div className={`rounded-lg border p-5 ${styling.bgColor} ${styling.borderColor}`}>
         <div className="flex items-start gap-3">
@@ -144,56 +191,116 @@ function CryptoHomeScreen({ status, setActiveTab }) {
         </div>
       </div>
 
-      {/* Quick Action Cards */}
+      {/* Analytics Cards - Only show when active/approved */}
       {(status === 'approved' || status === 'active') && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button
-            onClick={() => setActiveTab('crypto-validation')}
-            className="bg-gray-900 border border-gray-700 rounded-xl p-5 text-left hover:border-purple-500 transition-colors"
-          >
-            <FiShield className="text-purple-400 text-2xl mb-3" />
-            <h4 className="text-white font-semibold">Crypto Validation</h4>
-            <p className="text-gray-400 text-sm mt-1">Validate wallet addresses and transactions</p>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('address-screening')}
-            className="bg-gray-900 border border-gray-700 rounded-xl p-5 text-left hover:border-purple-500 transition-colors"
-          >
-            <FiSearch className="text-purple-400 text-2xl mb-3" />
-            <h4 className="text-white font-semibold">Address Screening</h4>
-            <p className="text-gray-400 text-sm mt-1">Screen addresses against sanctions & risk lists</p>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('transaction-monitoring')}
-            className="bg-gray-900 border border-gray-700 rounded-xl p-5 text-left hover:border-purple-500 transition-colors"
-          >
-            <FiActivity className="text-purple-400 text-2xl mb-3" />
-            <h4 className="text-white font-semibold">Transaction Monitoring</h4>
-            <p className="text-gray-400 text-sm mt-1">Real-time monitoring of on-chain transactions</p>
-          </button>
-        </div>
-      )}
-
-      {/* Stats overview placeholder */}
-      {(status === 'approved' || status === 'active') && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { label: 'Validations Today', value: '—', color: 'text-purple-400' },
-            { label: 'Addresses Screened', value: '—', color: 'text-blue-400' },
-            { label: 'Risk Alerts', value: '—', color: 'text-red-400' },
-            { label: 'Monitored Txns', value: '—', color: 'text-green-400' },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="bg-gray-900 border border-gray-700 rounded-xl p-4 text-center"
-            >
-              <p className={`text-3xl font-bold ${stat.color}`}>{stat.value}</p>
-              <p className="text-gray-400 text-sm mt-1">{stat.label}</p>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Card 1: Total Addresses */}
+            <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Total Addresses</p>
+                  <p className="text-3xl font-bold text-purple-400 mt-1">{cryptoStats.totalAddresses}</p>
+                </div>
+                <FiShield className="text-purple-500 text-2xl opacity-50" />
+              </div>
             </div>
-          ))}
-        </div>
+
+            {/* Card 2: Validations Pending */}
+            <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Pending Review</p>
+                  <p className="text-3xl font-bold text-yellow-400 mt-1">{cryptoStats.validationsPending}</p>
+                </div>
+                <FiClock className="text-yellow-500 text-2xl opacity-50" />
+              </div>
+            </div>
+
+            {/* Card 3: Risk Alerts */}
+            <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Risk Alerts</p>
+                  <p className="text-3xl font-bold text-red-400 mt-1">{cryptoStats.riskAlerts}</p>
+                </div>
+                <FiAlertCircle className="text-red-500 text-2xl opacity-50" />
+              </div>
+            </div>
+
+            {/* Card 4: Success Rate */}
+            <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-400 text-sm">Success Rate</p>
+                  <p className="text-3xl font-bold text-green-400 mt-1">{cryptoStats.successRate}%</p>
+                </div>
+                <FiCheckCircle className="text-green-500 text-2xl opacity-50" />
+              </div>
+            </div>
+          </div>
+
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Pie Chart: Validation Status Distribution */}
+            <div className="bg-gray-900 border border-gray-700 rounded-lg p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <FiBarChart2 className="text-purple-400" />
+                <h3 className="text-white font-semibold">Validation Status</h3>
+              </div>
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie
+                    data={validationData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={100}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {validationData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', color: '#fff' }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="flex justify-center gap-6 mt-4">
+                {validationData.map((item) => (
+                  <div key={item.name} className="text-center">
+                    <div className="w-3 h-3 rounded-full mx-auto mb-1" style={{ backgroundColor: item.color }}></div>
+                    <p className="text-gray-400 text-xs">{item.name}</p>
+                    <p className="text-white font-semibold text-sm">{item.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Bar Chart: Activity Over 7 Days */}
+            <div className="bg-gray-900 border border-gray-700 rounded-lg p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <FiTrendingUp className="text-blue-400" />
+                <h3 className="text-white font-semibold">Activity (7 Days)</h3>
+              </div>
+              <ResponsiveContainer width="100%" height={250}>
+                <BarChart data={activityData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                  <XAxis dataKey="day" stroke="#9ca3af" />
+                  <YAxis stroke="#9ca3af" />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#1f2937', border: '1px solid #374151', color: '#fff' }}
+                  />
+                  <Legend />
+                  <Bar dataKey="validations" fill="#8b5cf6" />
+                  <Bar dataKey="alerts" fill="#ef4444" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
