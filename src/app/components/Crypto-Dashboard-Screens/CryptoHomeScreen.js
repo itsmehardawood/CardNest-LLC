@@ -12,6 +12,7 @@ import {
   FiBarChart2,
 } from 'react-icons/fi';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { apiFetch } from '@/app/lib/api.js';
 
 /**
  * Crypto dashboard home screen — minimal, clean design with welcome message,
@@ -20,12 +21,26 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 function CryptoHomeScreen({ status, setActiveTab }) {
   const [verificationReason, setVerificationReason] = useState('');
   const [userData, setUserData] = useState(null);
+  const [analyticsError, setAnalyticsError] = useState('');
   const [cryptoStats, setCryptoStats] = useState({
     totalAddresses: 0,
-    validationsPending: 0,
-    riskAlerts: 0,
+    validatedCount: 0,
+    blockedCount: 0,
     successRate: 0,
   });
+  const [validationData, setValidationData] = useState([
+    { name: 'Validated', value: 0, color: '#10B981' },
+    { name: 'Blocked', value: 0, color: '#EF4444' },
+  ]);
+  const [activityData, setActivityData] = useState([
+    { day: 'Mon', validations: 0, alerts: 0 },
+    { day: 'Tue', validations: 0, alerts: 0 },
+    { day: 'Wed', validations: 0, alerts: 0 },
+    { day: 'Thu', validations: 0, alerts: 0 },
+    { day: 'Fri', validations: 0, alerts: 0 },
+    { day: 'Sat', validations: 0, alerts: 0 },
+    { day: 'Sun', validations: 0, alerts: 0 },
+  ]);
 
   const getStatusStyling = (currentStatus) => {
     switch (currentStatus) {
@@ -103,55 +118,82 @@ function CryptoHomeScreen({ status, setActiveTab }) {
     }
   };
 
+  const toDayLabel = (dateText) => {
+    if (!dateText) return 'N/A';
+    const date = new Date(dateText);
+    if (Number.isNaN(date.getTime())) return 'N/A';
+    return date.toLocaleDateString('en-US', { weekday: 'short' });
+  };
+
   useEffect(() => {
-    const storedUser = localStorage.getItem('userData');
-    if (storedUser) {
+    const initializeDashboard = async () => {
+      const storedUser = localStorage.getItem('userData');
+      if (!storedUser) return;
+
       try {
         const parsed = JSON.parse(storedUser);
         const user = parsed?.user || parsed;
         const reason = user?.verification_reason;
         if (reason) setVerificationReason(reason);
         setUserData(user);
-      } catch (err) {
-        console.error('Failed to parse user data:', err);
-      }
-    }
 
-    // Initialize with sample data — replace with API calls as needed
-    setCryptoStats({
-      totalAddresses: 234,
-      validationsPending: 12,
-      riskAlerts: 3,
-      successRate: 98,
-    });
+        if (!user?.merchant_id) return;
+
+        setAnalyticsError('');
+        const response = await apiFetch(
+          `/crypto-dashboard/analytics?merchant_id=${encodeURIComponent(user.merchant_id)}&range=7d`,
+          { method: 'GET' }
+        );
+
+        if (!response.ok) {
+          throw new Error(`Failed to load analytics (${response.status})`);
+        }
+
+        const payload = await response.json();
+        const data = payload?.data || {};
+        const summary = data?.summary || {};
+        const statusData = data?.validation_status || {};
+        const activity = Array.isArray(data?.activity_7_days) ? data.activity_7_days : [];
+
+        const validatedCount = Number(statusData?.validated ?? summary?.validated_count ?? 0);
+        const blockedCount = Number(statusData?.blocked ?? summary?.blocked_count ?? 0);
+
+        setCryptoStats({
+          totalAddresses: Number(summary?.total_addresses ?? 0),
+          validatedCount,
+          blockedCount,
+          successRate: Number(summary?.success_rate ?? 0),
+        });
+
+        setValidationData([
+          { name: 'Validated', value: validatedCount, color: '#10B981' },
+          { name: 'Blocked', value: blockedCount, color: '#EF4444' },
+        ]);
+
+        setActivityData(
+          activity.map((item) => ({
+            day: toDayLabel(item?.date),
+            validations: Number(item?.validations ?? 0),
+            alerts: Number(item?.alerts ?? 0),
+          }))
+        );
+      } catch (err) {
+        setAnalyticsError(err?.message || 'Unable to load analytics right now.');
+        console.error('Failed to initialize crypto dashboard:', err);
+      }
+    };
+
+    initializeDashboard();
   }, []);
 
   const styling = getStatusStyling(status);
   const userName = userData?.business_name || 'Welcome';
 
-  // Sample data for pie chart (validation status distribution)
-  const validationData = [
-    { name: 'Validated', value: 189, color: '#10B981' },
-    { name: 'Pending', value: 12, color: '#F59E0B' },
-    { name: 'Failed', value: 3, color: '#EF4444' },
-  ];
-
-  // Sample data for bar chart (activity over last 7 days)
-  const activityData = [
-    { day: 'Mon', validations: 28, alerts: 2 },
-    { day: 'Tue', validations: 35, alerts: 1 },
-    { day: 'Wed', validations: 31, alerts: 3 },
-    { day: 'Thu', validations: 42, alerts: 2 },
-    { day: 'Fri', validations: 38, alerts: 0 },
-    { day: 'Sat', validations: 22, alerts: 1 },
-    { day: 'Sun', validations: 25, alerts: 1 },
-  ];
-
   return (
     <div className="p-6 space-y-6">
       {/* Welcome Section */}
       <div>
-        <h1 className="text-3xl font-bold text-white">Welcome back, {userName}</h1>
+        <h1 className="text-3xl font-bold text-white">Welcome back</h1>
         <p className="text-gray-400 text-sm mt-1">
           {status === 'active' || status === 'approved'
             ? 'Your crypto validation dashboard is active and ready to use'
@@ -191,6 +233,12 @@ function CryptoHomeScreen({ status, setActiveTab }) {
         </div>
       </div>
 
+      {analyticsError && (
+        <div className="rounded-lg border border-red-700 bg-red-900/20 px-4 py-3 text-sm text-red-300">
+          {analyticsError}
+        </div>
+      )}
+
       {/* Analytics Cards - Only show when active/approved */}
       {(status === 'approved' || status === 'active') && (
         <>
@@ -206,23 +254,23 @@ function CryptoHomeScreen({ status, setActiveTab }) {
               </div>
             </div>
 
-            {/* Card 2: Validations Pending */}
+            {/* Card 2: Validated */}
             <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-400 text-sm">Pending Review</p>
-                  <p className="text-3xl font-bold text-yellow-400 mt-1">{cryptoStats.validationsPending}</p>
+                  <p className="text-gray-400 text-sm">Validated</p>
+                  <p className="text-3xl font-bold text-green-400 mt-1">{cryptoStats.validatedCount}</p>
                 </div>
-                <FiClock className="text-yellow-500 text-2xl opacity-50" />
+                <FiCheckCircle className="text-green-500 text-2xl opacity-50" />
               </div>
             </div>
 
-            {/* Card 3: Risk Alerts */}
+            {/* Card 3: Blocked */}
             <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-400 text-sm">Risk Alerts</p>
-                  <p className="text-3xl font-bold text-red-400 mt-1">{cryptoStats.riskAlerts}</p>
+                  <p className="text-gray-400 text-sm">Blocked</p>
+                  <p className="text-3xl font-bold text-red-400 mt-1">{cryptoStats.blockedCount}</p>
                 </div>
                 <FiAlertCircle className="text-red-500 text-2xl opacity-50" />
               </div>

@@ -124,39 +124,39 @@ function CryptoDashboardContent() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
   // ── Auth check ──
-  const getUserDataFromStorage = () => {
-    try {
-      const data = localStorage.getItem("userData");
-      if (!data) return null;
-      return JSON.parse(data);
-    } catch {
-      return null;
-    }
-  };
+  // const getUserDataFromStorage = () => {
+  //   try {
+  //     const data = localStorage.getItem("userData");
+  //     if (!data) return null;
+  //     return JSON.parse(data);
+  //   } catch {
+  //     return null;
+  //   }
+  // };
 
-  useEffect(() => {
-    const checkAuth = () => {
-      const stored = getUserDataFromStorage();
-      if (!stored) {
-        redirectToLogin();
-        return;
-      }
-      const userRole = stored.user?.role;
-      if (userRole !== "BUSINESS_USER" && userRole !== "ENTERPRISE_USER") {
-        if (userRole === "SUPER_ADMIN") {
-          router.push("/admin");
-        } else {
-          redirectToLogin();
-        }
-        return;
-      }
-      setIsAuthenticated(true);
-      const userObj = stored.user || stored;
-      setUserData(userObj);
-      setStatus(getStatusFromBusinessVerified(userObj.business_verified));
-    };
-    checkAuth();
-  }, [router]);
+  // useEffect(() => {
+  //   const checkAuth = () => {
+  //     const stored = getUserDataFromStorage();
+  //     if (!stored) {
+  //       redirectToLogin();
+  //       return;
+  //     }
+  //     const userRole = stored.user?.role;
+  //     if (userRole !== "BUSINESS_USER" && userRole !== "ENTERPRISE_USER") {
+  //       if (userRole === "SUPER_ADMIN") {
+  //         router.push("/admin");
+  //       } else {
+  //         redirectToLogin();
+  //       }
+  //       return;
+  //     }
+  //     setIsAuthenticated(true);
+  //     const userObj = stored.user || stored;
+  //     setUserData(userObj);
+  //     setStatus(getStatusFromBusinessVerified(userObj.business_verified));
+  //   };
+  //   checkAuth();
+  // }, [router]);
 
   useEffect(() => {
     const verified = searchParams.get("verified");

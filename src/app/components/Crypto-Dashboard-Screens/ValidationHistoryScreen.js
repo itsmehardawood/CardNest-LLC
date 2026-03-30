@@ -53,6 +53,7 @@ function ValidationHistoryScreen() {
     setError('');
 
     const merchantId = getMerchantId();
+
     if (!merchantId) {
       setError('Merchant ID not found. Please log in again.');
       setHistory([]);
@@ -65,7 +66,7 @@ function ValidationHistoryScreen() {
 
     try {
       const response = await apiFetch(
-        `/api/crypto/history?merchant_id=${encodeURIComponent(merchantId)}&min=${min}&max=${max}`,
+        `/crypto/history?merchant_id=${encodeURIComponent(merchantId)}&min=${min}&max=${max}`,
         { method: 'GET' }
       );
 
