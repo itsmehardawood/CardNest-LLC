@@ -17,6 +17,7 @@ import DashboardFooter from '../components/Super Admin/General/AdminFooter';
 import PageHeader from '../components/Super Admin/General/AdminHeader';
 import EnterpriseUsers from '../components/Super Admin/EnterpriseScreen/EnterpriseUsers';
 import RenewalSubscriptionSection from '../components/Super Admin/General/RenewalSubscriptionSection';
+import CryptoValidationHistory from '../components/Super Admin/Crypto/CryptoValidationHistory';
 
 
 const AdminDashboard = () => {
@@ -130,6 +131,8 @@ const AdminDashboard = () => {
             sectionDescription="Manage crypto verification requests"
           />
         );
+      case 'Crypto Validation History':
+        return <CryptoValidationHistory />;
       case 'Pricing':
         return <PricingSectionAdmin />;
       case 'User Activity':

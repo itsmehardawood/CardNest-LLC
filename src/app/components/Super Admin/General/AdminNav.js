@@ -63,13 +63,16 @@ const NavigationSidebar = ({
       ],
     },
 
-     {
+    {
       id: "cryptoProfiles",
       label: "Crypto | Business ",
       icon: Coins,
       accentColor: "#f5a2ad",
       textColor: "#e88290",
       activeBackground: "rgba(153, 27, 27, 0.16)",
+      submenu: [
+        { id: "cryptoValidationHistory", label: "Crypto Validation History", icon: History },
+      ],
     },
     {
       id: "kycProfiles",
