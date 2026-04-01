@@ -202,7 +202,7 @@ function CryptoValidationHistory() {
                           ? 'text-green-400 bg-green-400/10'
                           : 'text-red-400 bg-red-400/10'
                       }`}>
-                        {item.sanctionStatus}
+                        {item.sanctionStatus.toUpperCase() === 'CLEAN' ? 'CLEARED' : item.sanctionStatus}
                       </span>
                     </td>
                     <td className="px-6 py-4">
