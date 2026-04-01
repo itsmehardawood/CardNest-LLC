@@ -71,7 +71,8 @@ const NavigationSidebar = ({
       textColor: "#e88290",
       activeBackground: "rgba(153, 27, 27, 0.16)",
       submenu: [
-        { id: "cryptoValidationHistory", label: "Crypto Validation History", icon: History },
+        { id: "home", label: "Home", icon: Home },
+        { id: "cryptoValidationHistory", label: "Validation History", icon: History },
       ],
     },
     {
@@ -85,13 +86,14 @@ const NavigationSidebar = ({
    
   ];
 
-  const handleTabClick = (tabId, tabLabel) => {
-    setActiveTab(tabLabel);
+  const handleTabClick = (tabId, tabLabel, groupId) => {
+    const key = groupId ? `${groupId}:${tabId}` : tabLabel;
+    setActiveTab(key);
     console.log(`Switched to tab: ${tabId}`);
   };
 
   const handleMainItemClick = (group) => {
-    handleTabClick(group.id, group.label);
+    handleTabClick(group.id, group.label, group.id);
 
     if (!group.submenu?.length) {
       return;
@@ -149,7 +151,7 @@ const NavigationSidebar = ({
               {navigationGroups.map((group) => {
                 const { id, label, icon: Icon, submenu, accentColor, textColor, activeBackground } = group;
                 const isMainActive =
-                  activeTab === label || submenu?.some((item) => item.label === activeTab);
+                  activeTab === label || activeTab.startsWith(`${id}:`) || submenu?.some((item) => activeTab === `${id}:${item.id}`);
                 const isExpanded = openGroupId === id;
 
                 return (
@@ -210,12 +212,12 @@ const NavigationSidebar = ({
                       >
                         <div className="ml-5 pl-4 border-l border-gray-700/80 space-y-1">
                           {submenu.map(({ id: subId, label: subLabel, icon: SubIcon }) => {
-                            const isSubActive = activeTab === subLabel;
+                            const isSubActive = activeTab === `${id}:${subId}`;
 
                             return (
                               <button
                                 key={subId}
-                                onClick={() => handleTabClick(subId, subLabel)}
+                                onClick={() => handleTabClick(subId, subLabel, id)}
                                 className={`
                                   w-full flex items-center rounded-lg text-left px-3 py-2.5 text-sm transition-all duration-200
                                   ${
@@ -248,8 +250,8 @@ const NavigationSidebar = ({
           <div className="flex-shrink-0 p-4 border-t border-gray-700">
             <div className="mb-3 flex items-center space-x-2 text-sm text-gray-400">
               <span>Dashboard</span>
-              <span>•</span>
-              <span className="font-medium" style={{color: '#e0aa3e'}}>{activeTab}</span>
+              {/* <span>•</span> */}
+              {/* <span className="font-medium" style={{color: '#e0aa3e'}}>{activeTab}</span> */}
             </div>
 
             <div className="px-3 py-2 bg-gray-800 rounded-lg">

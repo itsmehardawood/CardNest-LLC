@@ -18,6 +18,7 @@ import PageHeader from '../components/Super Admin/General/AdminHeader';
 import EnterpriseUsers from '../components/Super Admin/EnterpriseScreen/EnterpriseUsers';
 import RenewalSubscriptionSection from '../components/Super Admin/General/RenewalSubscriptionSection';
 import CryptoValidationHistory from '../components/Super Admin/Crypto/CryptoValidationHistory';
+import CryptoAnalyticsHome from '../components/Super Admin/Crypto/CryptoAnalyticsHome';
 
 
 const AdminDashboard = () => {
@@ -111,8 +112,45 @@ const AdminDashboard = () => {
     }
 
     switch (activeTab) {
+      // CardScan routes
+      case 'cardScan:cardScan':
+        return <BusinessApprovalSectionUpdated />;
+      case 'cardScan:home':
+        return <HomePage />;
+      case 'cardScan:scanhistory':
+        return <CardScanHistory />;
+      case 'cardScan:EnterpriseUsers':
+        return <EnterpriseUsers />;
+      case 'cardScan:pricing':
+        return <PricingSectionAdmin />;
+      case 'cardScan:billing':
+        return <BillingLogsSection />;
+      case 'cardScan:renewalSubscription':
+        return <RenewalSubscriptionSection />;
+      case 'cardScan:api-docs':
+        return <APIDocumentationSection />;
+      case 'cardScan:access':
+        return <GrantAccessForm />;
+      case 'cardScan:displaysettings':
+        return <TempDisplaySettings />;
+      
+      // Crypto routes
+      case 'cryptoProfiles:cryptoProfiles':
+        return (
+          <BusinessApprovalSectionUpdated
+            pendingEndpoint="/business-profile/crypto"
+            sectionTitle="Crypto Profiles"
+            sectionDescription="Manage crypto verification requests"
+          />
+        );
+      case 'cryptoProfiles:home':
+        return <CryptoAnalyticsHome />;
+      case 'cryptoProfiles:cryptoValidationHistory':
+        return <CryptoValidationHistory />;
+      
+      // Legacy routes for backwards compatibility
       case 'Home':
-        return <HomePage/>
+        return <HomePage />;
       case 'CardScan | Business':
         return <BusinessApprovalSectionUpdated />;
       case 'KYC | Business':
@@ -131,7 +169,9 @@ const AdminDashboard = () => {
             sectionDescription="Manage crypto verification requests"
           />
         );
-      case 'Crypto Validation History':
+      case 'Analytics Home':
+        return <CryptoAnalyticsHome />;
+      case 'Validation History':
         return <CryptoValidationHistory />;
       case 'Pricing':
         return <PricingSectionAdmin />;
@@ -144,15 +184,15 @@ const AdminDashboard = () => {
       case 'Access Grant':
         return <GrantAccessForm />;
       case 'Scan History':
-      return <CardScanHistory/>
+        return <CardScanHistory />;
       case 'Billing Logs':
-        return <BillingLogsSection/>
+        return <BillingLogsSection />;
       case 'Renewal Subscription':
-        return <RenewalSubscriptionSection />
-         case 'Display Settings':
-        return <TempDisplaySettings/>
-        case 'Enterprise Users':
-          return <EnterpriseUsers />;
+        return <RenewalSubscriptionSection />;
+      case 'Display Settings':
+        return <TempDisplaySettings />;
+      case 'Enterprise Users':
+        return <EnterpriseUsers />;
       default:
         return (
           <div className="bg-black rounded-lg shadow-sm border border-gray-800 p-6">

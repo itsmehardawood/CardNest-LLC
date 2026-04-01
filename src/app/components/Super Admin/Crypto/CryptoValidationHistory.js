@@ -158,7 +158,7 @@ function CryptoValidationHistory() {
                 <tr className="border-b border-gray-800 text-gray-400">
                   <th className="text-left px-6 py-4 font-medium">Timestamp</th>
                   <th className="text-left px-6 py-4 font-medium">Merchant ID</th>
-                  <th className="text-left px-6 py-4 font-medium">Address</th>
+                  <th className="text-left px-6 py-4 font-medium">Recipient Crypto Address</th>
                   <th className="text-left px-6 py-4 font-medium">Chain</th>
                   <th className="text-left px-6 py-4 font-medium">Network</th>
                   <th className="text-left px-6 py-4 font-medium">Sanction Status</th>
