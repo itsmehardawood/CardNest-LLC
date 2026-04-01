@@ -73,7 +73,17 @@ function CryptoValidationHistory() {
     if (!value) return 'N/A';
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return 'N/A';
-    return date.toLocaleString();
+    return date.toLocaleString('en-US', {
+      timeZone: 'America/New_York',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+      timeZoneName: 'short',
+    });
   };
 
   const filteredHistory = useMemo(() => {
@@ -157,7 +167,7 @@ function CryptoValidationHistory() {
               <thead className="bg-[#111111]">
                 <tr className="border-b border-gray-800 text-gray-400">
                   <th className="text-left px-6 py-4 font-medium">Timestamp</th>
-                  <th className="text-left px-6 py-4 font-medium">Merchant ID</th>
+                  <th className="text-left px-6 py-4 font-medium">Account ID</th>
                   <th className="text-left px-6 py-4 font-medium">Recipient Crypto Address</th>
                   <th className="text-left px-6 py-4 font-medium">Chain</th>
                   <th className="text-left px-6 py-4 font-medium">Network</th>

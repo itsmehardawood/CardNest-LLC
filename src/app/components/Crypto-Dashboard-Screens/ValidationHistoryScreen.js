@@ -97,7 +97,70 @@ function ValidationHistoryScreen() {
     if (!value) return 'N/A';
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return 'N/A';
-    return date.toLocaleString();
+    return date.toLocaleString('en-US', {
+      timeZone: 'America/New_York',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+      timeZoneName: 'short',
+    });
+  };
+
+  const getSanctionStatusMeta = (value) => {
+    const normalized = (value || 'UNKNOWN').toString().toUpperCase();
+
+    if (normalized === 'CLEAN' || normalized === 'CLEARED') {
+      return {
+        label: 'CLEARED',
+        className: 'bg-green-900/50 text-green-300 border border-green-700/60',
+      };
+    }
+
+    if (normalized === 'UNKNOWN') {
+      return {
+        label: 'UNKNOWN',
+        className: 'bg-gray-800 text-gray-300 border border-gray-700',
+      };
+    }
+
+    return {
+      label: normalized,
+      className: 'bg-red-900/50 text-red-300 border border-red-700/60',
+    };
+  };
+
+  const getRiskLevelMeta = (value) => {
+    const normalized = (value || 'UNKNOWN').toString().toUpperCase();
+
+    if (normalized === 'LOW') {
+      return {
+        label: 'LOW',
+        className: 'bg-green-900/50 text-green-300 border border-green-700/60',
+      };
+    }
+
+    if (normalized === 'MEDIUM') {
+      return {
+        label: 'MEDIUM',
+        className: 'bg-yellow-900/50 text-yellow-300 border border-yellow-700/60',
+      };
+    }
+
+    if (normalized === 'HIGH' || normalized === 'SEVERE' || normalized === 'CRITICAL') {
+      return {
+        label: normalized,
+        className: 'bg-red-900/50 text-red-300 border border-red-700/60',
+      };
+    }
+
+    return {
+      label: normalized,
+      className: 'bg-gray-800 text-gray-300 border border-gray-700',
+    };
   };
 
   const filteredHistory = useMemo(() => {
@@ -183,7 +246,7 @@ function ValidationHistoryScreen() {
               <thead>
                 <tr className="border-b border-gray-700 text-gray-400">
                   <th className="text-left px-6 py-3 font-medium">Timestamp</th>
-                  <th className="text-left px-6 py-3 font-medium">Address</th>
+                  <th className="text-left px-6 py-3 font-medium">Recipient CryptoAddress</th>
                   <th className="text-left px-6 py-3 font-medium">Chain</th>
                   <th className="text-left px-6 py-3 font-medium">Network</th>
                   <th className="text-left px-6 py-3 font-medium">Sanction Status</th>
@@ -208,7 +271,13 @@ function ValidationHistoryScreen() {
                     </td>
                     <td className="px-6 py-4 text-gray-400 uppercase">{item.chain}</td>
                     <td className="px-6 py-4 text-gray-400">{item.network}</td>
-                    <td className="px-6 py-4 text-gray-400 uppercase">{item.sanctionStatus}</td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${getSanctionStatusMeta(item.sanctionStatus).className}`}
+                      >
+                        {getSanctionStatusMeta(item.sanctionStatus).label}
+                      </span>
+                    </td>
                     <td className="px-6 py-4">
                       <span
                         className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
@@ -225,7 +294,13 @@ function ValidationHistoryScreen() {
                         {item.validationPassed ? 'PASSED' : 'FAILED'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-400 uppercase">{item.riskLevel}</td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${getRiskLevelMeta(item.riskLevel).className}`}
+                      >
+                        {getRiskLevelMeta(item.riskLevel).label}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
