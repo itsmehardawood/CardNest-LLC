@@ -11,6 +11,7 @@ import AddressScreeningScreen from "../components/Crypto-Dashboard-Screens/Addre
 import TransactionMonitoringScreen from "../components/Crypto-Dashboard-Screens/TransactionMonitoringScreen";
 import RiskAlertsScreen from "../components/Crypto-Dashboard-Screens/RiskAlertsScreen";
 import ValidationHistoryScreen from "../components/Crypto-Dashboard-Screens/ValidationHistoryScreen";
+import SanctionedPreferenceScreen from "../components/Crypto-Dashboard-Screens/SanctionedPreferenceScreen";
 
 // ── Shared / reused screens from card-scan dashboard ──
 import MainBusinessScreen from "../components/Dashboard-Screens/BusinessDataScreen/MainBusinessScreen";
@@ -352,6 +353,7 @@ function CryptoDashboardContent() {
     { id: "transaction-monitoring", label: "Transaction Monitoring" },
     { id: "risk-alerts", label: "Risk Alerts" },
     { id: "validation-history", label: "Validation History" },
+    { id: "preference", label: "Preference" },
     { id: "sub-businesses", label: "Sub Businesses" },
     { id: "subscriptions", label: "Subscriptions" },
     { id: "billing", label: "Billing Logs" },
@@ -400,6 +402,8 @@ function CryptoDashboardContent() {
       //   return <RiskAlertsScreen />;
       case "validation-history":
         return <ValidationHistoryScreen />;
+      case "preference":
+        return <SanctionedPreferenceScreen />;
 
       // ── Shared / reused screens ──
       case "subscriptions":

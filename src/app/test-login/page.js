@@ -30,6 +30,9 @@ const handleLogin = async () => {
 
     if (data.status === true) {
       const userRole = data?.user?.role;
+      const serviceTypeRaw = data?.user?.service_type || data?.service_type || '';
+      const serviceType =
+        typeof serviceTypeRaw === 'string' ? serviceTypeRaw.trim().toLowerCase() : '';
       const allowedRoles = ["BUSINESS_USER", "ENTERPRISE_USER"];
 
       if (allowedRoles.includes(userRole)) {
@@ -38,7 +41,15 @@ const handleLogin = async () => {
         const userDataWithExpiry = { ...data, expiry: expiryTime };
 
         localStorage.setItem('userData', JSON.stringify(userDataWithExpiry));
-        router.push('/dashboard');
+
+        let redirectPath = '/dashboard';
+        if (serviceType === 'kyc') {
+          redirectPath = '/kyc-dashboard';
+        } else if (serviceType === 'crypto') {
+          redirectPath = '/crypto-dashboard';
+        }
+
+        router.push(redirectPath);
       } else {
         setError("Invalid user. Only business and enterprise users are allowed to access this platform.");
       }

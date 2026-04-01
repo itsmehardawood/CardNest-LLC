@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import {
   Home,
   User,
-  ShieldCheck,
   ClipboardList,
   History,
   Receipt,
@@ -14,9 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Coins,
-  Search,
-  BarChart3,
-  AlertTriangle,
+  SlidersHorizontal,
   Building2,
 } from 'lucide-react';
 
@@ -51,6 +48,7 @@ const CryptoSidebar = ({ sidebarOpen, setSidebarOpen, activeTab, setActiveTab, s
     // { id: 'transaction-monitoring', label: 'Transaction Monitoring', icon: <BarChart3 className="w-5 h-5" /> },
     // { id: 'risk-alerts', label: 'Risk Alerts', icon: <AlertTriangle className="w-5 h-5" /> },
     { id: 'validation-history', label: 'Validation History', icon: <History className="w-5 h-5" /> },
+    { id: 'preference', label: 'Preference', icon: <SlidersHorizontal className="w-5 h-5" /> },
     { id: 'subscriptions', label: 'Subscriptions', icon: <ClipboardList className="w-5 h-5" /> },
     { id: 'billing', label: 'Billing Logs', icon: <Receipt className="w-5 h-5" /> },
     { id: 'documents', label: 'Documents', icon: <FileText className="w-5 h-5" /> },
