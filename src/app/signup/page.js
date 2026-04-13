@@ -297,7 +297,10 @@ export default function SignUpPage() {
       }
 
       // Step 3: Store user data in localStorage with both API and Firebase info
+      const expiryTime = new Date().getTime() + 3 * 60 * 60 * 1000;
       const userData = {
+        expiry: expiryTime,
+        expirationTime: expiryTime,
         user: {
           id: data.user.id,
           service_type: data.user.service_type || serviceType,

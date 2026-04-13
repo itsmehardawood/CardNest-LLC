@@ -7,11 +7,25 @@ const useAutoLogout = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const storedData = JSON.parse(localStorage.getItem('userData'));
+    const rawData = localStorage.getItem('userData');
+    if (!rawData) return;
+
+    let storedData;
+    try {
+      storedData = JSON.parse(rawData);
+    } catch {
+      return;
+    }
+
     if (!storedData) return;
 
     // Calculate remaining time until expiry
-    const timeout = storedData.expiry - new Date().getTime();
+    const expiryTime = Number(storedData.expiry ?? storedData.expirationTime);
+    if (!Number.isFinite(expiryTime) || expiryTime <= 0) {
+      return;
+    }
+
+    const timeout = expiryTime - new Date().getTime();
 
     if (timeout <= 0) {
       // Session already expired
