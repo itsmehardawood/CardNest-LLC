@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Save, Loader2, CheckCircle2, Edit2, X, Check, AlertCircle, Clock } from 'lucide-react';
-import { apiFetch } from '@/app/lib/api.js';
+import { cryptoApiFetch } from '@/app/lib/api.js';
 
 const OPTIONS = ['approve', 'reject', 'review'];
 
@@ -51,7 +51,7 @@ function SanctionedPreferenceScreen() {
     }
 
     try {
-      const response = await apiFetch(
+      const response = await cryptoApiFetch(
         `/crypto/sanctioned-preference?merchant_id=${encodeURIComponent(currentMerchantId)}`,
         { method: 'GET' }
       );
@@ -99,7 +99,7 @@ function SanctionedPreferenceScreen() {
     setSaving(true);
 
     try {
-      const response = await apiFetch('/crypto/sanctioned-preference', {
+      const response = await cryptoApiFetch('/crypto/sanctioned-preference', {
         method: 'POST',
         body: JSON.stringify({
           merchant_id: merchantId,

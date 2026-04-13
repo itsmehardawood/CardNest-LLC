@@ -12,7 +12,7 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
 } from "firebase/auth";
-import { apiFetch } from "../lib/api.js";
+import { apiFetch, cryptoApiFetch } from "../lib/api.js";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -136,7 +136,8 @@ const handleSignIn = async (e) => {
         service_type: serviceType,
       };
 
-      const response = await apiFetch("/login", {
+      const authApiFetch = normalizeServiceType(serviceType) === "crypto" ? cryptoApiFetch : apiFetch;
+      const response = await authApiFetch("/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

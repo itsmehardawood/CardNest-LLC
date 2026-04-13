@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { History, Search, Copy, CheckCircle, XCircle } from 'lucide-react';
-import { apiFetch } from '@/app/lib/api.js';
+import { cryptoApiFetch } from '@/app/lib/api.js';
 
 function CryptoValidationHistory() {
   const pageSize = 10;
@@ -41,7 +41,7 @@ function CryptoValidationHistory() {
     const max = targetPage * pageSize;
 
     try {
-      const response = await apiFetch(
+      const response = await cryptoApiFetch(
         `/superadmin/crypto/history?min=${min}&max=${max}`,
         { method: 'GET' }
       );

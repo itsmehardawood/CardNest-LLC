@@ -9,7 +9,7 @@ import countryCodes from "../lib/Counttycodes";
 import { auth } from "../lib/firebase";
 import Select from "react-select";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
-import { apiFetch } from "../lib/api.js";
+import { apiFetch, cryptoApiFetch } from "../lib/api.js";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -135,9 +135,10 @@ export default function SignUpPage() {
   };
 
   // NEW: Function to check if user already exists
-  const checkUserExists = async (email, phone) => {
+  const checkUserExists = async (email, phone, currentServiceType) => {
     try {
-      const response = await apiFetch(
+      const userExistsApiFetch = normalizeServiceType(currentServiceType) === "crypto" ? cryptoApiFetch : apiFetch;
+      const response = await userExistsApiFetch(
         "/check-user-exists",
         {
           method: "POST",
@@ -175,7 +176,7 @@ export default function SignUpPage() {
     try {
       // Step 1: Check if user already exists
       console.log("Checking if user exists...");
-      const userExistsResult = await checkUserExists(formData.email, formData.phone);
+      const userExistsResult = await checkUserExists(formData.email, formData.phone, serviceType);
       
       if (userExistsResult.exists) {
         // Handle different scenarios based on which field(s) already exist
@@ -273,7 +274,8 @@ export default function SignUpPage() {
         service_type: serviceType,
       };
 
-      const response = await apiFetch(
+      const signupApiFetch = normalizeServiceType(serviceType) === "crypto" ? cryptoApiFetch : apiFetch;
+      const response = await signupApiFetch(
         "/signup",
         {
           method: "POST",

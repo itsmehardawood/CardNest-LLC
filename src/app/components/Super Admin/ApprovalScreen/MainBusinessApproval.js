@@ -4,7 +4,7 @@ import { Eye, CheckCircle, XCircle, Calendar, Building, Mail, FileText, AlertCir
 import BusinessTable from './BusinessTable';
 import StatsCards from './StatesBar';
 import BusinessModal from './BusinessModal';
-import { apiFetch } from '@/app/lib/api.js';
+import { apiFetch, cryptoApiFetch } from '@/app/lib/api.js';
 
 
 const BusinessApprovalSectionUpdated = ({
@@ -22,6 +22,8 @@ const BusinessApprovalSectionUpdated = ({
   const matchesApprovedService = (business) => {
     return (business?.service_type || '').toLowerCase() === approvedServiceType;
   };
+
+  const serviceApiFetch = approvedServiceType === 'crypto' ? cryptoApiFetch : apiFetch;
 
   const [businesses, setBusinesses] = useState([]);
   const [approvedBusinesses, setApprovedBusinesses] = useState([]);
@@ -47,7 +49,7 @@ const BusinessApprovalSectionUpdated = ({
     const fetchAllBusinesses = async () => {
       try {
         // Fetch pending businesses
-        const pendingResponse = await apiFetch(pendingEndpoint);
+        const pendingResponse = await serviceApiFetch(pendingEndpoint);
         const pendingData = await pendingResponse.json();
             
         if (pendingData.status) {
@@ -62,7 +64,7 @@ const BusinessApprovalSectionUpdated = ({
         }
 
         // Fetch approved businesses
-        const approvedResponse = await apiFetch('/business-profile/approved');
+        const approvedResponse = await serviceApiFetch('/business-profile/approved');
         const approvedData = await approvedResponse.json();
             
         if (approvedData.status) {
@@ -86,7 +88,7 @@ const BusinessApprovalSectionUpdated = ({
     
     setApprovedLoading(true);
     try {
-      const response = await apiFetch('/business-profile/approved');
+      const response = await serviceApiFetch('/business-profile/approved');
       const data = await response.json();
           
       if (data.status) {
@@ -124,7 +126,7 @@ const BusinessApprovalSectionUpdated = ({
   const handleApprove = async (businessId) => {
     setActionLoading(true);
     try {
-      const response = await apiFetch('/business-profile/decision', {
+      const response = await serviceApiFetch('/business-profile/decision', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -171,7 +173,7 @@ const BusinessApprovalSectionUpdated = ({
   const handleReject = async (businessId) => {
     setActionLoading(true);
     try {
-      const response = await apiFetch('/business-profile/decision', {
+      const response = await serviceApiFetch('/business-profile/decision', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

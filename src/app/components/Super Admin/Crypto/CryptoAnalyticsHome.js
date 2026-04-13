@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { TrendingUp, CheckCircle, XCircle, AlertCircle, BarChart3, Activity } from 'lucide-react';
-import { apiFetch } from '@/app/lib/api.js';
+import { cryptoApiFetch } from '@/app/lib/api.js';
 import {
   LineChart,
   Line,
@@ -28,7 +28,7 @@ function CryptoAnalyticsHome() {
       setError('');
 
       try {
-        const response = await apiFetch('/superadmin/crypto/analytics', {
+        const response = await cryptoApiFetch('/superadmin/crypto/analytics', {
           method: 'GET',
         });
 

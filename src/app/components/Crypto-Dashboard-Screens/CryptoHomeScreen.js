@@ -12,7 +12,7 @@ import {
   FiBarChart2,
 } from 'react-icons/fi';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { apiFetch } from '@/app/lib/api.js';
+import { cryptoApiFetch } from '@/app/lib/api.js';
 
 /**
  * Crypto dashboard home screen — minimal, clean design with welcome message,
@@ -140,7 +140,7 @@ function CryptoHomeScreen({ status, setActiveTab }) {
         if (!user?.merchant_id) return;
 
         setAnalyticsError('');
-        const response = await apiFetch(
+        const response = await cryptoApiFetch(
           `/crypto-dashboard/analytics?merchant_id=${encodeURIComponent(user.merchant_id)}&range=7d`,
           { method: 'GET' }
         );

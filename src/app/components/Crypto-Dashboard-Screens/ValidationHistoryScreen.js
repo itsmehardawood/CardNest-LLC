@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { History, Search, Copy, CheckCircle, XCircle, Clock } from 'lucide-react';
-import { apiFetch } from '@/app/lib/api.js';
+import { cryptoApiFetch } from '@/app/lib/api.js';
 
 /**
  * Validation History Screen
@@ -65,7 +65,7 @@ function ValidationHistoryScreen() {
     const max = targetPage * pageSize;
 
     try {
-      const response = await apiFetch(
+      const response = await cryptoApiFetch(
         `/crypto/history?merchant_id=${encodeURIComponent(merchantId)}&min=${min}&max=${max}`,
         { method: 'GET' }
       );
