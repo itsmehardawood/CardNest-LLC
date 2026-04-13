@@ -22,8 +22,10 @@ import DisplaySettings from "../components/Dashboard-Screens/DisplaySettings";
 import DevelopersScreen from "../components/Dashboard-Screens/Developer";
 import SubBusinessesScreen from "../components/Dashboard-Screens/SubBusinessesScreen";
 
-import { apiFetch } from "../lib/api.js";
+import { cryptoApiFetch } from "../lib/api.js";
 import useAutoLogout from "../hooks/Autologout";
+
+const CRYPTO_API_BASE_URL = process.env.NEXT_PUBLIC_CRYPTO_API_BASE_URL || "https://cryptolaravel.cardnest.io/api";
 
 // ── Helpers ──
 
@@ -261,7 +263,7 @@ function CryptoDashboardContent() {
       }
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/business-profile`,
+        `${CRYPTO_API_BASE_URL}/business-profile`,
         { method: "POST", body: formData }
       );
 
@@ -303,13 +305,36 @@ function CryptoDashboardContent() {
   };
 
   // ── Business verification status polling ──
-  const checkBusinessVerificationStatus = async (userId) => {
+  const checkBusinessVerificationStatus = async (userObj) => {
     try {
-      const response = await apiFetch(
-        `/business-profile/business-verification-status?user_id=${userId}`
-      );
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      const result = await response.json();
+      const queryCandidates = [];
+      if (userObj?.id) {
+        queryCandidates.push(`user_id=${encodeURIComponent(userObj.id)}`);
+      }
+      if (userObj?.merchant_id) {
+        queryCandidates.push(`merchant_id=${encodeURIComponent(userObj.merchant_id)}`);
+      }
+
+      let result = null;
+      for (const query of queryCandidates) {
+        const response = await cryptoApiFetch(
+          `/business-profile/business-verification-status?${query}`
+        );
+
+        if (!response.ok) {
+          if (response.status === 422) {
+            continue;
+          }
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        result = await response.json();
+        break;
+      }
+
+      if (!result) {
+        throw new Error("Business verification status query failed");
+      }
 
       if (result.status === true || result.success === true) {
         const businessVerified = result.data?.business_verified;
@@ -337,12 +362,12 @@ function CryptoDashboardContent() {
   };
 
   useEffect(() => {
-    if (userData?.id) {
-      checkBusinessVerificationStatus(userData.id);
-      const interval = setInterval(() => checkBusinessVerificationStatus(userData.id), 30000);
+    if (userData?.id || userData?.merchant_id) {
+      checkBusinessVerificationStatus(userData);
+      const interval = setInterval(() => checkBusinessVerificationStatus(userData), 30000);
       return () => clearInterval(interval);
     }
-  }, [userData?.id]);
+  }, [userData?.id, userData?.merchant_id]);
 
   // ── Header title ──
   const sidebarItems = [
@@ -388,6 +413,7 @@ function CryptoDashboardContent() {
             removeDocument={removeDocument}
             handleSubmit={handleSubmit}
             router={router}
+            verificationApiFetch={cryptoApiFetch}
           />
         );
 

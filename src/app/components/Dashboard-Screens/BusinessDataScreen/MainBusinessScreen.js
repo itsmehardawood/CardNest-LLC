@@ -20,6 +20,7 @@ function MainBusinessScreen({
   removeDocument,
   handleSubmit,
   router,
+  verificationApiFetch = apiFetch,
 }) {
   const [userData, setUserData] = useState(null);
   const [verificationData, setVerificationData] = useState(null);
@@ -41,21 +42,41 @@ function MainBusinessScreen({
         const userObj = parsedUser.user || parsedUser;
         setUserData(userObj);
 
-        // Fetch business verification status from API
-        if (userObj.id) {
-          const response = await apiFetch(
-            `/business-profile/business-verification-status?user_id=${userObj.id}`
+        // Fetch business verification status from API.
+        // Some backends validate either user_id or merchant_id, so try both.
+        const queryCandidates = [];
+        if (userObj?.id) {
+          queryCandidates.push(`user_id=${encodeURIComponent(userObj.id)}`);
+        }
+        if (userObj?.merchant_id) {
+          queryCandidates.push(`merchant_id=${encodeURIComponent(userObj.merchant_id)}`);
+        }
+
+        let resolved = false;
+        for (const query of queryCandidates) {
+          const response = await verificationApiFetch(
+            `/business-profile/business-verification-status?${query}`
           );
-      
-          if (response.ok) {
-            const data = await response.json();
-            // console.log("Business verification data:", data);
-            setVerificationData(data);
-            setApiError(null); // Clear any previous errors
-          } else {
+
+          if (!response.ok) {
+            // Retry only on validation failures where alternate key may be expected.
+            if (response.status === 422) {
+              continue;
+            }
             console.error("Failed to fetch business verification status");
             setApiError("Failed to load business verification status");
+            break;
           }
+
+          const data = await response.json();
+          setVerificationData(data);
+          setApiError(null);
+          resolved = true;
+          break;
+        }
+
+        if (!resolved && queryCandidates.length > 0) {
+          setApiError("Failed to load business verification status");
         }
       }
     } catch (error) {

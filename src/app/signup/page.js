@@ -321,7 +321,7 @@ export default function SignUpPage() {
       };
 
       localStorage.setItem("userData", JSON.stringify(userData));
-      console.log("Account created and verified successfully:", userData);
+      // console.log("Account created and verified successfully:", userData);
 
       setSuccess(
         "Account created and verified successfully! Redirecting to dashboard..."
