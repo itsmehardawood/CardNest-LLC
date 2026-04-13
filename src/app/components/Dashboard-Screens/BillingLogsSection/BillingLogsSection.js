@@ -2,7 +2,7 @@
 import { apiFetch } from '@/app/lib/api.js';
 import React, { useState, useEffect } from 'react';
 
-const BillingLogsSection = () => {
+const BillingLogsSection = ({ billingApiFetch = apiFetch }) => {
   const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,7 +28,7 @@ const BillingLogsSection = () => {
 
       // console.log('merchantId:', merchantId);
 
-      const response = await apiFetch(`/merchant/getOldSubscriptions?id=${merchantId}`, {
+      const response = await billingApiFetch(`/merchant/getOldSubscriptions?id=${merchantId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

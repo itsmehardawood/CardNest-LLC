@@ -435,13 +435,14 @@ function CryptoDashboardContent() {
       case "subscriptions":
         return <SubscriptionsScreen />;
       case "billing":
-        return <BillingLogsSection />;
+        return <BillingLogsSection billingApiFetch={cryptoApiFetch} />;
       case "documents":
         return (
           <DocumentsScreen
             documents={documents}
             setActiveTab={handleTabChange}
             handleFileUpload={handleFileUpload}
+            verificationApiFetch={cryptoApiFetch}
           />
         );
       case "displaysettings":

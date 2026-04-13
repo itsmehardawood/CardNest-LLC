@@ -14,7 +14,7 @@ import {
 import { FaShieldAlt } from "react-icons/fa";
 import { apiFetch } from "@/app/lib/api.js";
 
-function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
+function DocumentsScreen({ documents, setActiveTab, handleFileUpload, verificationApiFetch = apiFetch }) {
   const [userData, setUserData] = useState(null);
   const [verificationData, setVerificationData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -32,9 +32,18 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
           const userObj = parsedUser.user || parsedUser;
           setUserData(userObj);
 
-          if (userObj.id) {
-            const response = await apiFetch(
-              `/business-profile/business-verification-status?user_id=${userObj.id}`,
+          const queryCandidates = [];
+          if (userObj?.id) {
+            queryCandidates.push(`user_id=${encodeURIComponent(userObj.id)}`);
+          }
+          if (userObj?.merchant_id) {
+            queryCandidates.push(`merchant_id=${encodeURIComponent(userObj.merchant_id)}`);
+          }
+
+          let resolved = false;
+          for (const query of queryCandidates) {
+            const response = await verificationApiFetch(
+              `/business-profile/business-verification-status?${query}`,
               {
                 headers: {
                   Authorization: `Bearer ${userObj.token}`,
@@ -42,14 +51,26 @@ function DocumentsScreen({ documents, setActiveTab, handleFileUpload }) {
               }
             );
 
-            if (response.ok) {
-              const data = await response.json();
-              setVerificationData(data);
-            } else {
+            if (!response.ok) {
+              if (response.status === 422) {
+                continue;
+              }
               setApiError(
                 "Failed to load verification status. Please try again later."
               );
+              break;
             }
+
+            const data = await response.json();
+            setVerificationData(data);
+            resolved = true;
+            break;
+          }
+
+          if (!resolved && queryCandidates.length > 0) {
+            setApiError(
+              "Failed to load verification status. Please try again later."
+            );
           }
         }
       } catch (error) {
