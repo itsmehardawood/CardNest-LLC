@@ -15,12 +15,13 @@ const handleLogin = async () => {
   setError('');
 
   try {
-    const response = await apiFetch('/login', {
+    const response = await fetch('https://cryptolaravel.cardnest.io/api/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        service_type: "crypto",
         country_code: countryCode,
         login_input: loginInput,
       }),

@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { History, Search, Copy, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { cryptoApiFetch } from '@/app/lib/api.js';
+import { decryptWithAES256 } from '@/app/lib/decrypt';
 
 /**
  * Validation History Screen
@@ -17,22 +18,148 @@ function ValidationHistoryScreen() {
   const [error, setError] = useState('');
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
+  const [aesKey, setAesKey] = useState(null);
 
-  const getMerchantId = () => {
+  const getUserContext = () => {
     try {
       const stored = localStorage.getItem('userData');
       if (!stored) return null;
       const parsed = JSON.parse(stored);
       const user = parsed?.user || parsed;
-      return user?.merchant_id || null;
+      return {
+        user,
+        merchantId: user?.merchant_id || null,
+      };
     } catch {
       return null;
     }
   };
 
+  const fetchAesKey = async (user) => {
+    if (!user) return null;
+
+    const queryCandidates = [];
+    if (user?.id) {
+      queryCandidates.push(`user_id=${encodeURIComponent(user.id)}`);
+    }
+    if (user?.merchant_id) {
+      queryCandidates.push(`merchant_id=${encodeURIComponent(user.merchant_id)}`);
+    }
+
+    for (const query of queryCandidates) {
+      const response = await cryptoApiFetch(
+        `/business-profile/business-verification-status?${query}`,
+        {
+          method: 'GET',
+          headers: user?.token
+            ? {
+                Authorization: `Bearer ${user.token}`,
+              }
+            : {},
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 422) {
+          continue;
+        }
+        return null;
+      }
+
+      const payload = await response.json();
+      const key = payload?.data?.aes_key || null;
+
+      if (key) {
+        return key;
+      }
+    }
+
+    return null;
+  };
+
+  const analyzeKeyCandidate = (key) => {
+    if (!key || typeof key !== 'string') {
+      return {
+        isValid: false,
+        validMethod: null,
+        methods: {},
+      };
+    }
+
+    let rawKey = key.trim();
+    if ((rawKey.startsWith('"') && rawKey.endsWith('"')) || (rawKey.startsWith("'") && rawKey.endsWith("'"))) {
+      rawKey = rawKey.slice(1, -1);
+    }
+
+    const prefixed = rawKey.match(/^(base64|hex|utf8):(.+)$/i);
+    const candidate = (prefixed ? prefixed[2] : rawKey).trim();
+
+    const methods = {
+      base64: null,
+      hex: null,
+      utf8: null,
+    };
+
+    try {
+      const padded = candidate + '='.repeat((4 - candidate.length % 4) % 4);
+      const base64 = padded.replace(/-/g, '+').replace(/_/g, '/');
+      const binary = atob(base64);
+      methods.base64 = new Uint8Array([...binary].map((c) => c.charCodeAt(0))).length;
+    } catch {
+      methods.base64 = null;
+    }
+
+    if (/^[0-9a-fA-F]+$/.test(candidate) && candidate.length % 2 === 0) {
+      methods.hex = candidate.length / 2;
+    }
+
+    methods.utf8 = new TextEncoder().encode(candidate).length;
+
+    const validMethod = ['base64', 'hex', 'utf8'].find((name) => methods[name] === 32) || null;
+
+    return {
+      isValid: Boolean(validMethod),
+      validMethod,
+      methods,
+    };
+  };
+
+  const getKeyCandidates = ({ user, fetchedKey, row }) => {
+    return [
+      { source: 'business_status.aes_key', value: fetchedKey },
+      { source: 'userData.user.aes_key', value: user?.aes_key },
+      { source: 'row.encryption_key', value: row?.encryption_key },
+      { source: 'row.merchant_key', value: row?.merchant_key },
+      { source: 'row.aes_key', value: row?.aes_key },
+      { source: 'row.validation_result.encryption_key', value: row?.validation_result?.encryption_key },
+      { source: 'row.validation_result.aes_key', value: row?.validation_result?.aes_key },
+    ].filter((entry) => typeof entry.value === 'string' && entry.value.trim() !== '');
+  };
+
+  const decryptViaTestApi = async (encryptedData, key) => {
+    const response = await fetch('/api/test-crypto-decrypt', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ encryptedData, key }),
+    });
+
+    const payload = await response.json();
+
+    if (!response.ok || !payload?.ok) {
+      throw new Error(payload?.error || `Fallback decrypt API failed (${response.status})`);
+    }
+
+    return payload?.decrypted;
+  };
+
   const mapRecord = (item) => {
     const result = item?.validation_result || {};
-    const resultData = result?.data || {};
+    const resultData =
+      result?.data && typeof result.data === 'object' && !Array.isArray(result.data)
+        ? result.data
+        : {};
     const summary = resultData?.summary || {};
     const sanction = resultData?.sanction_check || {};
 
@@ -52,7 +179,8 @@ function ValidationHistoryScreen() {
     setLoading(true);
     setError('');
 
-    const merchantId = getMerchantId();
+    const context = getUserContext();
+    const merchantId = context?.merchantId;
 
     if (!merchantId) {
       setError('Merchant ID not found. Please log in again.');
@@ -65,6 +193,14 @@ function ValidationHistoryScreen() {
     const max = targetPage * pageSize;
 
     try {
+      let resolvedAesKey = aesKey;
+      if (!resolvedAesKey) {
+        resolvedAesKey = await fetchAesKey(context?.user);
+        if (resolvedAesKey) {
+          setAesKey(resolvedAesKey);
+        }
+      }
+
       const response = await cryptoApiFetch(
         `/crypto/history?merchant_id=${encodeURIComponent(merchantId)}&min=${min}&max=${max}`,
         { method: 'GET' }
@@ -75,7 +211,130 @@ function ValidationHistoryScreen() {
       }
 
       const payload = await response.json();
-      const rows = Array.isArray(payload?.data) ? payload.data.map(mapRecord) : [];
+      let sourceRows = [];
+
+      if (Array.isArray(payload?.data)) {
+        const decryptedRows = await Promise.all(
+          payload.data.map(async (item) => {
+            const encryptedResultData = item?.validation_result?.data;
+            const keyCandidates = getKeyCandidates({
+              user: context?.user,
+              fetchedKey: resolvedAesKey,
+              row: item,
+            });
+            const keyCandidatesWithAnalysis = keyCandidates.map((entry) => ({
+              ...entry,
+              analysis: analyzeKeyCandidate(entry.value),
+            }));
+            const validKeyEntry = keyCandidatesWithAnalysis.find((entry) => entry.analysis.isValid) || null;
+
+            if (typeof encryptedResultData === 'string' && encryptedResultData.trim() !== '') {
+              if (!validKeyEntry) {
+                return {
+                  ...item,
+                  _decrypt_meta: {
+                    status: 'failed',
+                    reason: 'No valid 32-byte key candidate found',
+                    keyCandidates: keyCandidatesWithAnalysis.map((entry) => ({
+                      source: entry.source,
+                      parseMethods: entry.analysis.methods,
+                      validMethod: entry.analysis.validMethod,
+                      fullKey: entry.value,
+                      preview: `${entry.value.slice(0, 4)}...${entry.value.slice(-4)}`,
+                    })),
+                  },
+                };
+              }
+
+              try {
+                const decryptedResultData = await decryptWithAES256(encryptedResultData, validKeyEntry.value);
+                return {
+                  ...item,
+                  validation_result: {
+                    ...(item.validation_result || {}),
+                    data: decryptedResultData,
+                  },
+                  _decrypt_meta: {
+                    status: 'success',
+                    keySource: validKeyEntry.source,
+                    keyByteLength: validKeyEntry.analysis.methods[validKeyEntry.analysis.validMethod],
+                    keyMethod: validKeyEntry.analysis.validMethod,
+                    selectedKey: validKeyEntry.value,
+                  },
+                };
+              } catch (decryptError) {
+                console.error('Crypto row browser decryption failed, trying API fallback:', {
+                  id: item?.id,
+                  error: decryptError,
+                });
+
+                try {
+                  const fallbackDecrypted = await decryptViaTestApi(encryptedResultData, validKeyEntry.value);
+                  return {
+                    ...item,
+                    validation_result: {
+                      ...(item.validation_result || {}),
+                      data: fallbackDecrypted,
+                    },
+                    _decrypt_meta: {
+                      status: 'success',
+                      keySource: validKeyEntry.source,
+                      keyByteLength: validKeyEntry.analysis.methods[validKeyEntry.analysis.validMethod],
+                      keyMethod: validKeyEntry.analysis.validMethod,
+                      selectedKey: validKeyEntry.value,
+                      usedFallbackApi: true,
+                    },
+                  };
+                } catch (fallbackError) {
+                  return {
+                    ...item,
+                    _decrypt_meta: {
+                      status: 'failed',
+                      reason: decryptError?.message || 'Decryption failed',
+                      fallbackReason: fallbackError?.message || 'Fallback decryption failed',
+                      keySource: validKeyEntry.source,
+                      keyByteLength: validKeyEntry.analysis.methods[validKeyEntry.analysis.validMethod],
+                      keyMethod: validKeyEntry.analysis.validMethod,
+                      selectedKey: validKeyEntry.value,
+                    },
+                  };
+                }
+              }
+            }
+
+            return {
+              ...item,
+              _decrypt_meta: {
+                status: 'skipped',
+                reason: 'No encrypted validation_result.data present',
+              },
+            };
+          })
+        );
+
+        sourceRows = decryptedRows;
+      } else if (typeof payload?.data === 'string' && payload.data.trim() !== '') {
+        if (!resolvedAesKey) {
+          throw new Error('Unable to decrypt history data. Encryption key not found.');
+        }
+
+        try {
+          const decryptedPayload = await decryptWithAES256(payload.data, resolvedAesKey);
+
+          if (Array.isArray(decryptedPayload)) {
+            sourceRows = decryptedPayload;
+          } else if (Array.isArray(decryptedPayload?.data)) {
+            sourceRows = decryptedPayload.data;
+          } else {
+            throw new Error('Unexpected decrypted history format');
+          }
+        } catch (decryptError) {
+          console.error('Crypto history decryption failed:', decryptError);
+          throw new Error('Failed to decrypt validation history data.');
+        }
+      }
+
+      const rows = sourceRows.map(mapRecord);
 
       setHistory(rows);
       setPage(targetPage);

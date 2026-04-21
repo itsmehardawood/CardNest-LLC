@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { History, Search, Copy, CheckCircle, XCircle } from 'lucide-react';
 import { cryptoApiFetch } from '@/app/lib/api.js';
+import { decryptWithAES256 } from '@/app/lib/decrypt';
 
 function CryptoValidationHistory() {
   const pageSize = 10;
@@ -16,7 +17,10 @@ function CryptoValidationHistory() {
 
   const mapRecord = (item) => {
     const result = item?.validation_result || {};
-    const resultData = result?.data || {};
+    const resultData =
+      result?.data && typeof result.data === 'object' && !Array.isArray(result.data)
+        ? result.data
+        : {};
     const summary = resultData?.summary || {};
     const sanction = resultData?.sanction_check || {};
 
@@ -31,6 +35,33 @@ function CryptoValidationHistory() {
       riskLevel: (resultData?.risk_level || 'UNKNOWN').toUpperCase(),
       chain: result?.chain || item?.chain || 'UNKNOWN',
     };
+  };
+
+  const decryptRow = async (item) => {
+    const encryptedData = item?.validation_result?.data;
+    const aesKey = item?.validation_result?.aes_key;
+
+    if (typeof encryptedData !== 'string' || encryptedData.trim() === '' || !aesKey) {
+      return item;
+    }
+
+    try {
+      const decryptedData = await decryptWithAES256(encryptedData, aesKey);
+      return {
+        ...item,
+        validation_result: {
+          ...(item.validation_result || {}),
+          data: decryptedData,
+        },
+      };
+    } catch (error) {
+      console.error('Failed to decrypt Super Admin crypto history row:', {
+        id: item?.id,
+        merchantId: item?.merchant_id,
+        error,
+      });
+      return item;
+    }
   };
 
   const fetchHistory = async (targetPage = 1) => {
@@ -51,7 +82,10 @@ function CryptoValidationHistory() {
       }
 
       const payload = await response.json();
-      const rows = Array.isArray(payload?.data) ? payload.data.map(mapRecord) : [];
+      const decryptedRows = Array.isArray(payload?.data)
+        ? await Promise.all(payload.data.map(decryptRow))
+        : [];
+      const rows = decryptedRows.map(mapRecord);
 
       setHistory(rows);
       setPage(targetPage);
