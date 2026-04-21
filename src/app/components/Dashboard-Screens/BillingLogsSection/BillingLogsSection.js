@@ -1,8 +1,29 @@
-
-import { apiFetch } from '@/app/lib/api.js';
+import { apiFetch, cryptoApiFetch } from '@/app/lib/api.js';
 import React, { useState, useEffect } from 'react';
 
-const BillingLogsSection = ({ billingApiFetch = apiFetch }) => {
+const resolveBillingApiFetch = (billingApiFetch) => {
+  if (billingApiFetch) {
+    return billingApiFetch;
+  }
+
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+
+    if (
+      host === 'cryptoadmin.cardnest.io' ||
+      host.endsWith('.cryptoadmin.cardnest.io') ||
+      host === 'cryptoadmin.cardnest.local' ||
+      host.endsWith('.cryptoadmin.cardnest.local')
+    ) {
+      return cryptoApiFetch;
+    }
+  }
+
+  return apiFetch;
+};
+
+const BillingLogsSection = ({ billingApiFetch }) => {
+  const billingFetch = resolveBillingApiFetch(billingApiFetch);
   const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,7 +49,7 @@ const BillingLogsSection = ({ billingApiFetch = apiFetch }) => {
 
       // console.log('merchantId:', merchantId);
 
-      const response = await billingApiFetch(`/merchant/getOldSubscriptions?id=${merchantId}`, {
+      const response = await billingFetch(`/merchant/getOldSubscriptions?id=${merchantId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
