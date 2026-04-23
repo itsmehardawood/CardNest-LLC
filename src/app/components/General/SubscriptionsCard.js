@@ -1,7 +1,7 @@
 // export default PricingSection;
 
-import React, { useState, useEffect } from 'react';
-import { Check, X, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Check, X, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { apiFetch } from '@/app/lib/api.js';
 
@@ -13,6 +13,18 @@ const PricingSection = ({ isDark = false }) => {
   const [businessVerification, setBusinessVerification] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [verificationLoading, setVerificationLoading] = useState(false);
+  const plansScrollRef = useRef(null);
+
+  const scrollPlans = (direction) => {
+    if (!plansScrollRef.current) return;
+    const scrollAmount = 340;
+    const nextLeft =
+      direction === 'left'
+        ? plansScrollRef.current.scrollLeft - scrollAmount
+        : plansScrollRef.current.scrollLeft + scrollAmount;
+
+    plansScrollRef.current.scrollTo({ left: nextLeft, behavior: 'smooth' });
+  };
 
   // Static features that apply to all plans
   const staticFeatures = [
@@ -140,7 +152,7 @@ const PricingSection = ({ isDark = false }) => {
         if (data.status && data.data) {
           const mappedPlans = mapApiDataToPlans(data.data);
           
-          // Add CardNest KYC plan as the fourth card
+          // Add CardNest KYC and CardNest Crypto as custom cards
           const kycPlan = {
             id: 'kyc',
             name: 'CARDNEST KYC',
@@ -165,8 +177,33 @@ const PricingSection = ({ isDark = false }) => {
             ],
             originalData: null
           };
+
+          const cryptoPlan = {
+            id: 'crypto',
+            name: 'CARDNEST CRYPTO',
+            subtitle: 'FOR COMPLIANCE',
+            price: 'CONTACT US',
+            period: 'CUSTOM',
+            apiScans: 'PRE-TRANSACTION VALIDATION',
+            gradient: 'from-red-500 to-red-600',
+            bgGradient: 'from-red-50 to-red-50',
+            buttonColor: 'bg-red-500 hover:bg-red-600',
+            popular: false,
+            features: [
+              { text: 'Pre-transaction validation checks', included: true },
+              { text: 'Sanction screening at scale', included: true },
+              { text: 'Wallet risk assessment', included: true },
+              { text: 'Entity security verification', included: true },
+              { text: 'Real-time fraud alerts', included: true },
+              { text: 'AML compliance controls', included: true },
+              { text: 'Simple API integration', included: true },
+              { text: '24/7 technical support', included: true },
+              { text: 'Audit-ready risk reports', included: true }
+            ],
+            originalData: null
+          };
           
-          setPlans([...mappedPlans, kycPlan]);
+          setPlans([...mappedPlans, kycPlan, cryptoPlan]);
         } else {
           throw new Error('Invalid API response format');
         }
@@ -183,8 +220,13 @@ const PricingSection = ({ isDark = false }) => {
 
   // Handle plan selection with enterprise redirect logic
   const handlePlanClick = (planId, planName) => {
-    // If it's CardNest KYC plan, scroll to contact section
-    if (planId === 'kyc' || planName === 'CARDNEST KYC') {
+    // If it's CardNest KYC or CardNest Crypto, scroll to contact section
+    if (
+      planId === 'kyc' ||
+      planName === 'CARDNEST KYC' ||
+      planId === 'crypto' ||
+      planName === 'CARDNEST CRYPTO'
+    ) {
       const contactSection = document.getElementById('contact-section');
       if (contactSection) {
         contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -224,7 +266,12 @@ const PricingSection = ({ isDark = false }) => {
 
   // *** UPDATED: Get redirect path based on plan ***
   const getRedirectPath = (planId, planName) => {
-    if (planId === 'kyc' || planName === 'CARDNEST KYC') {
+    if (
+      planId === 'kyc' ||
+      planName === 'CARDNEST KYC' ||
+      planId === 'crypto' ||
+      planName === 'CARDNEST CRYPTO'
+    ) {
       return '#contact-section';
     }
     if (planId === 3 || planName === 'ENTERPRISE') {
@@ -326,13 +373,35 @@ const PricingSection = ({ isDark = false }) => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-7xl mx-auto items-stretch auto-rows-fr">
+        <div className="relative max-w-7xl mx-auto">
+          <button
+            type="button"
+            onClick={() => scrollPlans('left')}
+            className="hidden sm:flex absolute -left-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-white shadow-md border border-gray-200 text-gray-700 hover:bg-gray-50"
+            aria-label="Scroll plans left"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => scrollPlans('right')}
+            className="hidden sm:flex absolute -right-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-white shadow-md border border-gray-200 text-gray-700 hover:bg-gray-50"
+            aria-label="Scroll plans right"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+
+          <div
+            ref={plansScrollRef}
+            className="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth pb-2 px-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          >
           {plans.map((plan, index) => (
             <div
               key={plan.id}
               className={`relative rounded-2xl overflow-hidden shadow-lg transform hover:scale-105 transition-all duration-300 ${
                 plan.popular ? 'ring-2 ring-cyan-400' : ''
-              } w-full h-full flex flex-col`}
+              } w-[280px] sm:w-[300px] lg:w-[320px] h-[680px] sm:h-[700px] lg:h-[720px] flex flex-col flex-shrink-0`}
             >
               {/* Popular badge */}
               {plan.popular && (
@@ -391,7 +460,7 @@ const PricingSection = ({ isDark = false }) => {
                 
                 {/* Content with higher z-index to stay above the wave */}
                 <div className="relative z-10 flex flex-col flex-1">
-                  <ul className="space-y-1 sm:space-y-1.5 mb-4 sm:mb-6 flex-1">
+                  <ul className="space-y-1 sm:space-y-1.5 mb-4 sm:mb-6 flex-1 overflow-y-auto pr-1">
                     {plan.features.map((feature, featureIndex) => (
                       <li key={featureIndex} className="flex items-start">
                         {feature.included ? (
@@ -411,7 +480,7 @@ const PricingSection = ({ isDark = false }) => {
                   </ul>
                   
                   {/* *** UPDATED: Conditional button rendering with enterprise logic *** */}
-                  {plan.id === 'kyc' || plan.name === 'CARDNEST KYC' ? (
+                  {plan.id === 'kyc' || plan.name === 'CARDNEST KYC' || plan.id === 'crypto' || plan.name === 'CARDNEST CRYPTO' ? (
                     <button
                       onClick={() => handlePlanClick(plan.id, plan.name)}
                       className={`w-full mt-auto ${plan.buttonColor} text-white block text-center py-2 sm:py-2.5 px-3 sm:px-4 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 hover:shadow-lg transform hover:-translate-y-0.5`}
@@ -444,6 +513,7 @@ const PricingSection = ({ isDark = false }) => {
               </div>
             </div>
           ))}
+          </div>
         </div>
         
         {/* Additional info */}

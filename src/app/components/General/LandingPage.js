@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 
 import DiagonalHeroSection from "./HeroSection";
 import ContactSection from "./ContactSection";
-import Image from "next/image";
 import PricingSection from "./SubscriptionsCard";
 import FAQs from "./FAQs";
 import NavbarHomepage from "./NavbarHomepage";
@@ -456,12 +455,13 @@ footer: "",
             <div className="w-full md:w-1/2 flex justify-center">
               <div className="">
                 <div className="flex justify-center items-center pb-3">
-                  <Image
-                    src="/images/CardNest.png"
-                    alt="this is about img"
-                    width="450"
-                    height="450"
-                  />
+                  <video autoPlay loop muted playsInline width="450" aria-label="CardNest Logo">
+                    <source
+                      src="https://dw1u598x1c0uz.cloudfront.net/CardNest%20Logo%20WebM%20version.webm"
+                      type="video/webm"
+                    />
+                    Your browser does not support the video tag.
+                  </video>
                 </div>
                 <p className="text-base md:text-lg text-gray-700 text-justify pt-7 leading-relaxed">
                 
