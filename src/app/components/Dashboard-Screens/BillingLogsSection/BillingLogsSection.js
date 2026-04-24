@@ -220,18 +220,23 @@ const BillingLogsSection = ({ billingApiFetch }) => {
         </thead>
         <tbody className="bg-black divide-y divide-gray-700">
           {subscriptions.map((subscription, index) => (
-            <tr key={subscription.id || index} className="hover:bg-gray-900">
+            <tr
+              key={`${subscription.id ?? 'no-id'}-${subscription.subscription_date ?? 'no-sub-date'}-${subscription.created_at ?? 'no-created-at'}-${index}`}
+              className="hover:bg-gray-900"
+            >
               {/* Package Column - Updated */}
               <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
                 <div className="flex flex-col">
                   <span className="font-medium">
-                    {subscription.package_id === 3 
+                    {subscription.package_id === 3
                       ? 'Custom Enterprise Plan' 
                       : subscription.package_id === 2 
                         ? 'Premium Plan' 
                         : subscription.package_id === 1 
                           ? 'Basic Plan' 
-                          : `Package ${subscription.package_id}`
+                          : subscription.package_id == null
+                            ? 'Custom Plan'
+                            : `Package ${subscription.package_id}`
                     }
                   </span>
                   {/* {subscription.package_id === 3 && (

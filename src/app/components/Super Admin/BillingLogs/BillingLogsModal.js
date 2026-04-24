@@ -46,8 +46,8 @@ const BillingLogsModal = ({
               <div className="bg-gray-900 rounded-lg p-3 sm:p-4 border border-gray-800">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="flex flex-col sm:flex-row sm:justify-between">
-                    <span className="text-gray-400 text-sm">User ID:</span>
-                    <span className="font-medium text-white text-sm sm:text-base">{subscription.user_id}</span>
+                    <span className="text-gray-400 text-sm">Business Name:</span>
+                    <span className="font-medium text-white text-sm sm:text-base">{subscription.business_name}</span>
                   </div>
                   <div className="flex flex-col sm:flex-row sm:justify-between">
                     <span className="text-gray-400 text-sm">Merchant ID:</span>

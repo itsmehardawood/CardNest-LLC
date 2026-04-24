@@ -3,7 +3,7 @@ import { Eye, Calendar, User, CreditCard } from 'lucide-react';
 import { apiFetch } from '@/app/lib/api.js';
 import BillingLogsModal from './BillingLogsModal';
 
-const BillingLogsSection = () => {
+const BillingLogsSection = ({ billingApiFetch = apiFetch }) => {
   const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedSubscription, setSelectedSubscription] = useState(null);
@@ -13,7 +13,7 @@ const BillingLogsSection = () => {
   useEffect(() => {
     const fetchSubscriptions = async () => {
       try {
-        const response = await apiFetch('/superadmin/access-all-old-subscriptions', {
+        const response = await billingApiFetch('/superadmin/access-all-old-subscriptions', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -64,6 +64,9 @@ const BillingLogsSection = () => {
   const getPackageType = (subscription) => {
     if (subscription.custom_package) {
       return 'Custom Package';
+    }
+    if (subscription.package_id == null) {
+      return 'Custom Plan';
     }
     return `Package ${subscription.package_id}`;
   };
@@ -128,7 +131,7 @@ const BillingLogsSection = () => {
                     <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
                     <div className="min-w-0">
                       <div className="text-sm font-medium text-white truncate">
-                        User ID: {subscription.user_id}
+                        Business Name: {subscription.business_name}
                       </div>
                       <div className="text-xs text-gray-400 truncate">
                         {subscription.merchant_id}
@@ -221,7 +224,7 @@ const BillingLogsSection = () => {
                       <User className="w-4 h-4 text-gray-400 mr-2" />
                       <div>
                         <div className="text-sm font-medium text-white">
-                          User ID: {subscription.user_id}
+                          {subscription.business_name}
                         </div>
                         <div className="text-sm text-gray-400">
                           {subscription.merchant_id}
