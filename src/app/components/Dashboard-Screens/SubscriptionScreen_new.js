@@ -1,10 +1,32 @@
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import PricingSection from '../General/SubscriptionsCard';
-import { apiFetch } from '@/app/lib/api.js';
+import { apiFetch, cryptoApiFetch } from '@/app/lib/api.js';
 
-function SubscriptionsScreen() {
+const resolveSubscriptionApiFetch = (subscriptionApiFetch) => {
+  if (subscriptionApiFetch) {
+    return subscriptionApiFetch;
+  }
+
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+
+    if (
+      host === 'cryptoadmin.cardnest.io' ||
+      host.endsWith('.cryptoadmin.cardnest.io') ||
+      host === 'cryptoadmin.cardnest.local' ||
+      host.endsWith('.cryptoadmin.cardnest.local')
+    ) {
+      return cryptoApiFetch;
+    }
+  }
+
+  return apiFetch;
+};
+
+function SubscriptionsScreen({ subscriptionApiFetch }) {
   const router = useRouter();
+  const subscriptionFetch = resolveSubscriptionApiFetch(subscriptionApiFetch);
   const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
   const [subscriptionData, setSubscriptionData] = useState(null);
   const [userObj, setUserObj] = useState(null);
@@ -33,7 +55,7 @@ function SubscriptionsScreen() {
             for (const param of paramVariations) {
               if (subscriptionFound) break;
               try {
-                const response = await apiFetch(
+                const response = await subscriptionFetch(
                   `/Subscriptions/GetByUserIDorMerchantID?${param}`,
                   { method: 'GET', headers: { 'Content-Type': 'application/json' } }
                 );
@@ -51,7 +73,7 @@ function SubscriptionsScreen() {
                   break;
                 } else if (response.status === 404) {
                   // No subscription found - this is expected for new users
-                  console.log('No subscription found for user - this is normal for new users');
+                  // console.log('No subscription found for user - this is normal for new users');
                   setHasActiveSubscription(false);
                   setSubscriptionData(null);
                   subscriptionFound = true;

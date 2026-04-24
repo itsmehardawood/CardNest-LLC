@@ -155,8 +155,6 @@ function NavbarHomepage() {
               Features
             </button>
 
-          
-
             {/* More Dropdown with Full Width Submenu */}
             <div className="relative group">
               <button
@@ -190,8 +188,6 @@ function NavbarHomepage() {
                   <div className="bg-white/95 shadow-lg rounded-b-xl h-[160px] md:h-[170px] lg:h-[180px] xl:h-[190px] flex items-center px-5 md:px-7 lg:px-10 xl:px-12">
                     {/* Right side menu items */}
                     <div className="flex w-full items-start justify-between gap-1 md:gap-2 lg:gap-3 xl:gap-4">
-
-
                       <div className="group/item">
                         <button
                           onClick={() => scrollToSection("about")}
@@ -217,7 +213,7 @@ function NavbarHomepage() {
                         </p>
                       </div>
 
-                       <div className="group/item">
+                      <div className="group/item">
                         <button
                           onClick={() => scrollToSection("crypto")}
                           className={dropdownItemClass}
@@ -232,7 +228,13 @@ function NavbarHomepage() {
                               strokeLinecap="round"
                               strokeLinejoin="round"
                               strokeWidth={2}
-                              d="M13 10V3L4 14h7v7l9-11h-7z"
+                              d="M12 3a9 9 0 100 18 9 9 0 000-18z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 7v10m2.5-7H10.5a2 2 0 100 4h3a2 2 0 110 4H9.5"
                             />
                           </svg>
                           CardNest Crypto
@@ -289,7 +291,7 @@ function NavbarHomepage() {
                           Reasons why you should choose CardNest
                         </p>
                       </div>
-                     
+
                       <div className="group/item">
                         <button
                           onClick={() => scrollToSection("pricing")}
@@ -364,7 +366,7 @@ function NavbarHomepage() {
               </div>
             </div>
 
-              <button
+            <button
               onClick={() => scrollToSection("contact-section")}
               className={`hover:text-teal-600 transition-colors duration-200 font-medium ${
                 isScrolled ? "text-gray-800" : "text-white hover:text-teal-300"

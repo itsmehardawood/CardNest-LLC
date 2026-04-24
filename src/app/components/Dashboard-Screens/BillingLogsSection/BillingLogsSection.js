@@ -292,14 +292,13 @@ const BillingLogsSection = ({ billingApiFetch }) => {
               </td>
               
               {/* Status Column */}
-              <td className="px-6 py-4 whitespace-nowrap text-center">
-                <div className="flex flex-col space-y-1 text-center">
-                  <span className={`inline-flex px-2 py-1 text-xs text-center font-semibold rounded-full ${
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex justify-center">
+                  <span className={`inline-flex items-center justify-center px-2 py-1 text-xs font-semibold rounded-full ${
                     getStatusColor(subscription.is_blocked, subscription.renewal_date)
                   }`}>
                     {getStatusText(subscription.is_blocked, subscription.renewal_date)}
                   </span>
-              
                 </div>
               </td>
             </tr>
