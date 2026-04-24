@@ -107,7 +107,7 @@ function FAQs() {
         <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
           Frequently Asked Questions
         </h2>
-        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+        <p className="text-gray-600 text-lg px-2 max-w-2xl mx-auto">
           Everything you need to know about our pricing and plans
         </p>
       </div>

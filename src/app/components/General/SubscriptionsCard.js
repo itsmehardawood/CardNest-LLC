@@ -1,7 +1,7 @@
 // export default PricingSection;
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Check, X, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Check, X, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { apiFetch } from '@/app/lib/api.js';
 
@@ -13,18 +13,6 @@ const PricingSection = ({ isDark = false }) => {
   const [businessVerification, setBusinessVerification] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [verificationLoading, setVerificationLoading] = useState(false);
-  const plansScrollRef = useRef(null);
-
-  const scrollPlans = (direction) => {
-    if (!plansScrollRef.current) return;
-    const scrollAmount = 340;
-    const nextLeft =
-      direction === 'left'
-        ? plansScrollRef.current.scrollLeft - scrollAmount
-        : plansScrollRef.current.scrollLeft + scrollAmount;
-
-    plansScrollRef.current.scrollTo({ left: nextLeft, behavior: 'smooth' });
-  };
 
   // Static features that apply to all plans
   const staticFeatures = [
@@ -363,7 +351,7 @@ const PricingSection = ({ isDark = false }) => {
 
   return (
     <div className={`${isDark ? 'bg-slate-900' : 'bg-white'} py-8 px-4`}>
-      <div className="max-w-6xl mx-auto">
+      <div className="w-full max-w-[1700px] mx-auto">
         <div className="text-center mb-8">
           <h2 className={`text-2xl sm:text-3xl lg:text-4xl font-bold ${isDark ? 'text-white' : 'text-black'} mb-3 px-4`}>
             Subscription Plans
@@ -373,35 +361,14 @@ const PricingSection = ({ isDark = false }) => {
           </p>
         </div>
         
-        <div className="relative max-w-7xl mx-auto">
-          <button
-            type="button"
-            onClick={() => scrollPlans('left')}
-            className="hidden sm:flex absolute -left-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-white shadow-md border border-gray-200 text-gray-700 hover:bg-gray-50"
-            aria-label="Scroll plans left"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => scrollPlans('right')}
-            className="hidden sm:flex absolute -right-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 items-center justify-center rounded-full bg-white shadow-md border border-gray-200 text-gray-700 hover:bg-gray-50"
-            aria-label="Scroll plans right"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
-
-          <div
-            ref={plansScrollRef}
-            className="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth pb-2 px-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-          >
+        <div className="relative w-full mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 pb-2 px-1">
           {plans.map((plan, index) => (
             <div
               key={plan.id}
               className={`relative rounded-2xl overflow-hidden shadow-lg transform hover:scale-105 transition-all duration-300 ${
                 plan.popular ? 'ring-2 ring-cyan-400' : ''
-              } w-[280px] sm:w-[300px] lg:w-[320px] h-[680px] sm:h-[700px] lg:h-[720px] flex flex-col flex-shrink-0`}
+              } w-full min-h-[680px] sm:min-h-[700px] lg:min-h-[720px] flex flex-col`}
             >
               {/* Popular badge */}
               {plan.popular && (

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import DiagonalHeroSection from "./HeroSection";
 import ContactSection from "./ContactSection";
 import PricingSection from "./SubscriptionsCard";
+import CryptoSection from "./CryptoSection";
 import FAQs from "./FAQs";
 import NavbarHomepage from "./NavbarHomepage";
 
@@ -486,6 +487,8 @@ footer: "",
         </div>
       </section>
 
+      <CryptoSection />
+
       {/* CardNest KYC Section */}
       <section id="kyc" className="bg-slate-900">
         <div className="w-full">
@@ -656,7 +659,7 @@ footer: "",
 
 {/* Video Section */}
       <section id="video" className="py-16 px-6 bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
               Why Businesses Trust Us ?
@@ -666,7 +669,7 @@ footer: "",
             </p>
           </div>
           
-          <div className="relative max-w-4xl mx-auto">
+          <div className="relative w-[90%] mx-auto">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-black">
               <video
                 className="w-full h-auto"

@@ -146,6 +146,15 @@ function NavbarHomepage() {
               About
             </button>
 
+            <button
+              onClick={() => scrollToSection("features")}
+              className={`hover:text-teal-600 transition-colors duration-200 font-medium ${
+                isScrolled ? "text-gray-800" : "text-white hover:text-teal-300"
+              }`}
+            >
+              Features
+            </button>
+
           
 
             {/* More Dropdown with Full Width Submenu */}
@@ -207,6 +216,31 @@ function NavbarHomepage() {
                           Fraud & Chargeback Prevention
                         </p>
                       </div>
+
+                       <div className="group/item">
+                        <button
+                          onClick={() => scrollToSection("crypto")}
+                          className={dropdownItemClass}
+                        >
+                          <svg
+                            className="w-3 h-3 md:w-4 md:h-4 lg:w-5 lg:h-5 transition-transform duration-300 group-hover/item:scale-150 group-hover/item:rotate-12 flex-shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M13 10V3L4 14h7v7l9-11h-7z"
+                            />
+                          </svg>
+                          CardNest Crypto
+                        </button>
+                        <p className={dropdownDescriptionClass}>
+                          Pre-transaction crypto compliance validation
+                        </p>
+                      </div>
                       <div className="group/item">
                         <button
                           onClick={() => scrollToSection("kyc")}
@@ -255,6 +289,7 @@ function NavbarHomepage() {
                           Reasons why you should choose CardNest
                         </p>
                       </div>
+                     
                       <div className="group/item">
                         <button
                           onClick={() => scrollToSection("pricing")}
@@ -279,31 +314,7 @@ function NavbarHomepage() {
                           Flexible subscription plans suitable for everyone
                         </p>
                       </div>
-                      <div className="group/item">
-                        <button
-                          onClick={() => scrollToSection("features")}
-                          className={dropdownItemClass}
-                        >
-                          <svg
-                            className="w-3 h-3 md:w-4 md:h-4 lg:w-5 lg:h-5 transition-transform duration-300 group-hover/item:scale-150 group-hover/item:-rotate-12 flex-shrink-0"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
-                            />
-                          </svg>
-                          Features
-                        </button>
-                        <p className={dropdownDescriptionClass}>
-                          Explore our powerful product features
-                        </p>
-                      </div>
-                    
+
                       <div className="group/item">
                         <div className="relative">
                           <div className="flex items-center transition-colors duration-200 hover:text-teal-800 text-black gap-1 md:gap-2 px-2 md:px-3 lg:px-4 xl:px-5 py-1 md:py-1.5 lg:py-2">
@@ -354,7 +365,7 @@ function NavbarHomepage() {
             </div>
 
               <button
-              onClick={() => scrollToSection("contact")}
+              onClick={() => scrollToSection("contact-section")}
               className={`hover:text-teal-600 transition-colors duration-200 font-medium ${
                 isScrolled ? "text-gray-800" : "text-white hover:text-teal-300"
               }`}
@@ -501,13 +512,20 @@ function NavbarHomepage() {
                 </button>
 
                 <button
+                  onClick={() => scrollToSection("crypto")}
+                  className="text-left text-white hover:text-teal-300 hover:bg-gray-800 transition-all duration-200 font-medium py-4 px-4 rounded-lg w-full"
+                >
+                  CardNest Crypto
+                </button>
+
+                <button
                   onClick={() => scrollToSection("pricing")}
                   className="text-left text-white hover:text-teal-300 hover:bg-gray-800 transition-all duration-200 font-medium py-4 px-4 rounded-lg w-full"
                 >
                   Pricing
                 </button>
                 <button
-                  onClick={() => scrollToSection("contact")}
+                  onClick={() => scrollToSection("contact-section")}
                   className="text-left text-white hover:text-teal-300 hover:bg-gray-800 transition-all duration-200 font-medium py-4 px-4 rounded-lg w-full"
                 >
                   Contact
