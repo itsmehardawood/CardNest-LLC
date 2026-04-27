@@ -1,4 +1,5 @@
 import React from "react";
+import DeferredVideo from "./DeferredVideo";
 
 const CryptoSection = () => {
   return (
@@ -39,23 +40,19 @@ const CryptoSection = () => {
           </div>
         </div>
 
-        <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-black">
-          <video
-            className="w-full h-auto"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            aria-label="CardNest Crypto Video"
-          >
-            <source
-              src="https://d21vkevu6wrni5.cloudfront.net/CardNest%20Crypto%20Video.MP4"
-              type="video/mp4"
-            />
-            Your browser does not support the video tag.
-          </video>
-        </div>
+        <DeferredVideo
+          source="https://d21vkevu6wrni5.cloudfront.net/CardNest%20Crypto%20Video.MP4"
+          type="video/mp4"
+          poster="/images/css.png"
+          ariaLabel="CardNest Crypto Video"
+          containerClassName="relative rounded-2xl overflow-hidden shadow-2xl bg-black"
+          className="w-full h-auto"
+          placeholder={
+            <div className="w-full h-full min-h-[320px] bg-gradient-to-br from-slate-950 to-slate-800 flex items-center justify-center text-white">
+              <p className="text-sm sm:text-base text-slate-200">Loading crypto video...</p>
+            </div>
+          }
+        />
       </div>
     </section>
   );

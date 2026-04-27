@@ -1,256 +1,72 @@
 "use client";
-import React, { useEffect, useState } from "react";
-
+import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
 import DiagonalHeroSection from "./HeroSection";
-import ContactSection from "./ContactSection";
-import PricingSection from "./SubscriptionsCard";
-import CryptoSection from "./CryptoSection";
-import FAQs from "./FAQs";
 import NavbarHomepage from "./NavbarHomepage";
+import { landingPageData } from "./landingPageData";
+import DeferredVideo from "./DeferredVideo";
+
+const CryptoSection = dynamic(() => import("./CryptoSection"), {
+  ssr: false,
+  loading: () => (
+    <section id="crypto" className="py-12 px-4 sm:px-6 bg-white">
+      <div className="w-[90%] mx-auto">
+        <div className="max-w-6xl mx-auto h-64 rounded-2xl bg-slate-100 animate-pulse" />
+      </div>
+    </section>
+  ),
+});
+
+const FAQsSection = dynamic(() => import("./FAQs"), {
+  ssr: false,
+  loading: () => <div className="py-12 px-6 bg-white" />,
+});
+
+const ContactSectionLazy = dynamic(() => import("./ContactSection"), {
+  ssr: false,
+  loading: () => <div className="py-12 px-6 bg-gray-50" />,
+});
+
+const PricingSectionLazy = dynamic(() => import("./SubscriptionsCard"), {
+  ssr: false,
+  loading: () => <div className="py-12 px-6 bg-white" />,
+});
+
+const LazySection = ({ id, className = "", placeholderHeight = "h-64", children }) => {
+  const ref = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+
+    if (!node) {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "300px 0px", threshold: 0.1 }
+    );
+
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section id={id} ref={ref} className={className}>
+      {isVisible ? children : <div className={`w-full ${placeholderHeight}`} aria-hidden="true" />}
+    </section>
+  );
+};
 
 const LandingPage = () => {
- const sectionsData = {
-    // modular: {
-    //   title: "Modular solutions",
-    //   heading: "A fully integrated suite of payments products",
-    //   description: "We bring together everything that is required to build websites and apps that accept payments and send payouts globally.",
-    //   media: ''
-    // },
-    kyc: {
-      title: "",
-      heading: "",
-      description: "Welcome to CardNest KYC Verification Thank you for choosing CardNest LLC. To ensure the highest level of security, compliance, and fraud prevention, your organization uses CardNest to ensure that all users complete a Know Your Customer (KYC) verification process before accessing the services or system.",
-      media: null,
-      darkMode: true,
-      sections: [
-        {
-          content: "CardNest is an advanced fraud prevention intelligence platform designed to stop credit and debit card fraud before it occurs. Our technology protects businesses from unauthorized transactions, financial losses, and chargebacks. As part of this commitment, identity verification is a critical step in maintaining a trusted and secure ecosystem for all parties involved."
-        },
-        {
-          emoji: "🔐",
-          title: "Why is KYC Verification Important",
-          content: "The KYC process allows CardNest to:",
-          points: [
-            "Verify identities accurately and prevent impersonation or fraudulent activity",
-            "Comply with global regulatory and financial security standards",
-            "Protect merchants, customers, and partners from card fraud and chargebacks",
-            "Ensure only legitimate users access CardNest's fraud-prevention infrastructure"
-          ],
-          footer: ""
-        },
-        {
-          emoji: "🧭",
-          title: "What to Expect: CardNest KYC Verification Steps",
-          content: "Our KYC process is designed to be secure, efficient, and user-friendly. Below is a step-by-step overview of how verification works:",
-          steps: [
-            {
-              emoji: "🪪",
-              title: "Step 1: Identity Document Submission",
-              content: "You will be asked to upload a valid government-issued identification document, such as:",
-              points: [
-                "Passport",
-                "National ID card",
-                "Driver's license and many others"
-              ],
-              footer: "Please ensure the document is clear, unexpired, and fully visible."
-            },
-            {
-              emoji: "🤳",
-              title: "Step 2: Facial Recognition Verification",
-              content: "Next, you will complete a facial verification check using your device's camera. This step confirms that you are the rightful owner of the submitted identification and helps prevent identity misuse."
-            },
-            {
-              emoji: "🧠",
-              title: "Step 3: Intelligent Verification Analysis",
-              content: "CardNest's proprietary KYC intelligence system securely analyzes your information by:",
-              points: [
-                "Authenticating document legitimacy",
-                "Matching facial biometrics with submitted documents",
-                "Detecting anomalies or potential fraud indicators"
-              ],
-              footer: "All data is encrypted and processed in compliance with strict security and privacy standards."
-            },
-            {
-              emoji: "✅",
-              title: "Step 4: Verification Outcome",
-              content: "Once the review is complete:",
-              points: [
-                "Approved users will gain access to CardNest services",
-                "If additional information is required, you will be guided through the next steps"
-              ],
-              footer: "Most verifications are completed quickly, with minimal user effort."
-            }
-          ]
-        },
-        {
-          emoji: "🛡️",
-          title: "Your Privacy & Security",
-          content: "CardNest takes data protection seriously. All personal information is:",
-          points: [
-            "Encrypted during transmission and storage",
-            "Used strictly for verification and compliance purposes",
-            "Handled in accordance with applicable data protection regulations"
-          ]
-        },
-        {
-          emoji: "🚀",
-          title: "Moving Forward with CardNest",
-          content: "Completing the KYC process ensures you can fully benefit from CardNest's fraud prevention intelligence—helping stop fraud in advance, reduce chargebacks, and build trust across payment ecosystems.",
-          footer: "We appreciate your cooperation and look forward to supporting your secure journey with CardNest."
-        },
-        
-{
-  emoji: "💬",
-  title: "Need Help During Verification?",
-  content: "If you encounter any issues during the KYC process, CardNest provides dedicated support to assist you at every step.",
-  points: [
-    "Real-time guidance if document uploads fail",
-    "Clear instructions when additional information is required",
-    "Assistance with verification delays or technical issues"
-  ],
-footer: "",
-}
-
-
-      ]
-    },
-
-
-    payments: {
-      title: "Payments",
-      heading: "Accept and optimize payments, globally",
-      description:
-        "Increase authorization rates, offer local payment methods to boost conversion, and reduce fraud using AI.",
-      seeAlso:
-        "Tax for automating tax registration, collection, and filing Radar for AI-powered fraud protection Terminal for custom in-person payments",
-      media: null,
-    },
-    billing: {
-      title: "Billing",
-      heading: "Capture recurring revenue",
-      description:
-        "Manage flat rate, usage-based, and hybrid pricing models, minimize churn, and automate finance operations.",
-      seeAlso:
-        "Invoicing for invoice creation, collection, and tracking Usage-based billing for metering, billing, and consumption insights Sigma for custom revenue reports—no SQL required",
-      media: null,
-    },
-    connect: {
-      title: "Benefits of CardNest",
-      heading: "",
-      description: "",
-      media: null,
-      features: [
-        {
-          title: "Real-Time Fraud Prevention",
-          description:
-            "CardNest detects and stops online fraudulent card transactions before they occur—unlike traditional systems that only respond after chargebacks or losses. This proactive approach significantly reduces fraud exposure and saves businesses from losing revenue or shutting down.",
-        },
-        {
-          title: "Advanced AI and Machine Learning",
-          description:
-            "The CardNest Security Scan engine uses intelligent behavioral models, pattern recognition, and anomaly detection to identify suspicious activity in milliseconds, improving accuracy with every transaction processed and ensuring the card being used belongs to the actual owner.",
-        },
-        {
-          title: "Saves Up to 98% or More Reduction in Chargebacks",
-          description:
-            "Businesses using CardNest have reported dramatic reductions in chargeback volume. By blocking fraudulent transactions at the source, merchants can retain more revenue and avoid costly disputes.",
-        },
-        {
-          title: "Simple API Integration (Setup in a Few Hours)",
-          description:
-            "CardNest can be easily integrated into existing platforms, including e-commerce sites, payment gateways, remittance services, and banking systems—with minimal development effort and maximum compatibility.",
-        },
-        {
-          title: "No Storage of Sensitive Data",
-          description:
-            "CardNest performs Real-Time intelligence scanning and verification without storing cardholder information, ensuring user privacy and reducing the risks associated with data breaches or regulatory non-compliance.",
-        },
-        {
-          title: "PCI DSS–Compliant Security Infrastructure",
-          description:
-            "Built to the highest global payment security standards, CardNest helps businesses maintain compliance and avoid penalties associated with non-compliant transaction systems. All data, both in transit and at rest, is encrypted with maximum security protocols.",
-        },
-        {
-          title: "Adaptive and Scalable Technology",
-          description:
-            "As fraud tactics evolve, CardNest's self-learning algorithms adapt in real time—making it a future-proof solution for both small businesses and large enterprises processing high transaction volumes.",
-        },
-        {
-          title: "Enhanced Customer Trust and Satisfaction",
-          description:
-            "By preventing fraud and reducing false declines, CardNest helps businesses deliver a safer and smoother customer experience, building loyalty and strengthening brand reputation.",
-        },
-      ],
-    },
-    features: {
-      title: "Comprehensive Features of CardNest ",
-      media: null,
-      darkMode: true,
-      features: [
-        {
-          title: "Card-At-Present (CAP) Intelligence Engine",
-          description:
-            "Simulates physical card presence in online transactions by analyzing user card security features, building intelligence around card behavior, device signals, and transaction context to validate cardholder identity.",
-        },
-        {
-          title:
-            "Real-Time Transaction Security Scanning, Detection, and Prevention",
-          description:
-            "Performs instant, pre-authorization fraud detection within milliseconds—preventing suspicious transactions before they're approved.",
-        },
-        {
-          title: "Machine Learning Behavioral Modeling",
-          description:
-            "Learns and analyzes cardholder behavior, patterns, and motion data to detect deviations that signal fraud, improving detection accuracy over time.",
-        },
-        {
-          title: "Anomaly and Pattern Recognition",
-          description:
-            "Identifies abnormal transaction trends, geographic mismatches, inconsistent device usage, and other red flags across thousands of data points.",
-        },
-        {
-          title: "Zero Data Storage Technology",
-          description:
-            "Performs all security operations in real-time without storing cardholder data, ensuring full compliance with PCI DSS and data protection standards.",
-        },
-        {
-          title: "API-First Integration",
-          description:
-            "Offers a lightweight, developer-friendly API that integrates seamlessly with payment gateways, mobile apps, e-commerce stores, and financial platforms within a few hours.",
-        },
-        {
-          title: "Multi-Layered Fraud Detection Architecture",
-          description:
-            "Combines biometric analytics, card validation, transaction velocity checks, and AI insights to assess and mitigate fraud risk from multiple vectors.",
-        },
-        {
-          title: "Global Transaction Intelligence",
-          description:
-            "Uses a distributed network and real-time transaction datasets across multiple countries to improve fraud models and detect global fraud patterns.",
-        },
-        {
-          title: "Customizable Risk Scoring Engine",
-          description:
-            "Assigns a dynamic fraud confidence score to each transaction, allowing businesses to set custom thresholds, automate approvals/declines, or trigger manual reviews.",
-        },
-        {
-          title: "Adaptive Learning System",
-          description:
-            "Continuously trains its AI models using real-time data and evolving fraud trends, ensuring the system stays ahead of emerging attack methods.",
-        },
-        {
-          title: "False Positive Minimization",
-          description:
-            "Fine-tuned algorithms reduce the likelihood of blocking legitimate transactions—maintaining customer satisfaction, and maximize conversions.",
-        },
-        {
-          title: "Identity & Behavioral Biometrics",
-          description:
-            "Tracks user interactions such as typing speed, mouse movement, and screen behavior to enhance cardholder verification without friction. Visual analytics tools give merchants insights into fraud attempts, successful blocks, and chargeback trends—helping drive strategic decisions.",
-        },
-      ],
-    },
-  };
+  const sectionsData = landingPageData;
 
   // Component to render section content
   const SectionContent = ({ data, isDark = false, sectionKey }) => {
@@ -487,7 +303,9 @@ footer: "",
         </div>
       </section>
 
-      <CryptoSection />
+      <LazySection id="crypto" className="bg-white" placeholderHeight="h-96">
+        <CryptoSection />
+      </LazySection>
 
       {/* CardNest KYC Section */}
       <section id="kyc" className="bg-slate-900">
@@ -658,7 +476,7 @@ footer: "",
       </section>
 
 {/* Video Section */}
-      <section id="video" className="py-16 px-6 bg-gradient-to-br from-gray-50 to-gray-100">
+      <LazySection id="video" className="py-16 px-6 bg-gradient-to-br from-gray-50 to-gray-100" placeholderHeight="h-[28rem]">
         <div className="w-full mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
@@ -668,25 +486,21 @@ footer: "",
               Discover how our AI-powered fraud prevention technology protects your business in real-time
             </p>
           </div>
-          
+
           <div className="relative w-[90%] mx-auto">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-black">
-              <video
+              <DeferredVideo
+                source="https://d21vkevu6wrni5.cloudfront.net/Cardnest%20Main%20Promotion%20Video.mp4"
+                type="video/mp4"
+                poster="/images/ss.jpg"
+                ariaLabel="CardNest promo video"
                 className="w-full h-auto"
+                containerClassName="w-full"
                 controls
-                muted
-                autoPlay
-                loop
-                preload="metadata"
-                poster="/images/ss.jpg" // Optional: Add a poster image
-              >
-                <source
-                  src="https://d21vkevu6wrni5.cloudfront.net/Cardnest%20Main%20Promotion%20Video.mp4"
-                  type="video/mp4"
-                />
-                Your browser does not support the video tag.
-              </video>
-              
+                preload="none"
+                placeholder={<div className="w-full min-h-[320px] bg-black" aria-hidden="true" />}
+              />
+
               {/* Optional: Custom overlay with play button */}
               <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none">
                 <div className="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm">
@@ -696,7 +510,7 @@ footer: "",
                 </div>
               </div>
             </div>
-            
+
             {/* Video description */}
             <div className="mt-8 text-center">
               <p className="text-gray-600 leading-relaxed max-w-3xl mx-auto">
@@ -706,36 +520,33 @@ footer: "",
             </div>
           </div>
         </div>
-      </section>
+      </LazySection>
 
 
 
       {/* Connect Section */}
-      <section id="benefits" className="bg-white  ">
-        <SectionContent data={sectionsData.connect} isDark={true}  sectionKey="connect" />
-
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing">
-        {/* <PricingSection isDark={true} /> */}
-                <PricingSection isDark={true} />
-
-      </section>
+      <LazySection id="benefits" className="bg-white" placeholderHeight="h-[38rem]">
+        <SectionContent data={sectionsData.connect} isDark={true} sectionKey="connect" />
+      </LazySection>
 
       {/* Pricing Section */}
-      <section id="features">
+      <LazySection id="pricing" placeholderHeight="h-80">
+        <PricingSectionLazy isDark={true} />
+      </LazySection>
+
+      {/* Pricing Section */}
+      <LazySection id="features" placeholderHeight="h-[48rem]">
         <SectionContent data={sectionsData.features} />
-      </section>
+      </LazySection>
 
-      <section>
-        <FAQs />
-      </section>
+      <LazySection id="faq-1" placeholderHeight="h-[24rem]">
+        <FAQsSection />
+      </LazySection>
 
       {/* Contact Section */}
-      <section id="contact-section" className="py-5 lg:py-5 px-6 bg-gray-50">
-        <ContactSection />
-      </section>
+      <LazySection id="contact" className="py-5 lg:py-5 px-6 bg-gray-50" placeholderHeight="h-80">
+        <ContactSectionLazy />
+      </LazySection>
 
       {/* Footer */}
       <footer className=" bg-gradient-to-br  from-gray-900 via-gray-800 to-black text-white relative overflow-hidden">
@@ -750,10 +561,15 @@ footer: "",
               <div className="flex items-center space-x-3">
                 {/* logo footer */}
                 <div className="text-xl sm:text-2xl font-bold text-white">
-                  <video autoPlay loop muted playsInline width="50">
-<source src="https://dw1u598x1c0uz.cloudfront.net/CardNest%20Logo%20WebM%20version.webm" alt="CardNest Logo" />
-                    Your browser does not support the video tag.
-                  </video>
+                  <DeferredVideo
+                    source="https://dw1u598x1c0uz.cloudfront.net/CardNest%20Logo%20WebM%20version.webm"
+                    type="video/webm"
+                    ariaLabel="CardNest Logo"
+                    containerClassName="w-[50px] h-[50px]"
+                    className="w-[50px] h-[50px] object-contain"
+                    preload="metadata"
+                    placeholder={<div className="w-[50px] h-[50px] rounded-full bg-slate-700" aria-hidden="true" />}
+                  />
                 </div>
 
                 <div className="text-2xl font-bold text-white">CardNest</div>

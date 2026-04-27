@@ -1,13 +1,34 @@
 "use client";
 import Link from "next/link";
-import React from "react";
-const { useState, useEffect } = require("react");
+import { memo, useEffect, useRef, useState } from "react";
+
+const NavbarLogoVideo = memo(function NavbarLogoVideo() {
+  return (
+    <video
+      autoPlay
+      loop
+      muted
+      playsInline
+      preload="metadata"
+      poster="/images/favicon.png"
+      width="70"
+      aria-label="CardNest Logo"
+    >
+      <source
+        src="https://dw1u598x1c0uz.cloudfront.net/CardNest%20Logo%20WebM%20version.webm"
+        type="video/webm"
+      />
+      Your browser does not support the video tag.
+    </video>
+  );
+});
 
 function NavbarHomepage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState(null);
+  const isScrolledRef = useRef(false);
   const dropdownItemClass =
     "text-gray-800 hover:text-teal-600 transition-colors duration-200 font-semibold text-[11px] md:text-xs lg:text-sm xl:text-[15px] px-2 md:px-3 lg:px-4 xl:px-5 py-1 md:py-1.5 lg:py-2 rounded-lg w-full text-left flex items-center gap-1 md:gap-2 whitespace-nowrap";
   const dropdownDescriptionClass =
@@ -32,13 +53,35 @@ function NavbarHomepage() {
   }, []);
 
   useEffect(() => {
+    let frameId = null;
+
     const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      setIsScrolled(scrollTop > 50);
+      if (frameId !== null) {
+        return;
+      }
+
+      frameId = window.requestAnimationFrame(() => {
+        const nextIsScrolled = window.scrollY > 50;
+
+        if (nextIsScrolled !== isScrolledRef.current) {
+          isScrolledRef.current = nextIsScrolled;
+          setIsScrolled(nextIsScrolled);
+        }
+
+        frameId = null;
+      });
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   // Prevent body scroll when mobile menu is open
@@ -117,13 +160,7 @@ function NavbarHomepage() {
         <div className="flex justify-between items-center py-1">
           {/* Logo */}
           <div className="text-xl sm:text-2xl font-bold">
-            <video autoPlay loop muted playsInline width="70">
-              <source
-                src="https://dw1u598x1c0uz.cloudfront.net/CardNest%20Logo%20WebM%20version.webm"
-                alt="CardNest Logo"
-              />
-              Your browser does not support the video tag.
-            </video>
+            <NavbarLogoVideo />
           </div>
 
           {/* Desktop Navigation - Only show on large screens */}
