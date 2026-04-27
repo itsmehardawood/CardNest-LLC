@@ -10,7 +10,7 @@ const NavbarLogoVideo = memo(function NavbarLogoVideo() {
       muted
       playsInline
       preload="metadata"
-      poster="/images/favicon.png"
+      poster="/images/removed.png"
       width="70"
       aria-label="CardNest Logo"
     >

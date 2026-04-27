@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# CardNest
 
-## Getting Started
+CardNest is about helping businesses stay safe from payment fraud and build more trust into every transaction.
 
-First, run the development server:
+It is designed to protect card payments, reduce chargebacks, verify users when needed, and help teams feel confident that the people and payments they are dealing with are real.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+At its core, CardNest helps businesses make better decisions before risk turns into loss.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## How CardNest Works
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+CardNest works by checking risk before a payment, user action, or wallet transfer is allowed to move forward. Instead of waiting until a problem happens, CardNest helps businesses review and validate activity early.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The product focuses on three main ideas:
 
-## Learn More
+- Identify risky activity before it becomes fraud
+- Verify users and payment actions when needed
+- Help businesses keep more trust, more revenue, and fewer disputes
 
-To learn more about Next.js, take a look at the following resources:
+## What CardNest Delivers
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+CardNest is built to deliver practical outcomes for businesses that handle online payments and sensitive customer activity.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The main outcomes are:
 
-## Deploy on Vercel
+- Lower fraud risk
+- Fewer chargebacks
+- Better customer trust
+- Stronger payment confidence
+- Safer approval decisions
+- More reliable identity checks
+- More controlled crypto wallet validation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Main Product Areas
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+CardNest includes two key sub-products under the main platform.
+
+### Crypto Validation
+
+Crypto Validation helps businesses review crypto wallet activity before a transaction is completed.
+
+It is meant to help with:
+
+- Checking wallet addresses before transfer
+- Reducing the chance of sending funds to risky or wrong destinations
+- Improving confidence in crypto-related transactions
+- Supporting safer digital asset workflows
+
+### KYC
+
+KYC stands for Know Your Customer.
+
+The KYC part of CardNest helps businesses verify identity before giving access or allowing certain actions.
+
+It is meant to help with:
+
+- Confirming that a user is real
+- Supporting compliance and security checks
+- Reducing impersonation and misuse
+- Helping businesses trust who they are dealing with
+
+## Why Businesses Use CardNest
+
+Businesses use CardNest when they want more control over fraud, identity, and trust.
+
+It helps them:
+
+- Protect revenue
+- Reduce losses from fraud
+- Improve user confidence
+- Keep sensitive operations safer
+- Support a more secure digital experience
+
+## In Short
+
+CardNest is a trust and security platform for modern online payments.
+It helps businesses protect transactions, verify users, and validate crypto activity through CardNest, Crypto Validation, and KYC.
