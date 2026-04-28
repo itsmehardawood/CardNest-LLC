@@ -18,7 +18,6 @@ import MainBusinessScreen from "../components/Dashboard-Screens/BusinessDataScre
 import SubscriptionsScreen from "../components/Dashboard-Screens/SubscriptionScreen_new";
 import BillingLogsSection from "../components/Dashboard-Screens/BillingLogsSection/BillingLogsSection";
 import DocumentsScreen from "../components/Dashboard-Screens/DocumentScreens_new";
-// import DisplaySettings from "../components/Dashboard-Screens/DisplaySettings";
 import DevelopersScreen from "../components/Dashboard-Screens/Developer";
 import SubBusinessesScreen from "../components/Dashboard-Screens/SubBusinessesScreen";
 
@@ -445,8 +444,8 @@ function CryptoDashboardContent() {
             verificationApiFetch={cryptoApiFetch}
           />
         );
-      case "displaysettings":
-        return <DisplaySettings />;
+      // case "displaysettings":
+      //   return <DisplaySettings />;
       case "sub-businesses":
         return <SubBusinessesScreen />;
       case "developers":
