@@ -74,6 +74,7 @@ const NavigationSidebar = ({
         { id: "home", label: "Home", icon: Home },
         { id: "cryptoValidationHistory", label: "Validation History", icon: History },
         { id: "billing", label: "Billing Logs", icon: Receipt },
+        { id: "renewalSubscription", label: "Subscription Renewal", icon: RefreshCcw },
       ],
     },
     {

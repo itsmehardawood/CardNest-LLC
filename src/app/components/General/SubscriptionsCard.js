@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Check, X, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
-import { apiFetch } from '@/app/lib/api.js';
+import { apiFetch, cryptoApiFetch, kycApiFetch } from '@/app/lib/api.js';
 
 const PricingSection = ({ isDark = false }) => {
   const [plans, setPlans] = useState([]);
@@ -102,7 +102,17 @@ const PricingSection = ({ isDark = false }) => {
           // Fetch business verification status
           if (userObj.id) {
             setVerificationLoading(true);
-            const verificationResponse = await apiFetch(
+            const isBrowser = typeof window !== 'undefined';
+            const host = isBrowser ? window.location.hostname : '';
+            const path = isBrowser ? window.location.pathname : '';
+            const fetcher = host.includes('cryptoadmin') || host.includes('cryptoadmin.cardnest.io') || path.includes('/crypto-dashboard') || path.includes('crypto-dashboard')
+              ? cryptoApiFetch
+              : host.includes('kycadmin') || host.includes('kycadmin.cardnest.io') || path.includes('/kyc-dashboard') || path.includes('kyc-dashboard')
+              ? kycApiFetch
+              : apiFetch;
+            const fetcherName = fetcher === cryptoApiFetch ? 'cryptoApiFetch' : fetcher === kycApiFetch ? 'kycApiFetch' : 'apiFetch';
+            console.debug('[SubscriptionsCard] fetcher selected:', { isBrowser, host, path, fetcherName });
+            const verificationResponse = await fetcher(
               `/business-profile/business-verification-status?user_id=${userObj.id}`
             );
             
@@ -129,6 +139,7 @@ const PricingSection = ({ isDark = false }) => {
     const fetchPlans = async () => {
       try {
         setLoading(true);
+        console.debug('[SubscriptionsCard] fetching /Packages with apiFetch');
         const response = await apiFetch('/Packages');
         
         if (!response.ok) {

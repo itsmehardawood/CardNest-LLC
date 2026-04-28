@@ -1,32 +1,11 @@
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import PricingSection from '../General/SubscriptionsCard';
-import { apiFetch, cryptoApiFetch } from '@/app/lib/api.js';
-
-const resolveSubscriptionApiFetch = (subscriptionApiFetch) => {
-  if (subscriptionApiFetch) {
-    return subscriptionApiFetch;
-  }
-
-  if (typeof window !== 'undefined') {
-    const host = window.location.hostname;
-
-    if (
-      host === 'cryptoadmin.cardnest.io' ||
-      host.endsWith('.cryptoadmin.cardnest.io') ||
-      host === 'cryptoadmin.cardnest.local' ||
-      host.endsWith('.cryptoadmin.cardnest.local')
-    ) {
-      return cryptoApiFetch;
-    }
-  }
-
-  return apiFetch;
-};
+import { resolveApiFetchContext } from '@/app/lib/api.js';
 
 function SubscriptionsScreen({ subscriptionApiFetch }) {
   const router = useRouter();
-  const subscriptionFetch = resolveSubscriptionApiFetch(subscriptionApiFetch);
+  const subscriptionFetch = subscriptionApiFetch || resolveApiFetchContext();
   const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
   const [subscriptionData, setSubscriptionData] = useState(null);
   const [userObj, setUserObj] = useState(null);
@@ -121,8 +100,8 @@ function SubscriptionsScreen({ subscriptionApiFetch }) {
   // Helper functions for package data based on package_id
   const getMonthlyLimit = () => {
     if (!subscriptionData) return 0;
-    if (subscriptionData.package_id === 3) {
-      return subscriptionData.custom_api_count || 0;
+    if (subscriptionData.custom_package === 0) {
+      return subscriptionData.api_calls_limit || 0;
     }
     return subscriptionData.package?.monthly_limit || 0;
   };
@@ -153,7 +132,7 @@ function SubscriptionsScreen({ subscriptionApiFetch }) {
     if (subscriptionData.package_id === 3) {
       return 'Custom Enterprise Plan';
     }
-    return subscriptionData.package?.package_name ? `${subscriptionData.package.package_name} Plan` : 'Unknown Plan';
+    return subscriptionData.package?.package_name ? `${subscriptionData.package.package_name} Plan` : 'Custom Plan';
   };
 
   const getPlanPrice = () => {
@@ -220,7 +199,7 @@ if (loading) {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                       <div>
                         <h3 className="text-2xl font-bold text-white mb-1">{getPlanName()}</h3>
-                        <p className="text-gray-300 text-lg">{formatCurrency(getPlanPrice())} / {subscriptionData.package?.package_period || 'month'}</p>
+                        {/* <p className="text-gray-300 text-lg">{formatCurrency(getPlanPrice())} / {subscriptionData.package?.package_period || 'month'}</p> */}
                         {isCustomPackage() && (
                           <div className="mt-2">
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-900 text-purple-300">

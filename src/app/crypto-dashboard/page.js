@@ -18,7 +18,7 @@ import MainBusinessScreen from "../components/Dashboard-Screens/BusinessDataScre
 import SubscriptionsScreen from "../components/Dashboard-Screens/SubscriptionScreen_new";
 import BillingLogsSection from "../components/Dashboard-Screens/BillingLogsSection/BillingLogsSection";
 import DocumentsScreen from "../components/Dashboard-Screens/DocumentScreens_new";
-import DisplaySettings from "../components/Dashboard-Screens/DisplaySettings";
+// import DisplaySettings from "../components/Dashboard-Screens/DisplaySettings";
 import DevelopersScreen from "../components/Dashboard-Screens/Developer";
 import SubBusinessesScreen from "../components/Dashboard-Screens/SubBusinessesScreen";
 
@@ -383,7 +383,7 @@ function CryptoDashboardContent() {
     { id: "subscriptions", label: "Subscriptions" },
     { id: "billing", label: "Billing Logs" },
     { id: "documents", label: "Documents" },
-    { id: "displaysettings", label: "Display Settings" },
+    // { id: "displaysettings", label: "Display Settings" },
     { id: "developers", label: "Developers" },
   ];
 

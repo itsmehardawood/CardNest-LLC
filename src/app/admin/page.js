@@ -19,6 +19,7 @@ import EnterpriseUsers from '../components/Super Admin/EnterpriseScreen/Enterpri
 import RenewalSubscriptionSection from '../components/Super Admin/General/RenewalSubscriptionSection';
 import CryptoValidationHistory from '../components/Super Admin/Crypto/CryptoValidationHistory';
 import CryptoAnalyticsHome from '../components/Super Admin/Crypto/CryptoAnalyticsHome';
+import CryptoRenewalSubscriptionSection from '../components/Super Admin/Crypto/CryptoRenewalSubscriptionSection';
 import { cryptoApiFetch } from '../lib/api.js';
 
 
@@ -150,6 +151,8 @@ const AdminDashboard = () => {
         return <CryptoValidationHistory />;
       case 'cryptoProfiles:billing':
         return <BillingLogsSection billingApiFetch={cryptoApiFetch} />;
+      case 'cryptoProfiles:renewalSubscription':
+        return <CryptoRenewalSubscriptionSection />;
       
       // Legacy routes for backwards compatibility
       case 'Home':

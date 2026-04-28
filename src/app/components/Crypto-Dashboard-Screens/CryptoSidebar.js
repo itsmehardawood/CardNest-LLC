@@ -52,7 +52,7 @@ const CryptoSidebar = ({ sidebarOpen, setSidebarOpen, activeTab, setActiveTab, s
     { id: 'subscriptions', label: 'Subscriptions', icon: <ClipboardList className="w-5 h-5" /> },
     { id: 'billing', label: 'Billing Logs', icon: <Receipt className="w-5 h-5" /> },
     { id: 'documents', label: 'Documents', icon: <FileText className="w-5 h-5" /> },
-    { id: 'displaysettings', label: 'Display Settings', icon: <Settings className="w-5 h-5" /> },
+    // { id: 'displaysettings', label: 'Display Settings', icon: <Settings className="w-5 h-5" /> },
     { id: 'developers', label: 'Developers', icon: <Zap className="w-5 h-5" /> },
   ];
 

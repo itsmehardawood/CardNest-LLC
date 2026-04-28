@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Check, CreditCard, Shield, Zap, Phone, RotateCcw, Lock, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
-import { apiFetch } from '@/app/lib/api.js';
+import { resolveApiFetchContext } from '@/app/lib/api.js';
 
 const CreditCardFeatureSelector = () => {
   const [selectedFeatures, setSelectedFeatures] = useState({
@@ -55,7 +55,8 @@ const CreditCardFeatureSelector = () => {
     
     setIsLoadingFeatures(true);
     try {
-      const response = await apiFetch(`/feature/get?user_id=${userIdToUse}`, {
+      const fetcher = resolveApiFetchContext();
+      const response = await fetcher(`/feature/get?user_id=${userIdToUse}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -171,7 +172,8 @@ const CreditCardFeatureSelector = () => {
               if (subscriptionFound) break;
               
               try {
-                const response = await apiFetch(
+                const fetcher = resolveApiFetchContext();
+                const response = await fetcher(
                   `/Subscriptions/GetByUserIDorMerchantID?${param}`,
                   {
                     method: 'GET',
