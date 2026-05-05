@@ -110,7 +110,7 @@ const RenewalSubscriptionSection = () => {
           Renewal Subscription
         </h2>
         <p className="mt-1 text-sm text-gray-300">
-          Enable auto-renewal for a merchant by Merchant ID. For a new user, provide custom API count and a renewal date.
+          Enable auto-renewal for a merchant by Merchant ID. For a new user, provide custom API count and a start date.
         </p>
       </div>
 
@@ -177,7 +177,7 @@ const RenewalSubscriptionSection = () => {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-200">Renewal Date</label>
+              <label className="mb-2 block text-sm font-medium text-gray-200">Start Date</label>
               <input
                 type="date"
                 value={renewalDate}
