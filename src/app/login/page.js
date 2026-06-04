@@ -137,7 +137,7 @@ const handleSignIn = async (e) => {
       };
 
       const authApiFetch = normalizeServiceType(serviceType) === "crypto" ? cryptoApiFetch : apiFetch;
-      const response = await authApiFetch("/login", {
+      const response = await authApiFetch("/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

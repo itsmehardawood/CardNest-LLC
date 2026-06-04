@@ -276,7 +276,7 @@ export default function SignUpPage() {
 
       const signupApiFetch = normalizeServiceType(serviceType) === "crypto" ? cryptoApiFetch : apiFetch;
       const response = await signupApiFetch(
-        "/signup",
+        "/auth/signup",
         {
           method: "POST",
           headers: {

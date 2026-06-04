@@ -15,7 +15,7 @@ const handleLogin = async () => {
   setError('');
 
   try {
-    const response = await fetch('https://cryptolaravel.cardnest.io/api/login', {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

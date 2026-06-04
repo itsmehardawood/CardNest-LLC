@@ -12,7 +12,7 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError('');
     try {
-      const response = await apiFetch('/login', {
+      const response = await apiFetch('/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
