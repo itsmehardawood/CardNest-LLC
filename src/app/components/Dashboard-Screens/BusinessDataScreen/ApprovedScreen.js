@@ -52,7 +52,7 @@ const ApprovedStatus = ({ verificationData }) => {
                 <div>
                   <label className="text-sm font-medium text-gray-400 block mb-1">Account Holder Email</label>
                   <p className="text-base text-white font-mono bg-gray-900 px-3 py-2 rounded-md">
-                    {profile?.account_holder_email || 'null'}
+                    {profile?.account_holder?.email || 'null'}
                   </p>
                 </div>
               </div>
@@ -60,8 +60,8 @@ const ApprovedStatus = ({ verificationData }) => {
                 <div>
                   <label className="text-sm font-medium text-gray-400 block mb-1">Account Holder</label>
                   <p className="text-base font-semibold text-white">
-                    {(profile?.account_holder_first_name && profile?.account_holder_last_name) 
-                      ? `${profile?.account_holder_first_name} ${profile?.account_holder_last_name}` 
+                    {(profile?.account_holder?.first_name && profile?.account_holder?.last_name) 
+                      ? `${profile?.account_holder?.first_name} ${profile?.account_holder?.last_name}` 
                       : 'null'}
                   </p>
                 </div>
@@ -118,26 +118,26 @@ const ApprovedStatus = ({ verificationData }) => {
                 <div>
                   <label className="text-sm font-medium text-gray-400 block mb-1">Street Address</label>
                   <p className="text-sm text-white">
-                    {profile?.account_holder_street 
-                      ? `${profile?.account_holder_street}${profile?.account_holder_street_line2 ? `, ${profile?.account_holder_street_line2}` : ''}`
+                    {profile?.account_holder?.street 
+                      ? `${profile?.account_holder?.street}${profile?.account_holder?.street_line2 ? `, ${profile?.account_holder?.street_line2}` : ''}`
                       : 'null'}
                   </p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-400 block mb-1">City</label>
-                  <p className="text-sm text-white">{profile?.account_holder_city || 'null'}</p>
+                  <p className="text-sm text-white">{profile?.account_holder?.city || 'null'}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-400 block mb-1">State</label>
-                  <p className="text-sm text-white">{profile?.account_holder_state || 'null'}</p>
+                  <p className="text-sm text-white">{profile?.account_holder?.state || 'null'}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-400 block mb-1">ZIP Code</label>
-                  <p className="text-sm text-white font-mono">{profile?.account_holder_zip_code || 'null'}</p>
+                  <p className="text-sm text-white font-mono">{profile?.account_holder?.zip_code || 'null'}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-400 block mb-1">Country</label>
-                  <p className="text-sm text-white">{profile?.account_holder_country || 'null'}</p>
+                  <p className="text-sm text-white">{profile?.account_holder?.country || 'null'}</p>
                 </div>
               </div>
             </div>
@@ -151,21 +151,21 @@ const ApprovedStatus = ({ verificationData }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="text-sm font-medium text-gray-400 block mb-1">ID Type</label>
-                  <p className="text-sm text-white">{profile?.account_holder_id_type || 'null'}</p>
+                  <p className="text-sm text-white">{profile?.account_holder?.id_type || 'null'}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-400 block mb-1">ID Number</label>
-                  <p className="text-sm text-white font-mono">{profile?.account_holder_id_number || 'null'}</p>
+                  <p className="text-sm text-white font-mono">{profile?.account_holder?.id_number || 'null'}</p>
                 </div>
               </div>
               
               {/* Document Links */}
               <div className="space-y-3">
-                {profile?.account_holder_id_document_path && (
+                {profile?.account_holder?.id_document_path && (
                   <div>
                     <label className="text-sm font-medium text-gray-400 block mb-2">ID Document</label>
                     <a
-                      href={profile?.account_holder_id_document_path}
+                      href={profile?.account_holder?.id_document_path}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-200 bg-blue-900 border border-blue-700 rounded-md hover:bg-blue-800 hover:border-blue-600 transition-colors"

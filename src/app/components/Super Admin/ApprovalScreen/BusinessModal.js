@@ -256,23 +256,23 @@ const BusinessModal = ({
                 <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
                   <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Full Name</label>
                   <p className="text-white text-sm font-semibold">
-                    {selectedBusiness.account_holder_first_name} {selectedBusiness.account_holder_last_name}
+                    {selectedBusiness.account_holder?.first_name} {selectedBusiness.account_holder?.last_name}
                   </p>
                 </div>
                 <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
                   <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Email</label>
-                  <p className="text-white text-sm font-semibold">{selectedBusiness.account_holder_email}</p>
+                  <p className="text-white text-sm font-semibold">{selectedBusiness.account_holder?.email}</p>
                 </div>
                 <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
                   <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Date of Birth</label>
                   <p className="text-white text-sm font-semibold">
-                    {new Date(selectedBusiness.account_holder_date_of_birth).toLocaleDateString()}
+                    {selectedBusiness.account_holder?.date_of_birth ? new Date(selectedBusiness.account_holder?.date_of_birth).toLocaleDateString() : 'N/A'}
                   </p>
                 </div>
                 <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
                   <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">Phone</label>
                   <p className="text-white text-sm font-semibold">
-                    {selectedBusiness.user.country_code} {selectedBusiness.user.phone_no}
+                    {selectedBusiness.user?.country_code} {selectedBusiness.user?.phone_number || selectedBusiness.user?.phone_no}
                   </p>
                 </div>
               </div>
@@ -288,12 +288,12 @@ const BusinessModal = ({
               </div>
               <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
                 <div className="text-white space-y-1">
-                  <p className="font-semibold text-base">{selectedBusiness.account_holder_street}</p>
-                  {selectedBusiness.account_holder_street_line2 && (
-                    <p className="text-gray-300">{selectedBusiness.account_holder_street_line2}</p>
+                  <p className="font-semibold text-base">{selectedBusiness.account_holder?.street}</p>
+                  {selectedBusiness.account_holder?.street_line2 && (
+                    <p className="text-gray-300">{selectedBusiness.account_holder?.street_line2}</p>
                   )}
-                  <p className="text-gray-300">{selectedBusiness.account_holder_city}, {selectedBusiness.account_holder_state} {selectedBusiness.account_holder_zip_code}</p>
-                  <p className="font-semibold text-amber-400 text-sm">{selectedBusiness.account_holder_country}</p>
+                  <p className="text-gray-300">{selectedBusiness.account_holder?.city}, {selectedBusiness.account_holder?.state} {selectedBusiness.account_holder?.zip_code}</p>
+                  <p className="font-semibold text-amber-400 text-sm">{selectedBusiness.account_holder?.country}</p>
                 </div>
               </div>
             </div>
@@ -309,12 +309,12 @@ const BusinessModal = ({
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
                   <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">ID Type</label>
-                  <p className="text-white text-sm font-semibold">{selectedBusiness.account_holder_id_type}</p>
+                  <p className="text-white text-sm font-semibold">{selectedBusiness.account_holder?.id_type}</p>
                 </div>
                 <div className="bg-gray-900 rounded-xl p-4 hover:shadow-md transition-shadow duration-200 border border-gray-800">
                   <label className="block text-xs font-medium text-gray-400 mb-2 uppercase tracking-wide">ID Number</label>
                   <p className="text-white text-sm font-semibold font-mono">
-                    {selectedBusiness.account_holder_id_number}
+                    {selectedBusiness.account_holder?.id_number}
                   </p>
                 </div>
               </div>
@@ -391,14 +391,14 @@ const BusinessModal = ({
                 )}
 
                 {/* ID Document */}
-                {selectedBusiness.account_holder_id_document_path && (
+                {selectedBusiness.account_holder?.id_document_path && (
                   <DocumentPreview
-                    documentPath={selectedBusiness.account_holder_id_document_path}
-                    documentName={(selectedBusiness.account_holder_id_document_path || '').split('/').pop()}
+                    documentPath={selectedBusiness.account_holder?.id_document_path}
+                    documentName={(selectedBusiness.account_holder?.id_document_path || '').split('/').pop()}
                     documentType="id"
                     onDownload={() => handleDownloadDocument(
-                      selectedBusiness.account_holder_id_document_path,
-                      `${selectedBusiness.account_holder_first_name}_${selectedBusiness.account_holder_last_name}_id_document.${(selectedBusiness.account_holder_id_document_path || '').split('.').pop()}`
+                      selectedBusiness.account_holder?.id_document_path,
+                      `${selectedBusiness.account_holder?.first_name}_${selectedBusiness.account_holder?.last_name}_id_document.${(selectedBusiness.account_holder?.id_document_path || '').split('.').pop()}`
                     )}
                     downloadLoading={downloadLoading}
                   />

@@ -12,7 +12,7 @@ export async function GET(request) {
       );
     }
 
-    const apiUrl = `http://52.55.249.9:8001/api/merchant/getCardScans?id=${merchantId}`;
+    const apiUrl = `${process.env.API_BASE_URL}/merchant/getCardScans?id=${merchantId}`;
     
     const response = await fetch(apiUrl, {
       method: 'GET',

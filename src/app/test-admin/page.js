@@ -18,6 +18,7 @@ export default function AdminLoginPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          service_type: "card_scan",
           country_code: '+92',
           login_input: Email
         }),

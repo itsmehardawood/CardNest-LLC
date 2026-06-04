@@ -21,9 +21,10 @@ const handleLogin = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        service_type: "crypto",
+       service_type: "card_scan",
         country_code: countryCode,
         login_input: loginInput,
+        
       }),
     });
 
