@@ -159,6 +159,11 @@ const handleSignIn = async (e) => {
         throw new Error(data.message || "Login failed. Please check your credentials.");
       }
 
+      // Save JWT token from backend response
+      if (data.JWT_token) {
+        localStorage.setItem('token', data.JWT_token);
+      }
+
       setApiUserData(data);
 
       // Step 2: Send OTP to the phone provided by backend; fallback to user input.

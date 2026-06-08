@@ -181,6 +181,7 @@ function KYCDashboardContent() {
 
   const handleLogout = () => {
     localStorage.removeItem("userData");
+    localStorage.removeItem("token");
     localStorage.removeItem("rememberLogin");
     localStorage.removeItem("savedEmail");
     localStorage.removeItem("savedCountryCode");
@@ -252,9 +253,14 @@ function KYCDashboardContent() {
         formData.append("service_type", storedServiceType);
       }
 
+      const token = localStorage.getItem('token');
+      const fetchHeaders = {};
+      if (token) {
+        fetchHeaders['Authorization'] = `Bearer ${token}`;
+      }
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/business-profile`,
-        { method: "POST", body: formData }
+        { method: "POST", headers: fetchHeaders, body: formData }
       );
 
       if (response.ok) {

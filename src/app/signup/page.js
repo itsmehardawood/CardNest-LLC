@@ -296,6 +296,11 @@ export default function SignUpPage() {
         );
       }
 
+      // Save JWT token from backend response
+      if (data.JWT_token) {
+        localStorage.setItem('token', data.JWT_token);
+      }
+
       // Step 3: Store user data in localStorage with both API and Firebase info
       const expiryTime = new Date().getTime() + 3 * 60 * 60 * 1000;
       const userData = {

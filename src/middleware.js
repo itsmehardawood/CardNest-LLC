@@ -1,21 +1,5 @@
 import { NextResponse } from 'next/server';
 
-/**
- * Middleware for subdomain-based routing.
- * 
- * - cryptoadmin.cardnest.io  →  internally rewrites to /crypto-dashboard/*
- * - kycadmin.cardnest.io     →  internally rewrites to /kyc-dashboard/*
- * - cardnest.io (main)  →  unchanged, serves existing routes
- * 
- * For local development add to your hosts file
- * (C:\Windows\System32\drivers\etc\hosts):
- *     127.0.0.1  cardnest.local
- *     127.0.0.1  cryptoadmin.cardnest.local
- *     127.0.0.1  kycadmin.cardnest.local
- *   Then access:
- *     http://cryptoadmin.cardnest.local:3000
- *     http://kycadmin.cardnest.local:3000
- */
 
 // Root domains to strip when extracting subdomains
 const ROOT_DOMAINS = ['cardnest.io', 'cardnest.local', 'localhost'];

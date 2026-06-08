@@ -7,33 +7,55 @@ const withLeadingSlash = (endpoint = '') =>
 
 const buildUrl = (baseUrl, endpoint) => `${baseUrl}${withLeadingSlash(endpoint)}`;
 
+/**
+ * Reads the JWT token from localStorage.
+ * Returns the token string or null if not found / not in a browser.
+ */
+function getAuthToken() {
+  if (typeof window === 'undefined') return null;
+  try {
+    return localStorage.getItem('token') || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Merges caller-supplied headers with a Content-Type default and,
+ * when a JWT token is present in localStorage, an Authorization header.
+ */
+function buildHeaders(callerHeaders = {}) {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...callerHeaders,
+  };
+
+  const token = getAuthToken();
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  return headers;
+}
+
 export async function apiFetch(endpoint, options = {}) {
   return fetch(buildUrl(BASE_URL, endpoint), {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
     ...options,
+    headers: buildHeaders(options.headers),
   });
 }
 
 export async function cryptoApiFetch(endpoint, options = {}) {
   return fetch(buildUrl(CRYPTO_BASE_URL, endpoint), {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
     ...options,
+    headers: buildHeaders(options.headers),
   });
 }
 
 export async function kycApiFetch(endpoint, options = {}) {
   return fetch(buildUrl(KYC_BASE_URL, endpoint), {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
     ...options,
+    headers: buildHeaders(options.headers),
   });
 }
 

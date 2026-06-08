@@ -30,6 +30,7 @@ const useAutoLogout = () => {
     if (timeout <= 0) {
       // Session already expired
       localStorage.removeItem('userData');
+      localStorage.removeItem('token');
       router.push('/login');
       return;
     }
@@ -37,6 +38,7 @@ const useAutoLogout = () => {
     // Set timer to auto logout when expiry is reached
     const timer = setTimeout(() => {
       localStorage.removeItem('userData');
+      localStorage.removeItem('token');
       router.push('/login');
     }, timeout);
 

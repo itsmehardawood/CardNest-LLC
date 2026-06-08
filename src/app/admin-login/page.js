@@ -146,7 +146,13 @@ export default function AdminLoginPage() {
         }
 
         // Step 2: Store user data in localStorage immediately after successful API call
-     const userData = data; // store entire backend response (or replace with your desired structure)
+      const userData = data; // store entire backend response (or replace with your desired structure)
+
+      // Save JWT token from backend response
+      if (data.JWT_token) {
+        localStorage.setItem('token', data.JWT_token);
+      }
+
 localStorage.setItem("userData", JSON.stringify(userData));
 setApiUserData(userData);
 
