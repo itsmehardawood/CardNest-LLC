@@ -49,11 +49,8 @@ const BillingLogsSection = ({ billingApiFetch }) => {
 
       // console.log('merchantId:', merchantId);
 
-      const response = await billingFetch(`/merchant/getOldSubscriptions?id=${merchantId}`, {
+      const response = await apiFetch(`/merchant/getOldSubscriptions`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
       });
 
       if (!response.ok) {
@@ -228,52 +225,29 @@ const BillingLogsSection = ({ billingApiFetch }) => {
               <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
                 <div className="flex flex-col">
                   <span className="font-medium">
-                    {subscription.package_id === 3
-                      ? 'Custom Enterprise Plan' 
-                      : subscription.package_id === 2 
-                        ? 'Premium Plan' 
-                        : subscription.package_id === 1 
-                          ? 'Basic Plan' 
-                          : subscription.package_id == null
-                            ? 'Custom Plan'
-                            : `Package ${subscription.package_id}`
-                    }
+                    Custom Package
                   </span>
-                  {/* {subscription.package_id === 3 && (
-                    <span className="text-xs text-purple-400 font-medium">
-                      Custom Package
-                    </span>
-                  )} */}
                 </div>
               </td>
               
               {/* API Calls Limit Column - Updated */}
               <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                {subscription.package_id === 3 
-                  ? (subscription.custom_api_count?.toLocaleString()  || 'N/A')
-                  : subscription.api_calls_limit?.toLocaleString() || 'N/A'
-                }
+                {Number(subscription.api_call_limit || subscription.api_calls_limit || 0).toLocaleString() || 'N/A'}
               </td>
               
               {/* API Calls Used Column - Updated */}
               <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
                 <div className="flex items-center">
                   <span className="mr-2">
-                    {subscription.package_id === 3 
-                      ? (subscription.custom_calls_used?.toLocaleString() || subscription.api_calls_used?.toLocaleString() || '0')
-                      : subscription.api_calls_used?.toLocaleString() || '0'
-                    }
+                    {Number(subscription.api_calls_used || subscription.custom_calls_used || 0).toLocaleString()}
                   </span>
-                  {subscription.api_calls_limit && (
+                  {(subscription.api_call_limit || subscription.api_calls_limit) && (
                     <div className="w-16 bg-gray-700 rounded-full h-2">
                       <div 
                         className="bg-blue-500 h-2 rounded-full" 
                         style={{
                           width: `${Math.min(
-                            (subscription.package_id === 3 
-                              ? (subscription.custom_calls_used || subscription.api_calls_used || 0) 
-                              : (subscription.api_calls_used || 0)
-                            ) / subscription.api_calls_limit * 100, 100)}%`
+                            (Number(subscription.api_calls_used || 0) / Number(subscription.api_call_limit || subscription.api_calls_limit || 1)) * 100, 100)}%`
                         }}
                       ></div>
                     </div>

@@ -57,7 +57,7 @@ const ApprovedStatus = ({ verificationData }) => {
                 </div>
               </div>
               <div className="space-y-4">
-                <div>
+                <div>  
                   <label className="text-sm font-medium text-gray-400 block mb-1">Account Holder</label>
                   <p className="text-base font-semibold text-white">
                     {(profile?.account_holder?.first_name && profile?.account_holder?.last_name) 

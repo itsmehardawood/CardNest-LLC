@@ -24,16 +24,18 @@ export default function AdminLoginPage() {
         }),
       });
       const data = await response.json();
+     
       if (data.status === true) {
+
+         if(data.JWT_token){
+        localStorage.setItem('token', data.JWT_token);
+      }
         // In your actual Next.js project, use:
         localStorage.setItem('userData', JSON.stringify(data));
-        // For demo purposes in this environment:
-        // console.log('Login successful:', data);
-        // alert('Login successful! Redirecting to dashboard...');
-        // In your actual Next.js project, use:
-        // window.location.href = '/dashboard';
-        // or with Next.js router:
+      
         router.push('/admin');
+
+
       } else {
         setError(data.message || 'Login failed');
       }

@@ -6,15 +6,10 @@ const ScanDetailsModal = ({ merchantId, scanData, onClose }) => {
   const [selectedScan, setSelectedScan] = useState(null);
   const [showScanDetailModal, setShowScanDetailModal] = useState(false);
 
+  // scanData is already filtered to this merchant by the parent (fetched per-merchant)
   const merchantScans = useMemo(() => {
-    const filtered = scanData.filter(scan => scan.merchant_id === merchantId);
-    // Sort by created_at in descending order (latest first)
-    return filtered.sort((a, b) => {
-      const dateA = new Date(a.created_at);
-      const dateB = new Date(b.created_at);
-      return dateB - dateA;
-    });
-  }, [scanData, merchantId]);
+    return [...(scanData || [])].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  }, [scanData]);
 
   const merchantInfo = merchantScans[0];
   

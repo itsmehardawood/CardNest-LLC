@@ -1,3 +1,4 @@
+import { apiFetch } from '@/app/lib/api.js';
 import { NextResponse } from 'next/server';
 
 export async function GET(request) {
@@ -12,14 +13,9 @@ export async function GET(request) {
       );
     }
 
-    const apiUrl = `${process.env.API_BASE_URL}/merchant/getCardScans?id=${merchantId}`;
     
-    const response = await fetch(apiUrl, {
+    const response = await apiFetch(`/merchant/getCardScans`, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
     });
 
     if (!response.ok) {

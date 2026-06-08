@@ -414,8 +414,8 @@ const renderCredentialsSection = () => {
               <div>
                 <p className="text-gray-300">Account Holder</p>
                 <p className="font-medium text-white break-words">
-                  {profile?.account_holder_first_name}{" "}
-                  {profile?.account_holder_last_name}
+                  {profile?.account_holder?.first_name}{" "}
+                  {profile?.account_holder?.last_name}
                 </p>
               </div>
               <div>
@@ -591,8 +591,8 @@ const renderCredentialsSection = () => {
             <div>
               <p className="text-gray-300">Account Holder</p>
               <p className="font-medium text-white break-words">
-                {profile?.account_holder_first_name}{" "}
-                {profile?.account_holder_last_name}
+                {profile?.account_holder?.first_name}{" "}
+                {profile?.account_holder?.last_name}
               </p>
             </div>
             <div>

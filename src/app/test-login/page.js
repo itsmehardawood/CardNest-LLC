@@ -15,11 +15,8 @@ const handleLogin = async () => {
   setError('');
 
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
+    const response = await apiFetch(`/auth/login`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify({
        service_type: "card_scan",
         country_code: countryCode,
@@ -29,6 +26,18 @@ const handleLogin = async () => {
     });
 
     const data = await response.json();
+
+    console.log("login data:", data);
+    if(data.JWT_token){ 
+      const jwtToken = data.JWT_token;
+
+      // Store token in localStorage
+      localStorage.setItem('token', jwtToken);
+
+      // Store token in session (so it survives page reloads)
+      sessionStorage.setItem('token', jwtToken);
+      
+    }
 
     if (data.status === true) {
       const userRole = data?.user?.role;

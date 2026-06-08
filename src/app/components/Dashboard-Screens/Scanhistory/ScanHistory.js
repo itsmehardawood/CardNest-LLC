@@ -98,10 +98,9 @@ const fetchScanHistory = async (encryptionKey = null) => {
       throw new Error('Merchant ID not found');
     }
 
-    const url = `/api/card-scans?id=${merchantId}`;
-    const response = await fetch(url, {
+    const url = `/merchant/getCardScans`;
+    const response = await apiFetch(url, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
     });
 
     if (!response.ok) {

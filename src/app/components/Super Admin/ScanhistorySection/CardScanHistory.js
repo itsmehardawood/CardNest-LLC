@@ -5,76 +5,30 @@ import SuperAdminDeviceInfo from "./SuperAdminDeviceInfo";
 import { decryptWithAES128 } from "@/app/lib/decrypt";
 import { Building, ChevronDown, ChevronRight } from 'lucide-react';
 
-// Merchant List Component
-const MerchantList = ({ scanData, onMerchantClick, searchQuery }) => {
+// ─── Merchant List Component ───────────────────────────────────────────────────
+// Now receives pre-aggregated merchant data directly from the API
+const MerchantList = ({ merchants, onMerchantClick, searchQuery, loadingMerchantId }) => {
   const [isOpen, setIsOpen] = useState(false);
-  
-  const merchantStats = useMemo(() => {
-    const grouped = scanData.reduce((acc, scan) => {
-      const merchantId = scan.merchant_id;
 
-      if (!acc[merchantId]) {
-        acc[merchantId] = {
-          merchant_id: merchantId,
-          business_name: scan.business_name,
-          merchant_key: scan.merchant_key,
-          total_scans: 0,
-          unique_users: new Set(),
-          unique_cards: new Set(),
-          success_count: 0,
-          failed_count: 0,
-          latest_scan: null,
-        };
-      }
-
-      acc[merchantId].total_scans++;
-      acc[merchantId].unique_users.add(scan.user_id);
-      acc[merchantId].unique_cards.add(scan.card_number_masked);
-
-      if (scan.status === "success") {
-        acc[merchantId].success_count++;
-      } else if (scan.status === "failed") {
-        acc[merchantId].failed_count++;
-      }
-
-      acc[merchantId].latest_scan = scan;
-
-      return acc;
-    }, {});
-
-    return (
-      Object.values(grouped)
-        .map((merchant) => {
-          const validScans = merchant.success_count + merchant.failed_count;
-          return {
-            ...merchant,
-            unique_users: merchant.unique_users.size,
-            unique_cards: merchant.unique_cards.size,
-            success_rate: validScans > 0
-              ? ((merchant.success_count / validScans) * 100).toFixed(1)
-              : 0,
-          };
-        })
-        // Fixed implementation with proper null checking
-        .filter((merchant) => {
-          const query = searchQuery.toLowerCase();
-          return (
-            merchant.merchant_id?.toLowerCase().includes(query) ||
-            merchant.merchant_key?.toLowerCase().includes(query) ||
-            merchant.business_name?.toLowerCase().includes(query)
-          );
-        })
+  const filtered = useMemo(() => {
+    const q = searchQuery.toLowerCase();
+    if (!q) return merchants;
+    return merchants.filter(
+      (m) =>
+        m.merchant_id?.toLowerCase().includes(q) ||
+        m.business_name?.toLowerCase().includes(q)
     );
-  }, [scanData, searchQuery]);
+  }, [merchants, searchQuery]);
 
   const getStatusBadge = (successRate) => {
-    if (successRate >= 95) {
+    const rate = parseFloat(successRate);
+    if (rate >= 95) {
       return (
         <span className="px-2 py-1 text-xs font-medium bg-green-900/50 text-green-300 rounded-full backdrop-blur-sm">
           Excellent
         </span>
       );
-    } else if (successRate >= 80) {
+    } else if (rate >= 80) {
       return (
         <span className="px-2 py-1 text-xs font-medium bg-yellow-900/50 text-yellow-300 rounded-full backdrop-blur-sm">
           Good
@@ -97,12 +51,12 @@ const MerchantList = ({ scanData, onMerchantClick, searchQuery }) => {
         className="w-full px-8 py-6 flex items-center justify-between hover:bg-white/5 transition-colors"
       >
         <div>
-         <div className="flex space-x-3">
-         <Building></Building>
-           <h2 className="text-2xl font-semibold text-gray-100 text-left">
-            Merchant Performance
-          </h2>
-         </div>
+          <div className="flex space-x-3">
+            <Building></Building>
+            <h2 className="text-2xl font-semibold text-gray-100 text-left">
+              Merchant Performance
+            </h2>
+          </div>
           <p className="text-sm text-gray-400 mt-1 text-left">
             Overview of scan activities across all merchants
           </p>
@@ -117,343 +71,256 @@ const MerchantList = ({ scanData, onMerchantClick, searchQuery }) => {
       {/* Accordion Content */}
       {isOpen && (
         <div className="px-8 pb-8">
-          {merchantStats.length === 0 ? (
-          <div className="text-center py-12 text-gray-400 bg-black/30 rounded-lg backdrop-blur-sm">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-500"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <p className="mt-4 text-lg font-medium text-gray-300">
-              {searchQuery
-                ? "No results found for search"
-                : "No scan data available"}
-            </p>
-            <p className="mt-1 text-sm text-gray-400">
-              {searchQuery
-                ? "Try adjusting your search terms"
-                : "Scan data will appear here once available"}
-            </p>
-          </div>
-        ) : (
-          <div className="grid gap-6">
-            {merchantStats.map((merchant) => (
-              <div
-                key={merchant.merchant_id}
-                onClick={() => onMerchantClick(merchant.merchant_id)}
-                className="bg-black/30 backdrop-blur-md border border-gray-700/50 rounded-xl p-6 hover:border-blue-500/50 hover:shadow-xl cursor-pointer transition-all duration-300 group"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-4">
-                      <div className="p-2 bg-blue-900/30 rounded-lg">
-                        <svg
-                          className="w-6 h-6 text-blue-400"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-6 0H5m4 0h4m0 0h2M9 7h6m-6 4h6m-6 4h6"
-                          />
-                        </svg>
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-semibold text-gray-100 group-hover:text-blue-300 transition-colors">
-                          {merchant.business_name}
-                        </h3>
-                        <div className="flex items-center space-x-2">
-                          <p className="text-sm text-gray-400 font-mono">
-                            Key: {merchant.merchant_key.substring(0, 20)}...
-                          </p>
-                          <button className="text-gray-400 hover:text-blue-300 transition-colors">
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                              />
+          {filtered.length === 0 ? (
+            <div className="text-center py-12 text-gray-400 bg-black/30 rounded-lg backdrop-blur-sm">
+              <svg className="mx-auto h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="mt-4 text-lg font-medium text-gray-300">
+                {searchQuery ? "No results found for search" : "No merchant data available"}
+              </p>
+              <p className="mt-1 text-sm text-gray-400">
+                {searchQuery ? "Try adjusting your search terms" : "Merchant data will appear here once available"}
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-6">
+              {filtered.map((merchant) => {
+                const isLoadingThis = loadingMerchantId === merchant.merchant_id;
+                return (
+                  <div
+                    key={merchant.merchant_id}
+                    onClick={() => !isLoadingThis && onMerchantClick(merchant.merchant_id)}
+                    className={`bg-black/30 backdrop-blur-md border border-gray-700/50 rounded-xl p-6 hover:border-blue-500/50 hover:shadow-xl transition-all duration-300 group ${isLoadingThis ? 'cursor-wait opacity-70' : 'cursor-pointer'}`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-4">
+                          <div className="p-2 bg-blue-900/30 rounded-lg">
+                            <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-6 0H5m4 0h4m0 0h2M9 7h6m-6 4h6m-6 4h6" />
                             </svg>
-                          </button>
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-semibold text-gray-100 group-hover:text-blue-300 transition-colors">
+                              {merchant.business_name || `Merchant (${merchant.merchant_id})`}
+                            </h3>
+                            <p className="text-sm text-gray-400 font-mono">
+                              ID: {merchant.merchant_id}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        {isLoadingThis ? (
+                          <div className="flex items-center justify-end space-x-2">
+                            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-400"></div>
+                            <span className="text-sm text-blue-400">Loading…</span>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="text-3xl font-bold text-blue-400">
+                              {merchant.total_scans}
+                            </div>
+                            <div className="text-sm text-gray-400 uppercase tracking-wide font-medium">
+                              Total Scans
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="mt-6 pt-4 border-t border-gray-700/50 flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        {getStatusBadge(merchant.success_rate)}
+                        <div className="text-sm text-gray-400">
+                          Success Rate:{" "}
+                          <span className="font-medium text-green-400">
+                            {merchant.success_rate}
+                          </span>
+                        </div>
+                        <div className="w-32 h-2 bg-gray-700/50 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-green-500"
+                            style={{ width: `${parseFloat(merchant.success_rate)}%` }}
+                          ></div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-3xl font-bold text-blue-400">
-                      {merchant.total_scans}
-                    </div>
-                    <div className="text-sm text-gray-400 uppercase tracking-wide font-medium">
-                      Total Scans
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-6 pt-4 border-t border-gray-700/50 flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    {getStatusBadge(merchant.success_rate)}
-                    <div className="text-sm text-gray-400">
-                      Success Rate:{" "}
-                      <span className="font-medium text-green-400">
-                        {merchant.success_rate}%
-                      </span>
-                    </div>
-                    <div className="w-32 h-2 bg-gray-700/50 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-green-500"
-                        style={{ width: `${merchant.success_rate}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-6 text-sm">
-                    <div className="text-center">
-                      <div className="font-medium text-gray-100">
-                        {merchant.unique_users}
-                      </div>
-                      <div className="text-xs text-gray-400">Users</div>
-                    </div>
-                    <div className="w-px h-6 bg-gray-700/50"></div>
-                    <div className="text-center">
-                      <div className="font-medium text-gray-100">
-                        {merchant.unique_cards}
-                      </div>
-                      <div className="text-xs text-gray-400">Cards</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 };
 
-// Stats Overview Component
-const StatsOverview = ({ scanData }) => {
+// ─── Stats Overview Component ──────────────────────────────────────────────────
+// Derived from the pre-aggregated merchant list
+const StatsOverview = ({ merchants }) => {
   const stats = useMemo(() => {
-    const totalScans = scanData.length;
-    const uniqueUsers = new Set(scanData.map((scan) => scan.user_id)).size;
-    const uniqueCards = new Set(scanData.map((scan) => scan.card_number_masked))
-      .size;
-    const successCount = scanData.filter(
-      (scan) => scan.status === "success"
-    ).length;
-    const failedCount = scanData.filter(
-      (scan) => scan.status === "failed"
-    ).length;
-    const validScans = successCount + failedCount;
-    const successRate =
-      validScans > 0 ? ((successCount / validScans) * 100).toFixed(1) : 0;
+    const totalMerchants = merchants.length;
+    const totalScans = merchants.reduce((sum, m) => sum + (m.total_scans || 0), 0);
 
-    return { totalScans, uniqueUsers, uniqueCards, successRate };
-  }, [scanData]);
+    // Average success rate across merchants with data
+    const merchantsWithRate = merchants.filter((m) => m.success_rate != null);
+    const avgSuccessRate =
+      merchantsWithRate.length > 0
+        ? (
+            merchantsWithRate.reduce(
+              (sum, m) => sum + parseFloat(m.success_rate),
+              0
+            ) / merchantsWithRate.length
+          ).toFixed(1)
+        : 0;
+
+    return { totalMerchants, totalScans, avgSuccessRate };
+  }, [merchants]);
+
+  const cards = [
+    {
+      label: 'Total Merchants',
+      value: stats.totalMerchants,
+      color: 'text-blue-400',
+      bgColor: 'bg-blue-900/30',
+      icon: (
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-6 0H5m4 0h4" />
+      ),
+    },
+    {
+      label: 'Total Scans',
+      value: stats.totalScans,
+      color: 'text-purple-400',
+      bgColor: 'bg-purple-900/30',
+      icon: (
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      ),
+    },
+    {
+      label: 'Avg. Success Rate',
+      value: `${stats.avgSuccessRate}%`,
+      color: 'text-yellow-400',
+      bgColor: 'bg-yellow-900/30',
+      icon: (
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      ),
+    },
+  ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div className="bg-black/30 backdrop-blur-md rounded-2xl p-6 border border-gray-700/50 hover:shadow-xl transition-all duration-300">
-        <div className="flex items-center">
-          <div className="p-3 bg-blue-900/30 rounded-lg mr-4">
-            <svg
-              className="w-8 h-8 text-blue-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-              />
-            </svg>
-          </div>
-          <div>
-            <p className="text-sm text-gray-400">Total Scans</p>
-            <p className="text-3xl font-bold text-gray-100">
-              {stats.totalScans}
-            </p>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+      {cards.map((card, i) => (
+        <div key={i} className="bg-black/30 backdrop-blur-md rounded-2xl p-6 border border-gray-700/50 hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center">
+            <div className={`p-3 ${card.bgColor} rounded-lg mr-4`}>
+              <svg className={`w-8 h-8 ${card.color}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {card.icon}
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm text-gray-400">{card.label}</p>
+              <p className={`text-3xl font-bold ${card.color}`}>{card.value}</p>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className="bg-black/30 backdrop-blur-md rounded-2xl p-6 border border-gray-700/50 hover:shadow-xl transition-all duration-300">
-        <div className="flex items-center">
-          <div className="p-3 bg-purple-900/30 rounded-lg mr-4">
-            <svg
-              className="w-8 h-8 text-purple-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-          </div>
-          <div>
-            <p className="text-sm text-gray-400">Unique Users</p>
-            <p className="text-3xl font-bold text-gray-100">
-              {stats.uniqueUsers}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-black/30 backdrop-blur-md rounded-2xl p-6 border border-gray-700/50 hover:shadow-xl transition-all duration-300">
-        <div className="flex items-center">
-          <div className="p-3 bg-green-900/30 rounded-lg mr-4">
-            <svg
-              className="w-8 h-8 text-green-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-              />
-            </svg>
-          </div>
-          <div>
-            <p className="text-sm text-gray-400">Unique Cards</p>
-            <p className="text-3xl font-bold text-gray-100">
-              {stats.uniqueCards}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-black/30 backdrop-blur-md rounded-2xl p-6 border border-gray-700/50 hover:shadow-xl transition-all duration-300">
-        <div className="flex items-center">
-          <div className="p-3 bg-yellow-900/30 rounded-lg mr-4">
-            <svg
-              className="w-8 h-8 text-yellow-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-          <div>
-            <p className="text-sm text-gray-400">Success Rate</p>
-            <p className="text-3xl font-bold text-gray-100">
-              {stats.successRate}%
-            </p>
-          </div>
-        </div>
-      </div>
+      ))}
     </div>
   );
 };
 
-// Main Component
+// ─── Main Component ────────────────────────────────────────────────────────────
 const CardScanHistory = () => {
-  const [scanData, setScanData] = useState([]);
+  const [merchants, setMerchants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedMerchant, setSelectedMerchant] = useState(null);
+
+  // Per-merchant scans state (fetched on click)
+  const [selectedMerchantId, setSelectedMerchantId] = useState(null);
+  const [merchantScans, setMerchantScans] = useState([]);
+  const [loadingMerchantId, setLoadingMerchantId] = useState(null);
+  const [merchantError, setMerchantError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [searchQuery, setSearchQuery] = useState("");
 
+  // ── Step 1: Fetch merchant summary list ──────────────────────────────────────
   useEffect(() => {
-    fetchScanData();
+    fetchMerchants();
   }, []);
 
-  const fetchScanData = async () => {
+  const fetchMerchants = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await apiFetch("/superadmin/access-all-scans");
       const result = await response.json();
 
-      if (result.status) {
-        // Process each scan to decrypt the encrypted_data using merchant_key
-        const processedScans = result.data.map(scan => {
-          let decryptedData = null;
-          
-          // Attempt to decrypt if encrypted_data and merchant_key are present
-          if (scan.encrypted_data && scan.merchant_key) {
-            try {
-              decryptedData = decryptWithAES128(scan.encrypted_data, scan.merchant_key);
-              // console.log(`✅ Decrypted scan for merchant ${scan.merchant_id}:`, decryptedData);
-            } catch (error) {
-              // console.error(`❌ Decryption failed for merchant ${scan.merchant_id}:`, error.message);
-            }
-          }
-
-          return {
-            ...scan,
-            decrypted_data: decryptedData
-          };
-        });
-
-        setScanData(processedScans);
-        // console.log("Fetched and processed scan data:", processedScans);
+      if (result.status && result.data?.merchants) {
+        setMerchants(result.data.merchants);
       } else {
-        setError("Failed to fetch scan data");
+        setError(result.message || "Failed to fetch merchant data");
       }
     } catch (err) {
-      setError("Error fetching scan data: " + err.message);
+      setError("Error fetching merchants: " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleMerchantClick = (merchantId) => {
-    setSelectedMerchant(merchantId);
-    setIsModalOpen(true);
+  // ── Step 2: Fetch per-merchant scans on click ─────────────────────────────────
+  const handleMerchantClick = async (merchantId) => {
+    setLoadingMerchantId(merchantId);
+    setMerchantError(null);
+
+    try {
+      const response = await apiFetch(`/superadmin/access-all-scans/${merchantId}`);
+      const result = await response.json();
+
+      if (result.status && result.data?.scans) {
+        // Decrypt encrypted_data using encryption_key per scan (same as before)
+        const processedScans = result.data.scans.map((scan) => {
+          let decryptedData = null;
+          const key = scan.encryption_key || scan.merchant_key;
+          if (scan.encrypted_data && key) {
+            try {
+              decryptedData = decryptWithAES128(scan.encrypted_data, key);
+            } catch {
+              // decryption failure is non-fatal
+            }
+          }
+          return { ...scan, decrypted_data: decryptedData };
+        });
+
+        setMerchantScans(processedScans);
+        setSelectedMerchantId(merchantId);
+        setIsModalOpen(true);
+      } else {
+        setMerchantError(result.message || "Failed to fetch scans for merchant");
+      }
+    } catch (err) {
+      setMerchantError("Error loading merchant scans: " + err.message);
+    } finally {
+      setLoadingMerchantId(null);
+    }
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setSelectedMerchant(null);
+    setSelectedMerchantId(null);
+    setMerchantScans([]);
   };
 
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
+  // ── Loading / Error states ────────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="min-h-screen bg-black p-8 flex flex-col items-center justify-center">
         <div className="flex flex-col items-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mb-4"></div>
-          <h3 className="text-2xl font-medium text-gray-100">
-            Loading Scan Data
-          </h3>
-          <p className="text-gray-400 mt-2">
-            Please wait while we fetch the latest information
-          </p>
+          <h3 className="text-2xl font-medium text-gray-100">Loading Scan Data</h3>
+          <p className="text-gray-400 mt-2">Please wait while we fetch the latest information</p>
         </div>
       </div>
     );
@@ -465,41 +332,19 @@ const CardScanHistory = () => {
         <div className="bg-red-900/20 backdrop-blur-md border border-red-700/50 rounded-2xl p-8 max-w-md w-full">
           <div className="flex items-center mb-4">
             <div className="p-3 bg-red-900/30 rounded-lg mr-4">
-              <svg
-                className="w-8 h-8 text-red-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
+              <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 className="text-xl font-medium text-gray-100">
-              Error Loading Data
-            </h3>
+            <h3 className="text-xl font-medium text-gray-100">Error Loading Data</h3>
           </div>
           <div className="text-red-300 text-sm">{error}</div>
           <button
-            onClick={fetchScanData}
+            onClick={fetchMerchants}
             className="mt-6 bg-red-700/80 hover:bg-red-600 text-gray-100 px-6 py-3 rounded-lg transition-all duration-300 w-full flex items-center justify-center backdrop-blur-sm"
           >
-            <svg
-              className="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
             Retry
           </button>
@@ -512,53 +357,54 @@ const CardScanHistory = () => {
     <div className="min-h-screen bg-black p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-10">
-          <h1 className="text-4xl font-bold text-gray-100">
-            Card Scan History
-          </h1>
-          <p className="text-gray-400 mt-2 text-sm">
-            View and manage card scan records by merchant
-          </p>
+          <h1 className="text-4xl font-bold text-gray-100">Card Scan History</h1>
+          <p className="text-gray-400 mt-2 text-sm">View and manage card scan records by merchant</p>
         </div>
 
+        {/* Search */}
         <div className="mb-8">
           <div className="relative">
             <input
               type="text"
               value={searchQuery}
-              onChange={handleSearchChange}
-              placeholder="Search by Business Name, Merchant ID or Key..."
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search by Business Name or Merchant ID..."
               className="w-full bg-black/30 border border-gray-700/50 rounded-lg py-3 px-4 pl-10 text-gray-100 placeholder-gray-400 focus:outline-none focus:border-blue-500/50"
             />
-            <svg
-              className="absolute left-3 top-3.5 h-5 w-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
+            <svg className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
         </div>
 
-        <StatsOverview scanData={scanData} />
+        {/* Stats */}
+        <StatsOverview merchants={merchants} />
 
+        {/* Per-merchant API error banner */}
+        {merchantError && (
+          <div className="mb-4 bg-red-900/20 border border-red-700/50 rounded-xl p-4 text-red-300 text-sm flex items-center space-x-2">
+            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{merchantError}</span>
+          </div>
+        )}
+
+        {/* Merchant List */}
         <MerchantList
-          scanData={scanData}
+          merchants={merchants}
           onMerchantClick={handleMerchantClick}
           searchQuery={searchQuery}
+          loadingMerchantId={loadingMerchantId}
         />
 
         <SuperAdminDeviceInfo />
 
+        {/* Scan Details Modal — receives the fetched per-merchant scans */}
         {isModalOpen && (
           <ScanDetailsModal
-            merchantId={selectedMerchant}
-            scanData={scanData}
+            merchantId={selectedMerchantId}
+            scanData={merchantScans}
             onClose={handleCloseModal}
           />
         )}

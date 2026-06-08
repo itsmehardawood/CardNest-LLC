@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Check, CreditCard, Shield, Zap, Phone, RotateCcw, Lock, AlertCircle } from 'lucide-react';
 import Image from 'next/image';
-import { resolveApiFetchContext } from '@/app/lib/api.js';
+import { apiFetch, resolveApiFetchContext } from '@/app/lib/api.js';
 
 const CreditCardFeatureSelector = () => {
   const [selectedFeatures, setSelectedFeatures] = useState({
@@ -50,43 +50,45 @@ const CreditCardFeatureSelector = () => {
   };
 
   // Function to load existing features
-  const loadExistingFeatures = async (userIdToUse) => {
-    if (!userIdToUse) return;
+  const loadExistingFeatures = async () => {
     
     setIsLoadingFeatures(true);
     try {
-      const fetcher = resolveApiFetchContext();
-      const response = await fetcher(`/feature/get?user_id=${userIdToUse}`, {
+      // const fetcher = resolveApiFetchContext();
+      const response = await apiFetch(`/feature/get`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      
       });
 
       const responseData = await response.json();
 
       if (response.ok && responseData.code === 200 && responseData.data) {
-        const data = responseData.data;
+        const rawData = responseData.data;
+        const data = Array.isArray(rawData) ? rawData[0] : rawData;
         
-        // Convert the API response to boolean values
-        // Handle both string and number values from API (1/"1" = true, 0/"0" = false)
-        setSelectedFeatures({
-          bank_logo: Boolean(Number(data.bank_logo)),
-          chip: Boolean(Number(data.chip)),
-          mag_strip: Boolean(Number(data.mag_strip)),
-          sig_strip: Boolean(Number(data.sig_strip)),
-          hologram: Boolean(Number(data.hologram)),
-          customer_service: Boolean(Number(data.customer_service)),
-          symmetry: Boolean(Number(data.symmetry))
-        });
-        
-        setHasExistingFeatures(true);
-        setMessage('Previously saved features loaded successfully!');
-        
-        // Clear the success message after 3 seconds
-        setTimeout(() => {
-          setMessage('');
-        }, 3000);
+        if (data) {
+          // Convert the API response to boolean values
+          // Handle both string and number values from API (1/"1" = true, 0/"0" = false)
+          setSelectedFeatures({
+            bank_logo: Boolean(Number(data.bank_logo)),
+            chip: Boolean(Number(data.chip)),
+            mag_strip: Boolean(Number(data.mag_strip)),
+            sig_strip: Boolean(Number(data.sig_strip)),
+            hologram: Boolean(Number(data.hologram)),
+            customer_service: Boolean(Number(data.customer_service)),
+            symmetry: Boolean(Number(data.symmetry))
+          });
+          
+          setHasExistingFeatures(true);
+          setMessage('Previously saved features loaded successfully!');
+          
+          // Clear the success message after 3 seconds
+          setTimeout(() => {
+            setMessage('');
+          }, 3000);
+        } else {
+          setHasExistingFeatures(false);
+        }
       } else {
         // No existing features found, keep default values
         setHasExistingFeatures(false);
@@ -101,17 +103,14 @@ const CreditCardFeatureSelector = () => {
   };
 
   const handleSubmit = async () => {
-    if (!userId) {
-      setMessage('Error: User ID not found. Please log in again.');
-      return;
-    }
+  
 
     setIsSubmitting(true);
     setMessage('');
 
     try {
       const requestBody = {
-        user_id: userId,
+        // user_id: userId,
         bank_logo: selectedFeatures.bank_logo,
         chip: selectedFeatures.chip,
         mag_strip: selectedFeatures.mag_strip,

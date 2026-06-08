@@ -16,7 +16,7 @@ function DevelopersScreen() {
     setError(null);
     
     try {
-      const response = await apiFetch(`/superadmin/getDocumentation`, {
+      const response = await apiFetch(`/getDocumentation`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
