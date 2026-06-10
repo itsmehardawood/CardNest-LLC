@@ -57,9 +57,9 @@ const DeviceInfo = () => {
 
       // Build query parameters based on year selection
       const queryParams = `year=${selectedYear}&month=${selectedMonth}&date=${selectedDate}`;
-      const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/device/merchant/${merchantId}?${queryParams}`;
+      const url = `/device/merchant/${merchantId}?${queryParams}`;
 
-      const response = await fetch(url, {
+      const response = await apiFetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

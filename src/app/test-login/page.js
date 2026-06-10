@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { apiFetch } from '../lib/api.js';
 
 export default function LoginPage() {
-  const [countryCode, setCountryCode] = useState('+92');
+  const [countryCode, setCountryCode] = useState('+1');
   const [loginInput, setLoginInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
