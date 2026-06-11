@@ -1,3 +1,4 @@
+import { apiFetch } from '@/app/lib/api.js';
 import React, { useState, useEffect } from 'react';
 
 const DisplaySettings = () => {
@@ -19,7 +20,7 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
   try {
     setDebugInfo('Fetching existing display info...');
     
-    const response = await fetch(`https://admin.cardnest.io/api/getmerchantDisplayInfo?merchantId=${encodeURIComponent(merchantIdValue)}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/getmerchantDisplayInfo?merchantId=${encodeURIComponent(merchantIdValue)}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -215,7 +216,7 @@ const fetchMerchantDisplayInfo = async (merchantIdValue) => {
       setDebugInfo('Sending FormData to API...');
 
       // Use FormData instead of JSON
-      const response = await fetch('https://admin.cardnest.io/api/updateMerchantScanInfo', {
+      const response = await apiFetch('/updateMerchantScanInfo', {
         method: 'POST',
         // Don't set Content-Type header - let browser set it with boundary for FormData
         headers: {
